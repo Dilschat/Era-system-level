@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Erasystemlevel.Tokenizer;
 
 namespace HelloWorld
@@ -8,7 +9,11 @@ namespace HelloWorld
         static void Main()
         {
             Tokenizer tok = new Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tokenizer/text.txt");
-            tok.tokenize();
+            LinkedList<Token> list = tok.Tokenize();
+            while(list.Count!=0){
+                Console.WriteLine(list.First.Value.ToString());
+                list.RemoveFirst();
+            }
         }
     }
 }
