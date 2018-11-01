@@ -1,5 +1,0 @@
-/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/bin/Debug/Era-system-level.exe
-/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/bin/Debug/Era-system-level.pdb
-/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/obj/x86/Debug/Era-system-level.csproj.CoreCompileInputs.cache
-/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/obj/x86/Debug/Era-system-level.exe
-/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/obj/x86/Debug/Era-system-level.pdb
