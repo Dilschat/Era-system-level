@@ -9,11 +9,29 @@ namespace Erasystemlevel.Tokenizer
 {
     public class Tokenizer
     {
-        Regex numericRegex = new Regex("1");
-        Regex identifierRegex = new Regex("f");
-        HashSet<string> delimeters = new HashSet<string>(new List<string>() { ";", "," });
-        HashSet<string> operators = new HashSet<string>(new List<string>() { ">", "<" });
-        HashSet<string> keywords = new HashSet<string>(new List<string>() { "if", "else" });
+        Regex numericRegex = new Regex("(^0|[1-9]+)([\\.][0-9]+)?$");
+        Regex identifierRegex = new Regex("\b([_a-zA-Z]{1}[0-9a-zA-Z_]{0,31})\b.*");
+        Regex register = new Regex("\bR([0-9]|[12][0-9]|3[01])\b");
+        HashSet<string> delimeters = new HashSet<string>(new List<string>()
+        {
+            ";", ",", ".", ":", "(", ")", "[", "]", "//"
+        });
+        HashSet<string> operators = new HashSet<string>(new List<string>()
+        {
+            "+", "-", "*", "&", "|", "^", "?", "=", "<", ">", "/=", ":=",
+            "+=", "-=", ">>=", "<<=", "|=", "&=", "^=", "<=", ">=", "?=",
+            "<=>"
+            
+        });
+
+        HashSet<string> keywords = new HashSet<string>(new List<string>()
+        {
+            "if", "else", "int", "short", "byte", "const", "routine", "do", "end",
+            "start", "entry", "skip", "stop", "goto", "format", "for", "from", "to",
+            "step", "while", "loop", "break", "then", "by", "nop", "trace", "data", 
+            "ld", "lda", "st", "mov", "add", "sub", "asr", "asl", "or", "and", "xor",
+            "lsl", "lsr", "cnd", "cbr"
+        });
         StreamReader reader;
 
 
@@ -35,7 +53,7 @@ namespace Erasystemlevel.Tokenizer
                 string currentToken = String.Empty;
                 for (int i = 0; i < chars.Length; i++)
                 {
-                    if(chars[i] == ' ' || chars[i] =='\n'){
+                    if(chars[i] == "" || chars[i] =="/n"){
                         continue;
                     }
                     currentToken += chars[i];
@@ -74,7 +92,7 @@ namespace Erasystemlevel.Tokenizer
                             continue;
                         }
                         char nextChar = chars[i + 1];
-                        if (!Char.IsDigit(nextChar)&&!Char.IsLetter(nextChar)&&nextChar!='_'){
+                        if (!Char.IsDigit(nextChar)&&!Char.IsLetter(nextChar)&&nextChar!="_"){
                             list.AddLast(new Token(Token.TokenType.Keyword, currentToken));
                             currentToken = "";
                             continue;
@@ -87,7 +105,7 @@ namespace Erasystemlevel.Tokenizer
                             continue;
                         }
                         char nextChar = chars[i + 1];
-                        if (Char.IsDigit(nextChar) && Char.IsLetter(nextChar) && nextChar != '_')
+                        if (Char.IsDigit(nextChar) && Char.IsLetter(nextChar) && nextChar != "_")
                         {
                             continue;
                         }else{
