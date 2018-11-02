@@ -1,9 +1,10 @@
 ﻿using System;
 namespace Erasystemlevel.Exception
 {
-    public class SyntaxError
+    public class SyntaxError : SystemException
     {
-        public SyntaxError()
+        public SyntaxError(string message)
+            :base(message)
         {
         }
     }
