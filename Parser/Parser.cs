@@ -45,6 +45,7 @@ namespace Erasystemlevel.Parser
             {
 
             }
+            return null;
 
         }
 
@@ -105,12 +106,12 @@ namespace Erasystemlevel.Parser
 
             try{
                 variable.addChild(parseType());
-            }catch(){
+            }catch(SystemException e){
 
             }
             Token nextToken = tokens.First.Value;
 
-            while (nextToken.GetValue.Equals(";")){
+            while (nextToken.GetValue().Equals(";")){
 
             }
         }
@@ -118,10 +119,7 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
-        private AstNode parseStatement()
-        {
-            return null;
-        }
+
 
         private AstNode parseIdentifier()
         {
@@ -239,30 +237,58 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>The assigment.</returns>
-
-        private AstNode parseExpression()
+        private AstNode parseOperand()
         {
             return null;
         }
-        private AstNode parseExpression()
+        private AstNode parseOperator()
         {
             return null;
         }
-        private AstNode parseExpression()
+        private AstNode parsePrimitiveOperator()
         {
             return null;
         }
-        private AstNode parseExpression()
+        private AstNode parseAssemblerStatement()
         {
             return null;
         }
-
-
-
+        private AstNode parseRegister()
+        {
+            return null;
+        }
+        private AstNode parseDirective()
+        {
+            return null;
+        }
+        private AstNode parseExtensionStatement()
+        {
+            return null;
+        }
+        private AstNode parseFor()
+        {
+            return null;
+        }
+        private AstNode parseWhile()
+        {
+            return null;
+        }
+        private AstNode parseLoopBody()
+        {
+            return null;
+        }
+        private AstNode parseBreak()
+        {
+            return null;
+        }
+        private AstNode parseSwap()
+        {
+            return null;
+        }
+        private AstNode parseGoto()
+        {
+            return null;
+        }
         private AstNode parseAssigment(){
             AstNode assigment = new AstNode("Assigment");
             Token nextToken = tokens.First.Value;
