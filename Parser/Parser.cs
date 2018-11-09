@@ -270,17 +270,74 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
+
         private AstNode parseLoopBody()
         {
-            return null;
+            AstNode loopBody = new AstNode("LoopBody");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("loop"))
+            {
+                loopBody.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse loop");
+            }
+
+            while(true){
+                try{
+                    loopBody.addChild(parseStatement());
+                }catch(SyntaxError e){
+                    nextToken = tokens.First.Value;
+                    if (nextToken.GetValue().Equals("end"))
+                    {
+                        loopBody.addChild(new AstNode(nextToken));
+                        tokens.RemoveFirst();
+                        return loopBody;
+                    }
+                    else
+                    {
+                        throw new SyntaxError("Can't parse loop");
+                    }
+                }
+            }
+
         }
+
         private AstNode parseBreak()
         {
-            return null;
+            AstNode breakNode = new AstNode("Break");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("break"))
+            {
+                breakNode.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse swap");
+            }
+            return breakNode;
         }
+
         private AstNode parseSwap()
         {
-            return null;
+            AstNode swap = new AstNode("Swap");
+            swap.addChild(parsePrimary());
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("<=>"))
+            {
+                swap.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse swap");
+            }
+            swap.addChild(parsePrimary());
+
+            return swap;
         }
 
         private AstNode parseGoto()
