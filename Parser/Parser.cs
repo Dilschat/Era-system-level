@@ -233,10 +233,7 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
-        private AstNode parseExpression()
-        {
-            return null;
-        }
+
         private AstNode parseOperand()
         {
             return null;
@@ -285,15 +282,44 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
+
         private AstNode parseGoto()
         {
-            return null;
+            AstNode go_to = new AstNode("GoTo");
+            Token nextToken = tokens.First.Value;
+
+            if (nextToken.GetValue().Equals("goto"))
+            {
+                go_to.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse goto");
+            }
+
+            go_to.addChild(parseIdentifier());
+
+
+
+            return go_to;
         }
         private AstNode parseAssigment(){
             AstNode assigment = new AstNode("Assigment");
-            Token nextToken = tokens.First.Value;
             assigment.addChild(parsePrimary());
-
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals(":="))
+            {
+                assigment.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse assigment");
+            }
+            assigment.addChild(parseExpression());
+            return assigment;
         }
 
 
