@@ -133,6 +133,8 @@ namespace Erasystemlevel.Parser
 
         private AstNode parseDeclaration()
         {
+            AstNode variable = new AstNode("Declaration");
+
             return null;
         }
 
@@ -268,7 +270,31 @@ namespace Erasystemlevel.Parser
         }
         private AstNode parseWhile()
         {
-            return null;
+            AstNode whileStatement = new AstNode("While");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("while"))
+            {
+                whileStatement.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse while");
+            }
+            while (true)
+            {
+                try
+                {
+                    whileStatement.addChild(parseExpression());
+                }
+                catch (SyntaxError e)
+                {
+                    nextToken = tokens.First.Value;
+                    whileStatement.addChild(parseLoopBody);
+                }
+            }
+
+            return whileStatement;
         }
 
         private AstNode parseLoopBody()
