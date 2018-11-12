@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Erasystemlevel.Exception;
-using Erasystemlevel.Tokenizer;
+using static Erasystemlevel.Tokenizer;
 
 namespace Erasystemlevel.Parser
 {
@@ -227,10 +227,7 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
-        private AstNode parseRegister()
-        {
-            return null;
-        }
+
         private AstNode parseExplicitAddress()
         {
             return null;
@@ -240,34 +237,114 @@ namespace Erasystemlevel.Parser
         {
             return null;
         }
+
         private AstNode parseOperator()
         {
             return null;
         }
+
         private AstNode parsePrimitiveOperator()
         {
-            return null;
+            AstNode primitiveOperator = new AstNode("PrimitiveOperator");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("=") || nextToken.GetValue().Equals("/=")
+               || nextToken.GetValue().Equals("<") || nextToken.GetValue().Equals(">"))
+            {
+                primitiveOperator.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse register");
+            }
+            return primitiveOperator;
         }
+
         private AstNode parseAssemblerStatement()
         {
             return null;
         }
+
         private AstNode parseRegister()
         {
-            return null;
+            AstNode register = new AstNode("Register");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals()) //TODO add regex for registers
+            {
+                register.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse register");
+            }
+
+            return register;
         }
+
         private AstNode parseDirective()
         {
-            return null;
+            AstNode directive = new AstNode("Directive");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("format"))
+            {
+                directive.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse directive");
+            }
+            if (nextToken.GetValue().Equals("8") || nextToken.GetValue().Equals("16") 
+                || nextToken.GetValue().Equals("32"))
+            {
+                directive.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+            }
+            else
+            {
+                throw new SyntaxError("Can't parse directive");
+            }
+            return directive;
         }
+
         private AstNode parseExtensionStatement()
         {
             return null;
         }
+
         private AstNode parseFor()
         {
-            return null;
+            AstNode forStatement = new AstNode("For");
+            Token nextToken = tokens.First.Value;
+            if (nextToken.GetValue().Equals("for"))
+            {
+                forStatement.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+                forStatement.addChild(parseIdentifier());
+            }
+            if (nextToken.GetValue().Equals("from"))
+            {
+                forStatement.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+                forStatement.addChild(parseExpression());
+            }
+            if (nextToken.GetValue().Equals("to"))
+            {
+                forStatement.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+                forStatement.addChild(parseExpression());
+            }
+            if (nextToken.GetValue().Equals("step"))
+            {
+                forStatement.addChild(new AstNode(tokens.First.Value));
+                tokens.RemoveFirst();
+                forStatement.addChild(parseExpression());
+            }
+            forStatement.addChild(parseLoopBody());
+            return forStatement;
         }
+
         private AstNode parseWhile()
         {
             AstNode whileStatement = new AstNode("While");
@@ -276,24 +353,9 @@ namespace Erasystemlevel.Parser
             {
                 whileStatement.addChild(new AstNode(tokens.First.Value));
                 tokens.RemoveFirst();
+                whileStatement.addChild(parseExpression());
             }
-            else
-            {
-                throw new SyntaxError("Can't parse while");
-            }
-            while (true)
-            {
-                try
-                {
-                    whileStatement.addChild(parseExpression());
-                }
-                catch (SyntaxError e)
-                {
-                    nextToken = tokens.First.Value;
-                    whileStatement.addChild(parseLoopBody);
-                }
-            }
-
+            whileStatement.addChild(parseLoopBody();
             return whileStatement;
         }
 
@@ -388,6 +450,7 @@ namespace Erasystemlevel.Parser
 
             return go_to;
         }
+
         private AstNode parseAssigment(){
             AstNode assigment = new AstNode("Assigment");
             assigment.addChild(parsePrimary());
@@ -404,7 +467,5 @@ namespace Erasystemlevel.Parser
             assigment.addChild(parseExpression());
             return assigment;
         }
-
-
     }
 }

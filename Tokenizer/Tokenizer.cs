@@ -9,9 +9,9 @@ namespace Erasystemlevel.Tokenizer
 {
     public class Tokenizer
     {
-        Regex numericRegex = new Regex("(^0|[1-9]+)([\\.][0-9]+)?$");
+        Regex numericRegex = new Regex("^(\+|-)?\d+$");
         Regex identifierRegex = new Regex("\b([_a-zA-Z]{1}[0-9a-zA-Z_]{0,31})\b.*");
-        Regex register = new Regex("\bR([0-9]|[12][0-9]|3[01])\b");
+        public Regex register = new Regex("\bR([0-9]|[12][0-9]|3[01])\b");
         HashSet<string> delimeters = new HashSet<string>(new List<string>()
         {
             ";", ",", ".", ":", "(", ")", "[", "]", "//"
