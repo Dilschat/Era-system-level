@@ -12,8 +12,22 @@ namespace Erasystemlevel.Parser
             this.value = value;
         }
 
+        public void setValue(Object value){
+            this.value = value;
+        }
+
+        public Object getValue(){
+            return this.value;
+        }
+
         public void addChild(AstNode node){
             childs.Add(node);
         }
+
+        public void cleanChild(){
+            childs = new ArrayList();
+        }
+
+
     }
 }

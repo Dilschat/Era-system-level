@@ -9,12 +9,12 @@ namespace Erasystemlevel.Tokenizer
 {
     public class Tokenizer
     {
-        Regex numericRegex = new Regex("^(\+|-)?\d+$");
-        Regex identifierRegex = new Regex("\b([_a-zA-Z]{1}[0-9a-zA-Z_]{0,31})\b.*");
-        public Regex register = new Regex("\bR([0-9]|[12][0-9]|3[01])\b");
+        Regex numericRegex = new Regex("^(\\+|-)?\\d+$");
+        Regex identifierRegex = new Regex("\\b([A-Za-z][A-Za-z0-9_]*)\\b");
+        public Regex register = new Regex("\\bR([0-9]|[12][0-9]|3[01])\\b");
         HashSet<string> delimeters = new HashSet<string>(new List<string>()
         {
-            ";", ",", ".", ":", "(", ")", "[", "]", "//"
+            ";", ",", ".", "(", ")", "[", "]", "//"
         });
         HashSet<string> operators = new HashSet<string>(new List<string>()
         {
@@ -42,98 +42,75 @@ namespace Erasystemlevel.Tokenizer
             this.reader = new StreamReader(fs, Encoding.UTF8);
         }
 
-        public LinkedList<Token> Tokenize()
+        public Token Tokenize()
         {
-            LinkedList<Token> list = new LinkedList<Token>();
+            string currentToken = String.Empty;
 
             while (!this.reader.EndOfStream)
             {
-                string input = this.reader.ReadLine();
-                char[] chars = input.ToCharArray();
-                string currentToken = String.Empty;
-                for (int i = 0; i < chars.Length; i++)
-                {
-                    if(chars[i] == "" || chars[i] =="/n"){
+                
+                    Char next = Convert.ToChar(this.reader.Read());
+                    if (next.ToString() == "" || next.ToString() =="\n" || next.ToString() == " "){
                         continue;
                     }
-                    currentToken += chars[i];
+                    currentToken += next;
+                    //Console.WriteLine(currentToken);
 
                     if (delimeters.Contains(currentToken))
                     {
-                        list.AddLast(new Token(Token.TokenType.Delimiter, currentToken)) ;
-                        currentToken = "";
-                        continue;
+                        return new Token(Token.TokenType.Delimiter, currentToken); 
+                    }
+                    if(register.IsMatch(currentToken)){
+                    char nextChar = Convert.ToChar(this.reader.Peek());
 
+                    if (!Char.IsDigit(nextChar) && !Char.IsLetter(nextChar) && nextChar.ToString() != "_"){
+                        return new Token(Token.TokenType.Register, currentToken);
+                    }
                     }
                     if (operators.Contains(currentToken))
                     {
-                        String extendedToken = currentToken;
-                        while (operators.Contains(extendedToken)){
-                            currentToken = extendedToken;
-                            i++;
-                            if (i == chars.Length)
-                            {
-                                break;
-                            }
-                            extendedToken = currentToken + chars[i];
+                        while (operators.Contains(currentToken+ Convert.ToChar(this.reader.Peek()))){
+                            currentToken = currentToken + Convert.ToChar(this.reader.Read());  
                         }
-                        i--;
-                        list.AddLast(new Token(Token.TokenType.Operator, currentToken));
-                        currentToken = "";
-                        continue;
-
+                        return new Token(Token.TokenType.Operator, currentToken);
 
                     }
                     if (keywords.Contains(currentToken)){
-                        if (i + 1 == chars.Length)
+                        if (this.reader.EndOfStream || Convert.ToString(this.reader.Peek()).Equals(" ") || Convert.ToString(this.reader.Peek()).Equals("/n"))
                         {
-                            list.AddLast(new Token(Token.TokenType.Keyword, currentToken));
-                            currentToken = "";
-                            continue;
+                            return new Token(Token.TokenType.Keyword, currentToken);
                         }
-                        char nextChar = chars[i + 1];
-                        if (!Char.IsDigit(nextChar)&&!Char.IsLetter(nextChar)&&nextChar!="_"){
-                            list.AddLast(new Token(Token.TokenType.Keyword, currentToken));
-                            currentToken = "";
-                            continue;
+                        char nextChar = Convert.ToChar(this.reader.Peek());
+                        if (!Char.IsDigit(nextChar)&&!Char.IsLetter(nextChar)&& nextChar.ToString()!="_"){
+                            return new Token(Token.TokenType.Keyword, currentToken);
                         }
                     }
                     if(identifierRegex.IsMatch(currentToken)){
-                        if(i+1 == chars.Length){
-                            list.AddLast(new Token(Token.TokenType.Identifier, currentToken));
-                            currentToken = "";
-                            continue;
+                        if(this.reader.EndOfStream || Convert.ToString(this.reader.Peek()).Equals(" ") || Convert.ToString(this.reader.Peek()).Equals("/n"))
+                        {
+                            return new Token(Token.TokenType.Identifier, currentToken);
                         }
-                        char nextChar = chars[i + 1];
-                        if (Char.IsDigit(nextChar) && Char.IsLetter(nextChar) && nextChar != "_")
+                        char nextChar = Convert.ToChar(this.reader.Peek());
+                        if ((Char.IsDigit(nextChar) || Char.IsLetter(nextChar)) && nextChar != ' ')
                         {
                             continue;
                         }else{
-                            list.AddLast(new Token(Token.TokenType.Identifier, currentToken));
-                            currentToken = "";
-                            continue;
+                            return new Token(Token.TokenType.Identifier, currentToken);
                         }
                     }
                     if (numericRegex.IsMatch(currentToken))
                     {
-                        String extendedToken = currentToken;
-                        while (numericRegex.IsMatch(extendedToken)){
-                            currentToken = extendedToken;
-                            i++;
-                            if(i == chars.Length){
-                                break;
-                            }
-                            extendedToken = currentToken + chars[i];
+                        while (numericRegex.IsMatch(currentToken+Convert.ToChar(this.reader.Peek())) && !this.reader.EndOfStream){
+                            currentToken = currentToken + Convert.ToChar(this.reader.Read());
                         }
-                        i--;
-                        list.AddLast(new Token(Token.TokenType.Number, currentToken));
-                        currentToken = "";
-                        continue;
+                       return new Token(Token.TokenType.Number, currentToken);
+
                     }
-                }
+
 
             }
-            return list;
+            this.reader.Close();
+            return null;
         }
 
 
