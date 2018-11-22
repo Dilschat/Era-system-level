@@ -28,9 +28,7 @@ namespace Erasystemlevel.Tokenizer
         {
             "if", "else", "int", "short", "byte", "const", "routine", "do", "end",
             "start", "entry", "skip", "stop", "goto", "format", "for", "from", "to",
-            "step", "while", "loop", "break", "then", "by", "nop", "trace", "data", 
-            "ld", "lda", "st", "mov", "add", "sub", "asr", "asl", "or", "and", "xor",
-            "lsl", "lsr", "cnd", "cbr"
+            "step", "while", "loop", "break", "then", "by", "trace", "data", "module", "code"
         });
         StreamReader reader;
 

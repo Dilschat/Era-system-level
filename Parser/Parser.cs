@@ -734,11 +734,39 @@ namespace Erasystemlevel.Parser
 
         private AstNode parseVariableReference()//TODO finish node
         {
-            return null;
+            AstNode variableReference = new AstNode(null);
+            assigment.addChild(parseIdentifier());
+            return variableReference;
         }
         private AstNode parseDereference()//TODO finish node
         {
-            return null;
+            AstNode deference = new AstNode("deference");
+            Token nextToken = readNextToken();
+            if (!nextToken.GetValue().Equals("*"))
+            {
+                saveReadedTokens();
+                throw new SyntaxError("");
+            }
+            try
+            {
+                lookaheadBuffer.Clear();
+                return parseVariableReference();
+            }
+            catch (SyntaxError e)
+            {
+                saveReadedTokens();
+            }
+            try
+            {
+                lookaheadBuffer.Clear();
+                return parseRegister();
+            }
+            catch (SyntaxError e)
+            {
+                saveReadedTokens();
+            }
+            throw new SyntaxError("Cant parse operand");
+            return deference;
         }
         private AstNode parseArrayElement()//TODO finish node
         {
@@ -751,7 +779,16 @@ namespace Erasystemlevel.Parser
 
         private AstNode parseExplicitAddress()//TODO finish node
         {
-            return null;
+            AstNode explicitAddress = new AstNode("explicitAddress");
+            Token nextToken = readNextToken();
+            if (!nextToken.GetValue().Equals("*"))
+            {
+                saveReadedTokens();
+                throw new SyntaxError("");
+            }
+            explicitAddress.addChild(parseLiteral());
+            lookaheadBuffer.Clear();
+            return explicitAddress;
         }
 
         private AstNode parseOperand()
@@ -781,7 +818,16 @@ namespace Erasystemlevel.Parser
 
         private AstNode parseAddress()//TODO finish node
         {
-            throw new NotImplementedException();
+            AstNode address = new AstNode("address");
+            Token nextToken = readNextToken();
+            if (!nextToken.GetValue().Equals("&"))
+            {
+                saveReadedTokens();
+                throw new SyntaxError("");
+            }
+            address.addChild(parseVariableReference());
+            lookaheadBuffer.Clear();
+            return address;
         }
 
         private AstNode parseReceiver()//TODO finish node
