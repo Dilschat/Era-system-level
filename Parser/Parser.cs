@@ -518,15 +518,18 @@ namespace Erasystemlevel.Parser
             return node;
         }
 
-        private AstNode parseAssemblerStatement(){//TODO finish node
+        private AstNode parseAssemblerStatement(){
             AstNode node = new AstNode("AssemblerStatement");
             Token nextToken = readNextToken();
             if(nextToken.GetValue().Equals("skip")){
                 node.addChild(new AstNode(nextToken));
                 try{
                     node.addChild(parseExpression());
+                    lookaheadBuffer.Clear();
+                    return node;
                 }catch(SyntaxError e){
-
+                    lookaheadBuffer.Clear();
+                    return node;
                 }
             }else if (nextToken.GetValue().Equals("stop"))
             {
@@ -534,22 +537,84 @@ namespace Erasystemlevel.Parser
                 try
                 {
                     node.addChild(parseExpression());
+                    lookaheadBuffer.Clear();
+                    return node;
                 }
                 catch (SyntaxError e)
                 {
-
+                    lookaheadBuffer.Clear();
+                    return node;
                 }
             }
-            else if (nextToken.GetValue().Equals("*"))
+            List<string> operators =new List<string>(new string[]{ ":=", "+=", ">>=", "-=", "<<=", "|=", "&=", "^="
+            , "<=", ">=", "?="});
+            try
             {
-
-            }else if (nextToken.GetValue().Equals("if"))
-            {
-
+                node.addChild(parseOperationOnRegisters(operators));
+            }catch(SyntaxError e){
+                try
+                {
+                    if (nextToken.GetValue().Equals("if"))
+                    {
+                        node.addChild(new AstNode(nextToken));
+                        node.addChild(parseRegister());
+                        Token newToken = readNextToken();
+                        if(!nextToken.GetValue().Equals("goto")){
+                            throw new SyntaxError("");
+                        }
+                        node.addChild(new AstNode(newToken));
+                        node.addChild(parseRegister());
+                    }else{
+                        saveReadedTokens();
+                        throw new SyntaxError("");
+                    }
+                }catch(SyntaxError){
+                    saveReadedTokens();
+                    throw new SyntaxError("");
+                }
             }
-            return null;
+            lookaheadBuffer.Clear();
+            return node;
         }
+        private AstNode parseOperationOnRegisters(List<string> operators){
+            AstNode leftOperand = null;
+            try
+            {
+                leftOperand = parseOperator();
+            }catch(SyntaxError e){}
+            if(leftOperand!=null && ((Token)leftOperand.getValue()).GetValue().Equals("*")){
+                leftOperand.addChild(parseRegister());
+            }else{
+                leftOperand = parseRegister();
+            }
+            Token operation =readNextToken();
+            bool exists = false;
+            for (int i = 0; i < operators.Count; i++){
+                if(operators[i].Equals(operation.GetValue())){
+                    exists = true;
+                }
+            }
+            if(exists==false){
+                saveReadedTokens();
+                throw new SyntaxError("");
+            }
+            AstNode rightOperand = null;
 
+            if (rightOperand != null && ((Token)rightOperand.getValue()).GetValue().Equals("*"))
+            {
+                rightOperand.addChild(parseRegister());
+            }
+            else
+            {
+                rightOperand = parseRegister();
+            }
+            AstNode node = new AstNode(operation);
+            node.addChild(leftOperand);
+            node.addChild(rightOperand);
+            lookaheadBuffer.Clear();
+            return node;
+        
+        }
 
         private AstNode parseAttribute()
         {
@@ -732,13 +797,13 @@ namespace Erasystemlevel.Parser
             throw new SyntaxError("Cant parse primary");
         }
 
-        private AstNode parseVariableReference()//TODO finish node
+        private AstNode parseVariableReference()
         {
             AstNode variableReference = new AstNode(null);
             variableReference.addChild(parseIdentifier());
             return variableReference;
         }
-        private AstNode parseDereference()//TODO finish node
+        private AstNode parseDereference()
         {
             AstNode deference = new AstNode("deference");
             Token nextToken = readNextToken();
@@ -807,7 +872,7 @@ namespace Erasystemlevel.Parser
             return dataElement;
         }
 
-        private AstNode parseExplicitAddress()//TODO finish node
+        private AstNode parseExplicitAddress()
         {
             AstNode explicitAddress = new AstNode("explicitAddress");
             Token nextToken = readNextToken();
