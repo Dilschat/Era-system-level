@@ -74,8 +74,101 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(childs, node.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
+
+        [Test()]
+        public void parseSwapTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/swap.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseSwap(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Operator, "man"));
+            ArrayList childs = new ArrayList();
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, "<=>"));
+            childs.Add(new AstNode(new Token(Token.TokenType.Operator, "woman")));
+            Assert.AreEqual(childs, node.getChilds());
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+        }
+
+        [Test()]
+        public void parseLoopBodyTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/loopBody.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseLoopBody(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "loop"));
+            ArrayList childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "if")));
+            Assert.AreEqual(childs, node.getChilds());
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Keyword, "end"));
+
+        }
+
+        [Test()]
+        public void parseWhileTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/while.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseWhile(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "while"));
+            ArrayList childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Operator, ">")));
+            childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "loop")));
+            Assert.AreEqual(childs, node.getChilds());
+        }
+
+        [Test()]
+        public void parseForTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/for.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseFor(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "for"));
+            ArrayList childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "a")));
+            childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "loop")));
+            Assert.AreEqual(childs, node.getChilds());
+        }
+
+        [Test()]
+        public void parseExtensionStatementTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/extensionStatement.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseExtensionStatement(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "if"));
+            ArrayList childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Keyword, ">")));
+            childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "break")));
+            Assert.AreEqual(childs, node.getChilds());
+        }
+
+        [Test()]
+        public void parseExpressionTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/expression.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseExpression(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "this"));
+            ArrayList childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Number, "12")));
+            Assert.AreEqual(childs, node.getChilds());
+        }
+
+        [Test()]
+        public void parsePrimaryTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/expression.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseExpression(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "this"));
+            ArrayList childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Number, "12")));
+            Assert.AreEqual(childs, node.getChilds());
+        }
+
+
     }
 
 
-    
+
 }

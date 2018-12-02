@@ -60,6 +60,12 @@
     <None Include="Tests\Identifier.txt" />
     <None Include="Tests\goto.txt" />
     <None Include="Tests\operator.txt" />
+    <None Include="Tests\swap.txt" />
+    <None Include="Tests\loopBody.txt" />
+    <None Include="Tests\while.txt" />
+    <None Include="Tests\for.txt" />
+    <None Include="Tests\extensionStatement.txt" />
+    <None Include="Tests\expression.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
