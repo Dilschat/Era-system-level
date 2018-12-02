@@ -407,7 +407,7 @@ namespace Erasystemlevel.Parser
             node.addChild(parseOperand());
             try
             {
-                node.addChild(parseOperator());
+                //node.addChild(parseOperator());
                 try
                 {
                     node.addChild(parseOperand());
@@ -580,7 +580,7 @@ namespace Erasystemlevel.Parser
             AstNode leftOperand = null;
             try
             {
-                leftOperand = parseOperator();
+              // leftOperand = parseOperator();
             }catch(SyntaxError e){}
             if(leftOperand!=null && ((Token)leftOperand.getValue()).GetValue().Equals("*")){
                 leftOperand.addChild(parseRegister());
@@ -939,12 +939,13 @@ namespace Erasystemlevel.Parser
             return receiver;
         }
 
-        private AstNode parseOperator()
+        public static AstNode parseOperator(TokenReader reader)
         {
-            Token nextToken = readNextToken();
-            if (nextToken.GetTokenType() == Token.TokenType.Operator)
+            Token nextToken = reader.readNextToken();
+            Token.TokenType operatorType = Token.TokenType.Operator;
+            if (nextToken.GetTokenType().Equals(operatorType))
             {
-                lookaheadBuffer.Clear();
+                reader.clear();
                 return new AstNode(nextToken);
             }
             throw new SyntaxError("");
