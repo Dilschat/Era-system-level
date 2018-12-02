@@ -65,13 +65,20 @@ namespace Erasystemlevel.Tests
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseGoto(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "goto"));
-            AstNode a = new AstNode("");
-            AstNode b = new AstNode("");
-            a.Equals(b);
-
             ArrayList childs = new ArrayList();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "player")));
             Assert.AreEqual(childs, node.getChilds());
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+        }
+
+
+        [Test()]
+        public void parseOperatorTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/operator.txt");
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseOperator(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Operator, "+"));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
     }
