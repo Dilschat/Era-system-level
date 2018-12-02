@@ -1,4 +1,6 @@
 ﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit3TestAdapter.3.11.2\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.11.2\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
   <PropertyGroup>
     <ProjectGuid>{77706B92-2B61-44F6-887E-6F33FFCEA638}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -30,19 +32,34 @@
     <Compile Include="Parser\Parser.cs" />
     <Compile Include="Exception\SyntaxError.cs" />
     <Compile Include="Parser\AstNode.cs" />
+    <Compile Include="Tests\NUnitTestClass.cs" />
+    <Compile Include="Parser\TokenReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokenizer\" />
     <Folder Include="Parser\" />
     <Folder Include="Exception\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Json" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Tokenizer\text.txt" />
+    <None Include="text1.txt" />
+    <None Include="packages.config" />
+    <None Include="Tests\test_reading.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\Break.txt" />
+    <None Include="Tests\Identifier.txt" />
+    <None Include="Tests\goto.txt" />
+    <None Include="Tests\operator.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
