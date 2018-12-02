@@ -31,7 +31,7 @@ namespace Erasystemlevel.Tokenizer
             "step", "while", "loop", "break", "then", "by", "trace", "data", "module", "code",
             "this"
         });
-        StreamReader reader;
+        private StreamReader reader;
 
 
         public Tokenizer(string filePath)
