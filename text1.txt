@@ -2,5 +2,5 @@
     int a := 2;
     while a>2 loop
         int b:=1;
-       end
-       end
+    end
+end

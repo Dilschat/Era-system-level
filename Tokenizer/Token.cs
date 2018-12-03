@@ -24,5 +24,15 @@ namespace Erasystemlevel.Tokenizer
         public String ToString(){
             return "{ " + type + ":" + value + "}";
         }
+
+        public override bool Equals(object obj)
+        {
+            if(obj == null)
+            {
+                return false;
+            }
+            return this.ToString().Equals(((Token) obj).ToString());
+        }
+
     }
 }
