@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Tokenizer;
 namespace Erasystemlevel.Parser
@@ -105,6 +106,7 @@ namespace Erasystemlevel.Parser
             }
 
         }
+        
         public static AstNode parseData(TokenReader reader){
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("data"))
