@@ -27,6 +27,10 @@ namespace Erasystemlevel.Tokenizer
 
         public override bool Equals(object obj)
         {
+            if(obj == null)
+            {
+                return false;
+            }
             return this.ToString().Equals(((Token) obj).ToString());
         }
 

@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Tokenizer\text.txt" />
-    <None Include="text1.txt" />
+    <None Include="text1.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="packages.config" />
     <None Include="Tests\test_reading.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -66,6 +66,14 @@
     <None Include="Tests\for.txt" />
     <None Include="Tests\extensionStatement.txt" />
     <None Include="Tests\expression.txt" />
+    <None Include="Tests\receiver.txt" />
+    <None Include="Tests\Literal.txt" />
+    <None Include="Tests\Address.txt" />
+    <None Include="Tests\register.txt" />
+    <None Include="Tests\dereference.txt" />
+    <None Include="Tests\array_and_data_elements.txt" />
+    <None Include="Tests\explicitAddress.txt" />
+    <None Include="Tests\primary.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -12,10 +12,10 @@ namespace HelloWorld
         static void Main()
         {
 
-            Tokenizer t = new Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/text1.txt");
-            Parser parser = new Parser(t);
-            AstNode n = parser.ParseUnit();
-            Console.WriteLine(n.ToString());
+            Tokenizer t = new Tokenizer("text1.txt");
+            //Parser parser = new Parser(t);
+            //AstNode n = parser.ParseUnit();
+            //Console.WriteLine(n.ToString());
                          //Tokenizer tok = new Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tokenizer/text.txt");
             //LinkedList<Token> list = tok.Tokenize();
             //while(list.Count!=0){
