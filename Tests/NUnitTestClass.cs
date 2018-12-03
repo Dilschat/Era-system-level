@@ -11,7 +11,8 @@ namespace Erasystemlevel.Tests
         [Test()]
         public void TokenReadingTestCase()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/test_reading.txt");
+            
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/test_reading.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
@@ -23,7 +24,7 @@ namespace Erasystemlevel.Tests
         [Test()]
         public void TokenSavedReadingTestCase()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/test_reading.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/test_reading.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
@@ -39,7 +40,7 @@ namespace Erasystemlevel.Tests
         [Test()]
         public void parseBreakTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/Break.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/Break.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode breakNode = Parser.Parser.parseBreak(reader);
             Assert.AreEqual(((Token)breakNode.getValue()), new Token(Token.TokenType.Keyword, "break"));
@@ -50,7 +51,7 @@ namespace Erasystemlevel.Tests
         [Test()]
         public void parseIdentifierTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/Identifier.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/Identifier.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseIdentifier(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Identifier, "player"));
@@ -61,7 +62,7 @@ namespace Erasystemlevel.Tests
         [Test()]
         public void parseGoToTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/goto.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/goto.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseGoto(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "goto"));
@@ -75,10 +76,10 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
-        [Test()]
+        /*[Test()]
         public void parseSwapTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/swap.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/swap.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseSwap(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Operator, "man"));
@@ -87,12 +88,12 @@ namespace Erasystemlevel.Tests
             childs.Add(new AstNode(new Token(Token.TokenType.Operator, "woman")));
             Assert.AreEqual(childs, node.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
-        }
+        }*/
 
-        [Test()]
+        /*[Test()]
         public void parseLoopBodyTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/loopBody.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/loopBody.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseLoopBody(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "loop"));
@@ -101,12 +102,12 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(childs, node.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Keyword, "end"));
 
-        }
+        }*/
 
-        [Test()]
+        /*[Test()]
         public void parseWhileTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/while.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/while.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseWhile(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "while"));
@@ -114,12 +115,12 @@ namespace Erasystemlevel.Tests
             childs.Add(new AstNode(new Token(Token.TokenType.Operator, ">")));
             childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "loop")));
             Assert.AreEqual(childs, node.getChilds());
-        }
+        }*/
 
-        [Test()]
+        /*[Test()]
         public void parseForTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/for.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/for.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseFor(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "for"));
@@ -127,12 +128,12 @@ namespace Erasystemlevel.Tests
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "loop")));
             Assert.AreEqual(childs, node.getChilds());
-        }
+        }*/
 
-        [Test()]
+        /*[Test()]
         public void parseExtensionStatementTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/extensionStatement.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/extensionStatement.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseExtensionStatement(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "if"));
@@ -140,31 +141,31 @@ namespace Erasystemlevel.Tests
             childs.Add(new AstNode(new Token(Token.TokenType.Keyword, ">")));
             childs.Add(new AstNode(new Token(Token.TokenType.Keyword, "break")));
             Assert.AreEqual(childs, node.getChilds());
-        }
+        }*/
 
-        [Test()]
+        /*[Test()]
         public void parseExpressionTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/expression.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/expression.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseExpression(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "this"));
             ArrayList childs = new ArrayList();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "12")));
             Assert.AreEqual(childs, node.getChilds());
-        }
+        }*/
 
-        [Test()]
+        /*[Test()]
         public void parsePrimaryTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tests/expression.txt");
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer("Tests/expression.txt");
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseExpression(reader);
             Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "this"));
             ArrayList childs = new ArrayList();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "12")));
             Assert.AreEqual(childs, node.getChilds());
-        }
+        }*/
 
 
     }

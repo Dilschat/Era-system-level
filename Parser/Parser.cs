@@ -25,9 +25,9 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-
+                Console.WriteLine(e);
             }
-
+            Console.WriteLine('1');
             try
             {
                 AstNode node = parseData();
@@ -36,8 +36,10 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-
+                Console.WriteLine(e);
             }
+            Console.WriteLine('2');
+
             try
             {
                 AstNode node = parseModule();
@@ -46,7 +48,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-
+                Console.WriteLine(e);
             }
             try
             {
@@ -56,7 +58,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-
+                Console.WriteLine(e);
             }
             throw new SyntaxError("");
 
