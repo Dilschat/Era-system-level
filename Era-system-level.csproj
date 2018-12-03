@@ -50,10 +50,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <None Include="Tokenizer\text.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="text1.txt" CopyToOutputDirectory="PreserveNewest" />
@@ -68,6 +64,14 @@
     <None Include="Tests\for.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Tests\extensionStatement.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Tests\expression.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Tests\receiver.txt" />
+    <None Include="Tests\Literal.txt" />
+    <None Include="Tests\Address.txt" />
+    <None Include="Tests\register.txt" />
+    <None Include="Tests\dereference.txt" />
+    <None Include="Tests\array_and_data_elements.txt" />
+    <None Include="Tests\explicitAddress.txt" />
+    <None Include="Tests\primary.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
