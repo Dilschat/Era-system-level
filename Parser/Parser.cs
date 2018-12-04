@@ -362,7 +362,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseType(TokenReader reader){
             Token nextToken = reader.readNextToken();
-            if (!(nextToken.GetTokenType() == Token.TokenType.Keyword))
+            if (nextToken.GetTokenType() != Token.TokenType.Keyword)
             {
                 reader.saveReadedTokens();
                 throw new SyntaxError("");
@@ -370,17 +370,17 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetValue().Equals("int"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                 return new AstNode(nextToken);
             }
             if (nextToken.GetValue().Equals("short"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
             if (nextToken.GetValue().Equals("byte"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
             reader.saveReadedTokens();
             throw new SyntaxError("");
@@ -489,7 +489,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("Can't parse error");
 
             }
-            node.addChild(new AstNode(nextToken));
+            node.setValue(nextToken);
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(">"))
             {
@@ -603,12 +603,12 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetValue().Equals("start"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
             if (nextToken.GetValue().Equals("entry"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
             reader.saveReadedTokens();
             throw new SyntaxError("Can't parse attribute");
@@ -646,17 +646,19 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseResults(TokenReader reader){
             AstNode node = new AstNode("Results");
+            node.addChild(Parser.parseRegister(reader));
+            Token nextToken = reader.readNextToken();
             while (true)
             {
-                node.addChild(Parser.parseRegister(reader));
-                Token nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
                     node.addChild(Parser.parseRegister(reader));
-                    continue;
+                    nextToken = reader.readNextToken();
+
                 }
                 else
                 {
+                    reader.saveReadedTokens();
                     reader.clear();
                     return node;
                 }
@@ -664,10 +666,9 @@ namespace Erasystemlevel.Parser
         }
 
         public static AstNode parseParameter(TokenReader reader){
-            AstNode node = new AstNode("Parameter");
             try
             {
-                node.addChild(Parser.parseType(reader));
+                AstNode node=parseType(reader);
                 node.addChild(Parser.parseIdentifier(reader));
                 reader.clear();
                 return node;
@@ -675,13 +676,10 @@ namespace Erasystemlevel.Parser
             catch (SyntaxError e)
             {
                 reader.saveReadedTokens();
-                node.cleanChild();
             }
             try
             {
-                node.addChild(Parser.parseRegister(reader));
-                reader.clear();
-                return node;
+                return Parser.parseRegister(reader);
             }
             catch (SyntaxError e)
             {
@@ -722,7 +720,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                //reader.clear();
+                reader.clear();
                 return Parser.parseDereference(reader);
             }
             catch (SyntaxError)
@@ -731,7 +729,7 @@ namespace Erasystemlevel.Parser
             }
             try
             {
-                //reader.clear();
+                reader.clear();
                 return Parser.parseArrayElement(reader);
             }
             catch (SyntaxError)
@@ -740,7 +738,7 @@ namespace Erasystemlevel.Parser
             }
             try
             {
-                //reader.clear();
+                reader.clear();
                 return Parser.parseDataElement(reader);
             }
             catch (SyntaxError)
@@ -749,7 +747,7 @@ namespace Erasystemlevel.Parser
             }
             try
             {
-                //reader.clear();
+                reader.clear();
                 return Parser.parseRegister(reader);
             }
             catch (SyntaxError)
@@ -758,7 +756,7 @@ namespace Erasystemlevel.Parser
             }
             try
             {
-                //reader.clear();
+                reader.clear();
                 return Parser.parseExplicitAddress(reader);
             }
             catch (SyntaxError)
@@ -767,7 +765,7 @@ namespace Erasystemlevel.Parser
             }
             try
             {
-                // reader.clear();
+                reader.clear();
                 return Parser.parseVariableReference(reader);
             }
             catch (SyntaxError) { reader.saveReadedTokens(); }
@@ -980,6 +978,7 @@ namespace Erasystemlevel.Parser
                 reader.saveReadedTokens();
                 throw new SyntaxError("Can't parse directive");
             }
+            directive.setValue(nextToken);
             nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("8") || nextToken.GetValue().Equals("16")
                 || nextToken.GetValue().Equals("32"))
@@ -1275,7 +1274,7 @@ namespace Erasystemlevel.Parser
             Token nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals(":="))
             {
-                assigment.setValue(":=");
+                assigment.setValue(nextToken);
             }
             else
             {

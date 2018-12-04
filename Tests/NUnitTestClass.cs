@@ -332,31 +332,119 @@ namespace Erasystemlevel.Tests
         [Test()]
         public void parseAssigmentTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("primary.txt"));
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("assigment.txt"));
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
-            AstNode node = Parser.Parser.parsePrimary(reader);
-            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Identifier, "bla"));
+            AstNode node = Parser.Parser.parseAssigment(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Operator, ":="));
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier,"id")));
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number,"2")));
+        }
+        
+        [Test()]
+        public void parseDirectiveTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("directive.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseDirective(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "format"));
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number,"8")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
-            tokenizer = new Tokenizer.Tokenizer(getTestFilePath("array_and_data_elements.txt"));
-            reader = new Parser.TokenReader(tokenizer);
-            AstNode node1 = Parser.Parser.parsePrimary(reader);
-            Assert.AreEqual(((Token)node1.getValue()), new Token(Token.TokenType.Identifier, "bla"));
-            ArrayList childs = new ArrayList();
-            childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
-            ArrayList curChilds = node1.getChilds();
-            Assert.AreEqual(childs, curChilds);
+        }
+        
+        [Test()]
+        public void parseAttributeTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("attribute.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseAttribute(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "start"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+
+        }
+        
+        [Test()]
+        public void parseTypeTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("type.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseType(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "int"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+            node = Parser.Parser.parseType(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "short"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+            node = Parser.Parser.parseType(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Keyword, "byte"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+
+        }
+        
+        [Test()]
+        public void parseLabelTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("label.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseLabel(reader);
+            Assert.AreEqual(((Token)node.getValue()), new Token(Token.TokenType.Identifier, "id"));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
         
-        
-        
-        
-        
-        
-        
-        
+                
+        [Test()]
+        public void parseResultsTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("results.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseResults(reader);
+            Assert.AreEqual((node.getValue()),"Results");
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R1")));
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R2")));
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R3")));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+            
+            node = Parser.Parser.parseResults(reader);
+            Assert.AreEqual((node.getValue()),"Results");
+            curChilds = node.getChilds();
+            expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R1")));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+            
+            node = Parser.Parser.parseResults(reader);
+            Assert.AreEqual((node.getValue()),"Results");
+            curChilds = node.getChilds();
+            expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R1")));
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R2")));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
+        }
+        
+        [Test()]
+        public void parseParameterTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("parameter.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseParameter(reader);
+            Assert.AreEqual(((Token)node.getValue()),new Token(Token.TokenType.Keyword,"int"));
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier,"parameter")));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+            reader.clear();
+            
+            node = Parser.Parser.parseParameter(reader);
+            Assert.AreEqual(((Token)node.getValue()),new Token(Token.TokenType.Register,"R1"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+
+        }
+        
         public static string getTestFilePath(string fileName)
         {
             return "Tests/testFiles/" + fileName;
