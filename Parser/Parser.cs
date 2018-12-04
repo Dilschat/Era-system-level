@@ -1082,6 +1082,7 @@ namespace Erasystemlevel.Parser
                 reader.saveReadedTokens();
                 throw new SyntaxError("");
             }
+            
             reader.clear();
             return ifNode;
         }
