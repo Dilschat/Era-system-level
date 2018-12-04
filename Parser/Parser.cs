@@ -1060,7 +1060,7 @@ namespace Erasystemlevel.Parser
 
         }
 
-        public static AstNode parseIf(TokenReader reader) // if Expression do RoutineBody end
+        public static AstNode parseIf(TokenReader reader) // if Expression do RoutineBody end else do RoutineBody end
         {
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("if"))
