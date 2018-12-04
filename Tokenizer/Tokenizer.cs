@@ -99,6 +99,10 @@ namespace Erasystemlevel.Tokenizer
                     }
                     if (numericRegex.IsMatch(currentToken))
                     {
+                        if (reader.EndOfStream)
+                        {
+                            return new Token(Token.TokenType.Number, currentToken);
+                        }
                         while (numericRegex.IsMatch(currentToken+Convert.ToChar(this.reader.Peek())) && !this.reader.EndOfStream){
                             currentToken = currentToken + Convert.ToChar(this.reader.Read());
                         }

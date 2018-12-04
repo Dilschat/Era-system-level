@@ -463,11 +463,16 @@ namespace Erasystemlevel.Tests
             Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("constDefinition.txt"));
             Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseConstDefinition(reader);
-            Assert.AreEqual((Token)node.getValue(),new Token(Token.TokenType.Identifier,"dilchat"));
+            Assert.AreEqual((Token)node.getValue(),new Token(Token.TokenType.Operator,"="));
             ArrayList curChilds = node.getChilds();
             ArrayList expectedChilds = new ArrayList();
-            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Delimiter,"=")));
-            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number,"1")));
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier,"dilchat")));
+            AstNode expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
+            expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
+            expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
+            expectedChilds.Add(expression);
+            Assert.AreEqual(expectedChilds, curChilds);
+            
 
         }
         
