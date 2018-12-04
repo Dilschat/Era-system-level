@@ -445,6 +445,45 @@ namespace Erasystemlevel.Tests
 
         }
         
+        [Test()]
+        public void parseParametersTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("parameters.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseParameters(reader);
+            Assert.AreEqual(node.getValue(),"Parameters");
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register,"R0")));            
+        }
+
+        [Test()]
+        public void parseConstDefinitionTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("constDefinition.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseConstDefinition(reader);
+            Assert.AreEqual((Token)node.getValue(),new Token(Token.TokenType.Identifier,"dilchat"));
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Delimiter,"=")));
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number,"1")));
+
+        }
+        
+        [Test()]
+        public void parseVarDefinitionTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("varDefinition.txt"));
+            Parser.TokenReader reader = new Parser.TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseVarDefinition(reader);
+            Assert.AreEqual((Token)node.getValue(),new Token(Token.TokenType.Identifier,"dilchat"));
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number,"1")));
+
+        }
+
         public static string getTestFilePath(string fileName)
         {
             return "Tests/testFiles/" + fileName;
