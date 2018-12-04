@@ -11,7 +11,7 @@ namespace Erasystemlevel.Parser
         {
             try
             {
-                AstNode node = Parser.parseCode(reader);
+                AstNode node = parseCode(reader);
                 reader.clear();
                 return node;
             }
@@ -23,7 +23,7 @@ namespace Erasystemlevel.Parser
             Console.WriteLine('1');
             try
             {
-                AstNode node = Parser.parseData(reader);
+                AstNode node = parseData(reader);
                 reader.clear();
                 return node;
             }
@@ -36,7 +36,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                AstNode node = Parser.parseModule(reader);
+                AstNode node = parseModule(reader);
                 reader.clear();
                 return node;
             }
@@ -47,7 +47,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                AstNode node = Parser.parseRoutine(reader);
+                AstNode node = parseRoutine(reader);
                 reader.clear();
                 return node;
             }
@@ -74,7 +74,7 @@ namespace Erasystemlevel.Parser
             {
                 try
                 {
-                    code.addChild(Parser.parseVariable(reader));
+                    code.addChild(parseVariable(reader));
                     continue;
                 }
                 catch (SyntaxError e)
@@ -83,7 +83,7 @@ namespace Erasystemlevel.Parser
 
                 try
                 {
-                    code.addChild(Parser.parseConstant(reader));
+                    code.addChild(parseConstant(reader));
                     continue;
                 }
                 catch (SyntaxError e)
@@ -92,7 +92,7 @@ namespace Erasystemlevel.Parser
 
                 try
                 {
-                    code.addChild(Parser.parseStatement(reader));
+                    code.addChild(parseStatement(reader));
                     continue;
                 }
                 catch (SyntaxError e)
@@ -106,11 +106,9 @@ namespace Erasystemlevel.Parser
                     reader.clear();
                     return code;
                 }
-                else
-                {
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
-                }
+
+                reader.saveReadedTokens();
+                throw new SyntaxError("");
             }
         }
 
@@ -124,10 +122,10 @@ namespace Erasystemlevel.Parser
             }
 
             AstNode node = new AstNode("Data");
-            node.addChild(Parser.parseIdentifier(reader));
+            node.addChild(parseIdentifier(reader));
             try
             {
-                node.addChild(Parser.parseLiteral(reader));
+                node.addChild(parseLiteral(reader));
             }
             catch (SyntaxError e)
             {
@@ -137,10 +135,8 @@ namespace Erasystemlevel.Parser
                     reader.clear();
                     return node;
                 }
-                else
-                {
-                    throw new SyntaxError("");
-                }
+
+                throw new SyntaxError("");
             }
 
             while (true)
@@ -151,9 +147,10 @@ namespace Erasystemlevel.Parser
                     reader.clear();
                     return node;
                 }
-                else if (nextToken.GetValue().Equals(","))
+
+                if (nextToken.GetValue().Equals(","))
                 {
-                    node.addChild(Parser.parseLiteral(reader));
+                    node.addChild(parseLiteral(reader));
                 }
             }
         }
@@ -163,7 +160,7 @@ namespace Erasystemlevel.Parser
             AstNode node = new AstNode("Routine");
             try
             {
-                node.addChild(Parser.parseAttribute(reader));
+                node.addChild(parseAttribute(reader));
             }
             catch (SyntaxError e)
             {
@@ -176,10 +173,10 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("");
             }
 
-            node.addChild(Parser.parseIdentifier(reader));
+            node.addChild(parseIdentifier(reader));
             try
             {
-                node.addChild(Parser.parseParameter(reader));
+                node.addChild(parseParameter(reader));
             }
             catch (SyntaxError e)
             {
@@ -188,7 +185,7 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals(":"))
             {
-                node.addChild(Parser.parseResults(reader));
+                node.addChild(parseResults(reader));
             }
 
             if (nextToken.GetValue().Equals(";"))
@@ -196,9 +193,10 @@ namespace Erasystemlevel.Parser
                 reader.clear();
                 return node;
             }
-            else if (nextToken.GetValue().Equals("do"))
+
+            if (nextToken.GetValue().Equals("do"))
             {
-                node.addChild(Parser.parseRoutine(reader));
+                node.addChild(parseRoutine(reader));
                 nextToken = reader.readNextToken();
                 if (!nextToken.GetValue().Equals("end"))
                 {
@@ -223,12 +221,12 @@ namespace Erasystemlevel.Parser
             }
 
             AstNode node = new AstNode("Module");
-            node.addChild(Parser.parseIdentifier(reader));
+            node.addChild(parseIdentifier(reader));
             while (true)
             {
                 try
                 {
-                    node.addChild(Parser.parseDeclaration(reader));
+                    node.addChild(parseDeclaration(reader));
                 }
                 catch (SyntaxError e)
                 {
@@ -250,14 +248,13 @@ namespace Erasystemlevel.Parser
         public static AstNode parseVariable(TokenReader reader)
         {
             AstNode node = new AstNode("Variable");
-            node.addChild(Parser.parseType(reader));
+            node.addChild(parseType(reader));
             while (true)
             {
-                node.addChild(Parser.parseVarDefinition(reader));
+                node.addChild(parseVarDefinition(reader));
                 Token nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
-                    continue;
                 }
                 else if (nextToken.GetValue().Equals(";"))
                 {
@@ -284,11 +281,11 @@ namespace Erasystemlevel.Parser
             AstNode node = new AstNode("Constant");
             while (true)
             {
-                node.addChild(Parser.parseConstDefinition(reader));
+                node.addChild(parseConstDefinition(reader));
                 nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
-                    node.addChild(Parser.parseConstDefinition(reader));
+                    node.addChild(parseConstDefinition(reader));
                 }
                 else if (nextToken.GetValue().Equals(";"))
                 {
@@ -334,7 +331,7 @@ namespace Erasystemlevel.Parser
             AstNode variable = new AstNode("Declaration");
             try
             {
-                variable.addChild(Parser.parseVariable(reader));
+                variable.addChild(parseVariable(reader));
                 reader.clear();
                 return variable;
             }
@@ -345,7 +342,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                variable.addChild(Parser.parseConstant(reader));
+                variable.addChild(parseConstant(reader));
                 reader.clear();
                 return variable;
             }
@@ -356,7 +353,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                variable.addChild(Parser.parseRoutine(reader));
+                variable.addChild(parseRoutine(reader));
                 reader.clear();
                 return variable;
             }
@@ -371,17 +368,20 @@ namespace Erasystemlevel.Parser
         public static AstNode parseVarDefinition(TokenReader reader)
         {
             AstNode node = new AstNode("VarDefinition");
-            node.addChild(Parser.parseIdentifier(reader));
+            node.addChild(parseIdentifier(reader));
             Token nextToken = reader.readNextToken();
+            
             if (nextToken.GetValue().Equals(":="))
             {
-                node.addChild(Parser.parseExpression(reader));
+                node.setValue(nextToken);
+                node.addChild(parseExpression(reader));
                 reader.clear();
                 return node;
             }
             if (nextToken.GetValue().Equals("["))
             {
-                node.addChild(Parser.parseExpression(reader));
+                node.setValue(new Token(Token.TokenType.Operator, ":="));
+                node.addChild(parseExpression(reader));
                 nextToken = reader.readNextToken();
                 if (!nextToken.GetValue().Equals("]")) throw new SyntaxError("");
                 reader.clear();
@@ -426,16 +426,16 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseExpression(TokenReader reader)
         {
-            AstNode firstOPerand = Parser.parseOperand(reader);
+            AstNode firstOPerand = parseOperand(reader);
 
             reader.clear();
             try
             {
-                AstNode node = Parser.parseOperator(reader);
+                AstNode node = parseOperator(reader);
                 try
                 {
                     node.addChild(firstOPerand);
-                    node.addChild(Parser.parseOperand(reader));
+                    node.addChild(parseOperand(reader));
                     reader.clear();
                     return node;
                 }
@@ -455,7 +455,7 @@ namespace Erasystemlevel.Parser
         public static AstNode parseConstDefinition(TokenReader reader)
         {
             AstNode node = new AstNode("ConstDefinition");
-            node.addChild(Parser.parseIdentifier(reader));
+            node.addChild(parseIdentifier(reader));
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("="))
             {
@@ -464,7 +464,7 @@ namespace Erasystemlevel.Parser
             }
 
             node.setValue(nextToken);
-            node.addChild(Parser.parseExpression(reader));
+            node.addChild(parseExpression(reader));
             reader.clear();
             return node;
         }
@@ -476,7 +476,7 @@ namespace Erasystemlevel.Parser
             {
                 while (true)
                 {
-                    node.addChild(Parser.parseLabel(reader));
+                    node.addChild(parseLabel(reader));
                 }
             }
             catch (SyntaxError e)
@@ -486,7 +486,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseAssemblerStatement(reader));
+                node.addChild(parseAssemblerStatement(reader));
                 reader.clear();
                 return node;
             }
@@ -497,7 +497,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseExtensionStatement(reader));
+                node.addChild(parseExtensionStatement(reader));
                 reader.clear();
                 return node;
             }
@@ -508,7 +508,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseDirective(reader));
+                node.addChild(parseDirective(reader));
                 reader.clear();
                 return node;
             }
@@ -559,22 +559,7 @@ namespace Erasystemlevel.Parser
                 node.addChild(new AstNode(nextToken));
                 try
                 {
-                    node.addChild(Parser.parseExpression(reader));
-                    reader.clear();
-                    return node;
-                }
-                catch (SyntaxError e)
-                {
-                    reader.clear();
-                    return node;
-                }
-            }
-            else if (nextToken.GetValue().Equals("stop"))
-            {
-                node.addChild(new AstNode(nextToken));
-                try
-                {
-                    node.addChild(Parser.parseExpression(reader));
+                    node.addChild(parseExpression(reader));
                     reader.clear();
                     return node;
                 }
@@ -585,11 +570,27 @@ namespace Erasystemlevel.Parser
                 }
             }
 
-            List<string> operators = new List<string>(new string[]
+            if (nextToken.GetValue().Equals("stop"))
+            {
+                node.addChild(new AstNode(nextToken));
+                try
+                {
+                    node.addChild(parseExpression(reader));
+                    reader.clear();
+                    return node;
+                }
+                catch (SyntaxError e)
+                {
+                    reader.clear();
+                    return node;
+                }
+            }
+
+            List<string> operators = new List<string>(new[]
                 {":=", "+=", ">>=", "-=", "<<=", "|=", "&=", "^=", "<=", ">=", "?="});
             try
             {
-                node.addChild(Parser.parseOperationOnRegisters(operators, reader));
+                node.addChild(parseOperationOnRegisters(operators, reader));
             }
             catch (SyntaxError e)
             {
@@ -598,7 +599,7 @@ namespace Erasystemlevel.Parser
                     if (nextToken.GetValue().Equals("if"))
                     {
                         node.addChild(new AstNode(nextToken));
-                        node.addChild(Parser.parseRegister(reader));
+                        node.addChild(parseRegister(reader));
                         Token newToken = reader.readNextToken();
                         if (!nextToken.GetValue().Equals("goto"))
                         {
@@ -606,7 +607,7 @@ namespace Erasystemlevel.Parser
                         }
 
                         node.addChild(new AstNode(newToken));
-                        node.addChild(Parser.parseRegister(reader));
+                        node.addChild(parseRegister(reader));
                     }
                     else
                     {
@@ -630,7 +631,7 @@ namespace Erasystemlevel.Parser
             AstNode leftOperand = null;
             try
             {
-                leftOperand = Parser.parseOperator(reader);
+                leftOperand = parseOperator(reader);
             }
             catch (SyntaxError e)
             {
@@ -638,11 +639,11 @@ namespace Erasystemlevel.Parser
 
             if (leftOperand != null && ((Token) leftOperand.getValue()).GetValue().Equals("*"))
             {
-                leftOperand.addChild(Parser.parseRegister(reader));
+                leftOperand.addChild(parseRegister(reader));
             }
             else
             {
-                leftOperand = Parser.parseRegister(reader);
+                leftOperand = parseRegister(reader);
             }
 
             Token operation = reader.readNextToken();
@@ -665,11 +666,11 @@ namespace Erasystemlevel.Parser
 
             if (rightOperand != null && ((Token) rightOperand.getValue()).GetValue().Equals("*"))
             {
-                rightOperand.addChild(Parser.parseRegister(reader));
+                rightOperand.addChild(parseRegister(reader));
             }
             else
             {
-                rightOperand = Parser.parseRegister(reader);
+                rightOperand = parseRegister(reader);
             }
 
             AstNode node = new AstNode(operation);
@@ -710,7 +711,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseParameter(reader));
+                node.addChild(parseParameter(reader));
                 nextToken = reader.readNextToken();
             }
             catch
@@ -723,7 +724,7 @@ namespace Erasystemlevel.Parser
             {
                 if (nextToken.GetValue().Equals(","))
                 {
-                    node.addChild(Parser.parseParameter(reader));
+                    node.addChild(parseParameter(reader));
                     nextToken = reader.readNextToken();
                 }
                 else
@@ -746,13 +747,13 @@ namespace Erasystemlevel.Parser
         public static AstNode parseResults(TokenReader reader)
         {
             AstNode node = new AstNode("Results");
-            node.addChild(Parser.parseRegister(reader));
+            node.addChild(parseRegister(reader));
             Token nextToken = reader.readNextToken();
             while (true)
             {
                 if (nextToken.GetValue().Equals(","))
                 {
-                    node.addChild(Parser.parseRegister(reader));
+                    node.addChild(parseRegister(reader));
                     nextToken = reader.readNextToken();
                 }
                 else
@@ -769,7 +770,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 AstNode node = parseType(reader);
-                node.addChild(Parser.parseIdentifier(reader));
+                node.addChild(parseIdentifier(reader));
                 reader.clear();
                 return node;
             }
@@ -780,7 +781,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                return Parser.parseRegister(reader);
+                return parseRegister(reader);
             }
             catch (SyntaxError e)
             {
@@ -796,7 +797,7 @@ namespace Erasystemlevel.Parser
             {
                 try
                 {
-                    node.addChild(Parser.parseVariable(reader));
+                    node.addChild(parseVariable(reader));
                     continue;
                 }
                 catch (SyntaxError e)
@@ -806,7 +807,7 @@ namespace Erasystemlevel.Parser
 
                 try
                 {
-                    node.addChild(Parser.parseConstant(reader));
+                    node.addChild(parseConstant(reader));
                     continue;
                 }
                 catch (SyntaxError e)
@@ -816,7 +817,7 @@ namespace Erasystemlevel.Parser
 
                 try
                 {
-                    node.addChild(Parser.parseStatement(reader));
+                    node.addChild(parseStatement(reader));
                     continue;
                 }
                 catch (SyntaxError e)
@@ -836,7 +837,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseDereference(reader);
+                return parseDereference(reader);
             }
             catch (SyntaxError)
             {
@@ -846,7 +847,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseArrayElement(reader);
+                return parseArrayElement(reader);
             }
             catch (SyntaxError)
             {
@@ -856,7 +857,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseDataElement(reader);
+                return parseDataElement(reader);
             }
             catch (SyntaxError)
             {
@@ -866,7 +867,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseRegister(reader);
+                return parseRegister(reader);
             }
             catch (SyntaxError)
             {
@@ -876,7 +877,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseExplicitAddress(reader);
+                return parseExplicitAddress(reader);
             }
             catch (SyntaxError)
             {
@@ -886,7 +887,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseVariableReference(reader);
+                return parseVariableReference(reader);
             }
             catch (SyntaxError)
             {
@@ -898,7 +899,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseVariableReference(TokenReader reader)
         {
-            return Parser.parseIdentifier(reader);
+            return parseIdentifier(reader);
         }
 
         public static AstNode parseDereference(TokenReader reader)
@@ -915,7 +916,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                dereference.addChild(Parser.parseVariableReference(reader));
+                dereference.addChild(parseVariableReference(reader));
                 return dereference;
             }
             catch (SyntaxError)
@@ -926,7 +927,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                dereference.addChild(Parser.parseRegister(reader));
+                dereference.addChild(parseRegister(reader));
                 return dereference;
             }
             catch (SyntaxError)
@@ -939,7 +940,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseArrayElement(TokenReader reader)
         {
-            AstNode arrayElement = Parser.parseVariableReference(reader);
+            AstNode arrayElement = parseVariableReference(reader);
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("["))
             {
@@ -947,7 +948,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("");
             }
 
-            arrayElement.addChild(Parser.parseExpression(reader));
+            arrayElement.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("]"))
             {
@@ -961,7 +962,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseDataElement(TokenReader reader)
         {
-            AstNode dataElement = Parser.parseIdentifier(reader);
+            AstNode dataElement = parseIdentifier(reader);
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("["))
             {
@@ -969,7 +970,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("");
             }
 
-            dataElement.addChild(Parser.parseExpression(reader));
+            dataElement.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("]"))
             {
@@ -991,7 +992,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("");
             }
 
-            explicitAddress.addChild(Parser.parseLiteral(reader));
+            explicitAddress.addChild(parseLiteral(reader));
             reader.clear();
             return explicitAddress;
         }
@@ -1001,7 +1002,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseReceiver(reader);
+                return parseReceiver(reader);
             }
             catch (SyntaxError)
             {
@@ -1011,7 +1012,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseLiteral(reader);
+                return parseLiteral(reader);
             }
             catch (SyntaxError)
             {
@@ -1021,7 +1022,7 @@ namespace Erasystemlevel.Parser
             try
             {
                 reader.clear();
-                return Parser.parseAddress(reader);
+                return parseAddress(reader);
             }
             catch (SyntaxError)
             {
@@ -1041,7 +1042,7 @@ namespace Erasystemlevel.Parser
             }
 
             address.setValue(nextToken);
-            address.addChild(Parser.parseVariableReference(reader));
+            address.addChild(parseVariableReference(reader));
             reader.clear();
             return address;
         }
@@ -1101,11 +1102,9 @@ namespace Erasystemlevel.Parser
                 reader.clear();
                 return new AstNode(nextToken);
             }
-            else
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Can't parse register");
-            }
+
+            reader.saveReadedTokens();
+            throw new SyntaxError("Can't parse register");
         }
 
         public static AstNode parseDirective(TokenReader reader)
@@ -1140,7 +1139,7 @@ namespace Erasystemlevel.Parser
             AstNode node = new AstNode("ExtensionStatement");
             try
             {
-                node.addChild(Parser.parseAssigment(reader));
+                node.addChild(parseAssigment(reader));
             }
             catch (SyntaxError e)
             {
@@ -1149,7 +1148,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseCall(reader));
+                node.addChild(parseCall(reader));
                 reader.clear();
                 return node;
             }
@@ -1160,7 +1159,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseIf(reader));
+                node.addChild(parseIf(reader));
                 reader.clear();
                 return node;
             }
@@ -1171,7 +1170,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseWhile(reader));
+                node.addChild(parseWhile(reader));
                 reader.clear();
                 return node;
             }
@@ -1182,7 +1181,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseFor(reader));
+                node.addChild(parseFor(reader));
                 reader.clear();
                 return node;
             }
@@ -1193,7 +1192,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseBreak(reader));
+                node.addChild(parseBreak(reader));
                 reader.clear();
                 return node;
             }
@@ -1204,7 +1203,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseSwap(reader));
+                node.addChild(parseSwap(reader));
                 reader.clear();
                 return node;
             }
@@ -1215,7 +1214,7 @@ namespace Erasystemlevel.Parser
 
             try
             {
-                node.addChild(Parser.parseGoto(reader));
+                node.addChild(parseGoto(reader));
                 reader.clear();
                 return node;
             }
@@ -1237,7 +1236,7 @@ namespace Erasystemlevel.Parser
             }
 
             AstNode ifNode = new AstNode("if");
-            ifNode.addChild(Parser.parseExpression(reader));
+            ifNode.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("do"))
             {
@@ -1245,7 +1244,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("");
             }
 
-            ifNode.addChild(Parser.parseRoutineBody(reader));
+            ifNode.addChild(parseRoutineBody(reader));
             if (!nextToken.GetValue().Equals("end"))
             {
                 reader.saveReadedTokens();
@@ -1259,8 +1258,8 @@ namespace Erasystemlevel.Parser
         public static AstNode parseCall(TokenReader reader) //Identifier(); // Identifier ( [Identifier {, Identifier}]
         {
             AstNode call = new AstNode("Call");
-            call.addChild(Parser.parseIdentifier(reader));
-            call.addChild(Parser.parseCallParameters(reader));
+            call.addChild(parseIdentifier(reader));
+            call.addChild(parseCallParameters(reader));
             reader.clear();
             return call;
         }
@@ -1277,7 +1276,7 @@ namespace Erasystemlevel.Parser
 
             while (true)
             {
-                parameters.addChild(Parser.parseIdentifier(reader));
+                parameters.addChild(parseIdentifier(reader));
                 nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
@@ -1303,7 +1302,7 @@ namespace Erasystemlevel.Parser
             {
                 AstNode forNode = new AstNode(nextToken);
                 forStatement.addChild(forNode);
-                forNode.addChild(Parser.parseIdentifier(reader));
+                forNode.addChild(parseIdentifier(reader));
                 nextToken = reader.readNextToken();
             }
 
@@ -1311,7 +1310,7 @@ namespace Erasystemlevel.Parser
             {
                 AstNode fromStatement = new AstNode(nextToken);
                 forStatement.addChild(fromStatement);
-                fromStatement.addChild(Parser.parseExpression(reader));
+                fromStatement.addChild(parseExpression(reader));
                 nextToken = reader.readNextToken();
             }
 
@@ -1319,7 +1318,7 @@ namespace Erasystemlevel.Parser
             {
                 AstNode toStatement = new AstNode(nextToken);
                 forStatement.addChild(toStatement);
-                toStatement.addChild(Parser.parseExpression(reader));
+                toStatement.addChild(parseExpression(reader));
                 nextToken = reader.readNextToken();
             }
 
@@ -1327,10 +1326,10 @@ namespace Erasystemlevel.Parser
             {
                 AstNode stepNode = new AstNode(nextToken);
                 forStatement.addChild(stepNode);
-                stepNode.addChild(Parser.parseExpression(reader));
+                stepNode.addChild(parseExpression(reader));
             }
 
-            forStatement.addChild(Parser.parseLoopBody(reader));
+            forStatement.addChild(parseLoopBody(reader));
             reader.clear();
             return forStatement;
         }
@@ -1343,18 +1342,18 @@ namespace Erasystemlevel.Parser
             {
                 try
                 {
-                    whileStatement.addChild(Parser.parseExpression(reader));
+                    whileStatement.addChild(parseExpression(reader));
                 }
                 catch (SyntaxError e)
                 {
                     reader.saveReadedTokens();
-                    whileStatement.addChild(Parser.parseLoopBody(reader));
+                    whileStatement.addChild(parseLoopBody(reader));
                     reader.clear();
                     return whileStatement;
                 }
             }
 
-            whileStatement.addChild(Parser.parseLoopBody(reader));
+            whileStatement.addChild(parseLoopBody(reader));
             reader.clear();
             return whileStatement;
         }
@@ -1373,7 +1372,7 @@ namespace Erasystemlevel.Parser
             {
                 try
                 {
-                    loopBody.addChild(Parser.parseStatement(reader));
+                    loopBody.addChild(parseStatement(reader));
                 }
                 catch (SyntaxError e)
                 {
@@ -1409,7 +1408,7 @@ namespace Erasystemlevel.Parser
         public static AstNode parseSwap(TokenReader reader)
         {
             AstNode swap = new AstNode(null);
-            swap.addChild(Parser.parsePrimary(reader));
+            swap.addChild(parsePrimary(reader));
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("<=>"))
             {
@@ -1418,7 +1417,7 @@ namespace Erasystemlevel.Parser
             }
 
             swap.setValue(nextToken);
-            swap.addChild(Parser.parsePrimary(reader));
+            swap.addChild(parsePrimary(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(";"))
             {
@@ -1441,7 +1440,7 @@ namespace Erasystemlevel.Parser
             }
 
             go_to.setValue(nextToken);
-            go_to.addChild(Parser.parseIdentifier(reader));
+            go_to.addChild(parseIdentifier(reader));
             Token delim = reader.readNextToken();
             if (!delim.GetValue().Equals(";"))
             {
@@ -1455,7 +1454,7 @@ namespace Erasystemlevel.Parser
         public static AstNode parseAssigment(TokenReader reader)
         {
             AstNode assigment = new AstNode(null);
-            assigment.addChild(Parser.parsePrimary(reader));
+            assigment.addChild(parsePrimary(reader));
             Token nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals(":="))
             {
@@ -1467,7 +1466,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("Can't parse assigment");
             }
 
-            assigment.addChild(Parser.parseExpression(reader));
+            assigment.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(";"))
             {
