@@ -8,6 +8,10 @@ namespace Erasystemlevel.Parser
     {
         private Object value;
         private ArrayList childs = new ArrayList();
+        
+        public AstNode()
+        {
+        }
         public AstNode(Object value)
         {
             this.value = value;

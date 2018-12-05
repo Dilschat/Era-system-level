@@ -51,27 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Tests\testFiles\*" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Tokenizer\text.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="text1.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\test_reading.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\Break.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\Identifier.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\goto.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\operator.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\swap.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\loopBody.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\while.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\for.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\extensionStatement.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\expression.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\receiver.txt" />
-    <None Include="Tests\Literal.txt" />
-    <None Include="Tests\Address.txt" />
-    <None Include="Tests\register.txt" />
-    <None Include="Tests\dereference.txt" />
-    <None Include="Tests\array_and_data_elements.txt" />
-    <None Include="Tests\explicitAddress.txt" />
-    <None Include="Tests\primary.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
