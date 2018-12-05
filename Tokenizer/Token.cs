@@ -5,7 +5,7 @@ namespace Erasystemlevel.Tokenizer
     {
         private TokenType type;
         private String value;
-        public enum TokenType { Number, Identifier, Delimiter, Operator, Keyword, Register };
+        public enum TokenType { Number, Identifier, Delimiter, Operator, Keyword, Register }
         public Token(TokenType type, String value )
         {
             this.type = type;
