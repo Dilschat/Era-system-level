@@ -479,7 +479,7 @@ namespace Erasystemlevel.Parser
                     node.addChild(parseLabel(reader));
                 }
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
                 reader.saveReadedTokens();
             }
@@ -517,8 +517,6 @@ namespace Erasystemlevel.Parser
                 reader.saveReadedTokens();
                 throw new SyntaxError("Cant parse statement");
             }
-
-            throw new SyntaxError("Cant parse statement");
         }
 
         public static AstNode parseLabel(TokenReader reader)

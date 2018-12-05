@@ -646,6 +646,37 @@ namespace Erasystemlevel.Tests
             expectedChilds.Add(ifBody);
             Assert.AreEqual(curChilds, expectedChilds);
         }
+        
+        [Test]
+        public void parseStatementTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("statement.txt"));
+            TokenReader reader = new TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseStatement(reader);
+            Assert.AreEqual(node.getValue(), "Statement");
+            
+            ArrayList curChilds = node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            AstNode gotoNode = new AstNode(new Token(Token.TokenType.Keyword, "goto"));
+            gotoNode.addChild(new AstNode(new Token(Token.TokenType.Identifier,"a")));
+            AstNode extStatement = new AstNode("ExtensionStatement");
+            extStatement.addChild(gotoNode);
+            expectedChilds.Add(extStatement);
+            Assert.AreEqual(curChilds, expectedChilds);
+            
+            node = Parser.Parser.parseStatement(reader);
+            Assert.AreEqual(node.getValue(), "Statement");
+            
+            curChilds = node.getChilds();
+            expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier,"id")));
+            gotoNode = new AstNode(new Token(Token.TokenType.Keyword, "goto"));
+            gotoNode.addChild(new AstNode(new Token(Token.TokenType.Identifier,"a")));
+            extStatement = new AstNode("ExtensionStatement");
+            extStatement.addChild(gotoNode);
+            expectedChilds.Add(extStatement);
+            Assert.AreEqual(curChilds, expectedChilds);
+        }
 
 
         public static string getTestFilePath(string fileName)
