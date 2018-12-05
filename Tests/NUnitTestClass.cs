@@ -488,15 +488,17 @@ namespace Erasystemlevel.Tests
         [Test]
         public void parseVariableTest()
         {
-            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("variable.txt"));
-            TokenReader reader = new TokenReader(tokenizer);
-            AstNode node = Parser.Parser.parseVariable(reader);
+            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("variable.txt"));
+            var reader = new TokenReader(tokenizer);
+            var node = Parser.Parser.parseVariable(reader);
             Assert.AreEqual(node.getValue(), "Variable");
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
-            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Keyword, "byte")));
-            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "dilchat")));
-            AstNode expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
+            var curChilds = node.getChilds();
+            var expectedChilds = new ArrayList
+            {
+                new AstNode(new Token(Token.TokenType.Keyword, "byte")),
+                new AstNode(new Token(Token.TokenType.Identifier, "dilchat"))
+            };
+            var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
             expectedChilds.Add(expression);
@@ -510,10 +512,25 @@ namespace Erasystemlevel.Tests
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("declaration.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseDeclaration(reader);
-            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "format"));
+            Assert.AreEqual(node.getValue(), "Declaration");
+            
+            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "int"));
             node.getChilds();
-            var expectedChilds = new ArrayList {new AstNode(new Token(Token.TokenType.Number, "8"))};
+            var expectedChilds = new ArrayList
+            {
+                new AstNode(new Token(Token.TokenType.Identifier, "dilchat"))
+            };
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
+            reader.clear();
+
+            node = Parser.Parser.parseParameter(reader);
+            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "const"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, "="));
+            reader.clear();
+
+            node = Parser.Parser.parseParameter(reader);
+            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "const"));
+            Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, "="));
         }
         
         [Test]
@@ -648,7 +665,7 @@ namespace Erasystemlevel.Tests
         }
 
 
-        public static string getTestFilePath(string fileName)
+        private static string getTestFilePath(string fileName)
         {
             return "Tests/testFiles/" + fileName;
         }
