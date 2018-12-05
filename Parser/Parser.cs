@@ -278,7 +278,7 @@ namespace Erasystemlevel.Parser
                 throw new SyntaxError("");
             }
 
-            AstNode node = new AstNode("Constant");
+            AstNode node = new AstNode(nextToken);
             while (true)
             {
                 node.addChild(parseConstDefinition(reader));

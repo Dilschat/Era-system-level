@@ -514,6 +514,18 @@ namespace Erasystemlevel.Tests
             var expectedChilds = new ArrayList {new AstNode(new Token(Token.TokenType.Number, "8"))};
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
+        
+        [Test]
+        public void parseConstantTest()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("constant.txt"));
+            TokenReader reader = new TokenReader(tokenizer);
+            AstNode node = Parser.Parser.parseConstant(reader);
+            Assert.AreEqual(node.getValue(), "Parameters");
+            node.getChilds();
+            ArrayList expectedChilds = new ArrayList();
+            expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R0")));
+        }
 
 
         public static string getTestFilePath(string fileName)
