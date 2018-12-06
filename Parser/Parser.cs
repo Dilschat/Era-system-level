@@ -444,7 +444,7 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetTokenType() != Token.TokenType.Keyword)
             {
                 reader.saveReadTokens();
-                throw new SyntaxError("Can't parse type");
+                throw new SyntaxError("Can't parse type (token: " + nextToken.ToJsonString() + ")");
             }
 
             if (nextToken.GetValue().Equals("int"))
