@@ -2,17 +2,12 @@ using System.Collections.Generic;
 using System.Text;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
-using Erasystemlevel.Tokenizer;
 
 namespace Erasystemlevel.Generator
 {
     public class AssemblyBuffer
     {
         private LinkedList<AstNode> statements;
-
-        public AssemblyBuffer()
-        {
-        }
 
         public void put(AstNode node)
         {
@@ -38,8 +33,8 @@ namespace Erasystemlevel.Generator
         private static string statementToString(AstNode item)
         {
             var childs = item.getChilds();
-            var left = (AstNode) childs[0];
-            var right = (AstNode) childs[1];
+            var left = childs[0];
+            var right = childs[1];
 
             var leftRegister = (string) left.getValue();
             var rightRegister = (string) right.getValue();
@@ -50,12 +45,12 @@ namespace Erasystemlevel.Generator
                 {
                     if (leftRegister.Equals("*"))
                     {
-                        leftRegister += " " + ((AstNode) left.getChilds()[0]).getValue();
+                        leftRegister += " " + left.getChilds()[0].getValue();
                     }
 
                     if (rightRegister.Equals("*"))
                     {
-                        rightRegister += " " + ((AstNode) right.getChilds()[0]).getValue();
+                        rightRegister += " " + right.getChilds()[0].getValue();
                     }
                 }
 
@@ -73,10 +68,10 @@ namespace Erasystemlevel.Generator
 
                 if (val.Equals("if"))
                 {
-                    var gotoNode = (AstNode) item.getChilds()[1];
+                    var gotoNode = item.getChilds()[1];
 
-                    var condRegister = ((AstNode) item.getChilds()[0]).getValue();
-                    var addrRegister = ((AstNode) gotoNode.getChilds()[0]).getValue();
+                    var condRegister = item.getChilds()[0].getValue();
+                    var addrRegister = gotoNode.getChilds()[0].getValue();
 
                     return val + " " + condRegister + " " + gotoNode.getValue() + " " + addrRegister;
                 }
