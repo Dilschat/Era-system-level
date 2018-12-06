@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using static System.Char;
-
+using System.Text.RegularExpressions;
 
 namespace Erasystemlevel.Tokenizer
 {
@@ -14,24 +12,29 @@ namespace Erasystemlevel.Tokenizer
         readonly Regex identifierRegex = new Regex("\\b([A-Za-z][A-Za-z0-9_]*)\\b");
         private readonly Regex register = new Regex("\\bR([0-9]|[12][0-9]|3[01])\\b");
 
-        readonly HashSet<string> delimeters = new HashSet<string>(new List<string>()
+        readonly HashSet<string> delimeters = new HashSet<string>(new List<string>
         {
             ";", ",", ".", "(", ")", "[", "]", "//", ":>"
         });
 
-        readonly HashSet<string> operators = new HashSet<string>(new List<string>()
+        readonly HashSet<string> operators = new HashSet<string>(new List<string>
         {
             "+", "-", "*", "&", "|", "^", "?", "=", "<", ">", "/=", ":=",
             "+=", "-=", ">>=", "<<=", "|=", "&=", "^=", "<=", ">=", "?=",
             "<=>"
         });
 
-        readonly HashSet<string> keywords = new HashSet<string>(new List<string>()
+        readonly HashSet<string> keywords = new HashSet<string>(new List<string>
         {
             "if", "else", "int", "short", "byte", "const", "routine", "do", "end",
             "start", "entry", "skip", "stop", "goto", "format", "for", "from", "to",
             "step", "while", "loop", "break", "then", "by", "trace", "data", "module", "code",
             "this"
+        });
+
+        readonly HashSet<string> whitespace = new HashSet<string>(new List<string>
+        {
+            "", "\n", "\r", " "
         });
 
         private readonly StreamReader reader;
@@ -51,7 +54,7 @@ namespace Erasystemlevel.Tokenizer
             while (!reader.EndOfStream)
             {
                 var next = Convert.ToChar(reader.Read());
-                if (next.ToString() == "" || next.ToString() == "\n" || next.ToString() == " ")
+                if (whitespace.Contains(next.ToString()))
                 {
                     continue;
                 }
@@ -67,7 +70,7 @@ namespace Erasystemlevel.Tokenizer
                 {
                     var nextChar = Convert.ToChar(reader.Peek());
 
-                    if (!IsDigit(nextChar) && !IsLetter(nextChar) && nextChar.ToString() != "_")
+                    if (!char.IsDigit(nextChar) && !char.IsLetter(nextChar) && nextChar.ToString() != "_")
                     {
                         return new Token(Token.TokenType.Register, currentToken);
                     }
@@ -85,14 +88,13 @@ namespace Erasystemlevel.Tokenizer
 
                 if (keywords.Contains(currentToken))
                 {
-                    if (reader.EndOfStream || Convert.ToString(reader.Peek()).Equals(" ") ||
-                        Convert.ToString(reader.Peek()).Equals("/n"))
+                    if (reader.EndOfStream || whitespace.Contains(Convert.ToString(reader.Peek())))
                     {
                         return new Token(Token.TokenType.Keyword, currentToken);
                     }
 
                     var nextChar = Convert.ToChar(reader.Peek());
-                    if (!IsDigit(nextChar) && !IsLetter(nextChar) && nextChar.ToString() != "_")
+                    if (!char.IsDigit(nextChar) && !char.IsLetter(nextChar) && nextChar.ToString() != "_")
                     {
                         return new Token(Token.TokenType.Keyword, currentToken);
                     }
@@ -100,14 +102,13 @@ namespace Erasystemlevel.Tokenizer
 
                 if (identifierRegex.IsMatch(currentToken))
                 {
-                    if (reader.EndOfStream || Convert.ToString(reader.Peek()).Equals(" ") ||
-                        Convert.ToString(reader.Peek()).Equals("/n"))
+                    if (reader.EndOfStream || reader.Peek() == ' ' || Convert.ToString(reader.Peek()).Equals("\n"))
                     {
                         return new Token(Token.TokenType.Identifier, currentToken);
                     }
 
                     var nextChar = Convert.ToChar(reader.Peek());
-                    if ((IsDigit(nextChar) || IsLetter(nextChar)) && nextChar != ' ')
+                    if ((char.IsDigit(nextChar) || char.IsLetter(nextChar)) && nextChar != ' ')
                     {
                         continue;
                     }
@@ -121,8 +122,7 @@ namespace Erasystemlevel.Tokenizer
                     return new Token(Token.TokenType.Number, currentToken);
                 }
 
-                while (numericRegex.IsMatch(currentToken + Convert.ToChar(reader.Peek())) &&
-                       !reader.EndOfStream)
+                while (numericRegex.IsMatch(currentToken + Convert.ToChar(reader.Peek())) && !reader.EndOfStream)
                 {
                     currentToken = currentToken + Convert.ToChar(reader.Read());
                 }
