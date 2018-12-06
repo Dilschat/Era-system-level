@@ -417,12 +417,12 @@ namespace Erasystemlevel.Parser
 
             if (nextToken.GetValue().Equals("["))
             {
-                node.setValue(new Token(Token.TokenType.Operator, ":="));
+                node.setValue(new Token(Token.TokenType.Operator, "[]"));
                 node.addChild(parseExpression(reader));
                 nextToken = reader.readNextToken();
                 if (!nextToken.GetValue().Equals("]")) throw new SyntaxError("Can't parse varDefinition");
                 reader.clear();
-                node.SetNodeType(AstNode.NodeType.VarDefinition);
+                node.SetNodeType(AstNode.NodeType.ArrayElement);
                 return node;
             }
 

@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Erasystemlevel.Tests
 {
     [TestFixture]
-    public class Samples
+    public class SamplesTest
     {
         [Test]
         public void DataTest1Case()

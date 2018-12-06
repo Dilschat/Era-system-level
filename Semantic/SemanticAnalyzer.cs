@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
 
@@ -7,22 +8,28 @@ namespace Erasystemlevel.Semantic
 {
     public class SemanticAnalyzer
     {
-        public SymbolTable symbolTable;
-        public CallTable callTable;
+        public readonly SymbolTable symbolTable;
+        public readonly CallTable callTable;
+        private readonly AstNode tree;
         
         public SemanticAnalyzer(AstNode tree)
         {
             callTable = new CallTable();
             symbolTable = new SymbolTable();
+            this.tree = tree;
         }
 
-        public void AnalyzeTree(AstNode tree)
+        public void generateTables()
         {
-            List<AstNode> childs = tree.getChilds();
+            AnalyzeTree(tree);
+        }
+        private void AnalyzeTree(AstNode tree)
+        {
+            var childes = tree.getChilds();
             if (tree.GetNodeType().Equals(AstNode.NodeType.Routine))
             {
-                CallTableEntry entry = new CallTableEntry();
-                foreach(AstNode i in childs)
+                var entry = new CallTableEntry();
+                foreach(var i in childes)
                 {
                     if (i.GetNodeType().Equals(AstNode.NodeType.Attribute))
                     {
@@ -52,7 +59,7 @@ namespace Erasystemlevel.Semantic
             else
             {
                 AnalyzeSymbols(tree);
-                foreach(AstNode i in childs)
+                foreach(var i in childes)
                 {
                     AnalyzeTree(i);
                 }
@@ -63,18 +70,37 @@ namespace Erasystemlevel.Semantic
         {
             if (tree.GetNodeType().Equals(AstNode.NodeType.ConstDefinition))
             {
-                SymbolTableEntry entry = new SymbolTableEntry();
-                entry.type = "int";
-                entry.name = ((Token) tree.getChilds()[0].getValue()).GetValue();
+                SymbolTableEntry entry = new SymbolTableEntry
+                {
+                    type = "int", name = ((Token) tree.getChilds()[0].getValue()).GetValue()
+                };
+                checkSymbolEntry(entry);
+                symbolTable.Add(entry.name, entry);
+
+
             }else if(tree.GetNodeType().Equals(AstNode.NodeType.Variable))
             {
-                List<AstNode> childs = tree.getChilds();
+                var childes = tree.getChilds();
+                var type = ((Token) childes[0].getValue()).GetValue();
+                for (var i = 1; i < childes.Count; i++)
+                {
+                    var entry = new SymbolTableEntry
+                    {
+
+                        type = type, name = ((Token) childes[i].getChilds()[0].getValue()).GetValue()
+
+                    };
+                    checkSymbolEntry(entry);
+                    symbolTable.Add(entry.name, entry);
+                    
+                }
                 
-                
+
+
             }
         }
         
-        private string AnalyzeName(AstNode astNode)
+        private static string AnalyzeName(AstNode astNode)
         {
             return astNode.getValue().ToString();
         }
@@ -82,31 +108,40 @@ namespace Erasystemlevel.Semantic
         private ArrayList AnalyzeParameters(AstNode astNode)
         {
             
-            List<AstNode> childs = astNode.getChilds();
-            ArrayList parameters = new ArrayList();
-            foreach (AstNode i in childs)
+            var childes = astNode.getChilds();
+            var parameters = new ArrayList();
+            foreach (var i in childes)
             {
                 parameters.Add(((Token)i.getChilds()[0].getChilds()[0].getValue()).GetValue());
             }
-
+             
             return parameters;
         }
 
-        private ArrayList AnalyzeResults(AstNode astNode)
+        private static ArrayList AnalyzeResults(AstNode astNode)
         {
-            List<AstNode> childs = astNode.getChilds();
-            ArrayList results = new ArrayList();
-            foreach (AstNode i in childs)
+            var childes = astNode.getChilds();
+            var results = new ArrayList();
+            foreach (var i in childes)
             {
                 results.Add(((Token)i.getValue()).GetValue());
             }
-
             return results;
         }
 
-        private string AnalyzeAttribute(AstNode astNode)
+        private static string AnalyzeAttribute(AstNode astNode)
         {
             return astNode.getValue().ToString();
+        }
+
+        private void checkSymbolEntry(SymbolTableEntry entry)
+        {
+
+            if (!entry.Equals(symbolTable[entry.name]))
+            {
+                throw new SemanticError("Type error for:"+ entry.ToString());
+
+            }
         }
     }
 }
