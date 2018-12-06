@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
 using NUnit.Framework;
@@ -6,32 +7,8 @@ using NUnit.Framework;
 namespace Erasystemlevel.Tests
 {
     [TestFixture]
-    public class NUnitTestClass
+    public class ParserUnitTest
     {
-        [Test]
-        public void TokenReadingTestCase()
-        {
-            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("test_reading.txt"));
-            var reader = new TokenReader(tokenizer);
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
-        }
-
-        [Test]
-        public void TokenSavedReadingTestCase()
-        {
-            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("test_reading.txt"));
-            var reader = new TokenReader(tokenizer);
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
-            reader.saveReadTokens();
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
-        }
-
         [Test]
         public void parseBreakTest()
         {
@@ -226,7 +203,7 @@ namespace Erasystemlevel.Tests
 
 
         [Test]
-        public void parseWhileTest() 
+        public void parseWhileTest()
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("while.txt"));
             var reader = new TokenReader(tokenizer);
@@ -809,14 +786,43 @@ namespace Erasystemlevel.Tests
 
             var curChilds = node.getChilds();
 
-
             Assert.AreEqual(curChilds[0].GetNodeType(), AstNode.NodeType.Statement);
         }
+        
+        [Test]
+        public void negativeLoopVarDefinitionTest()
+        {
+            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("varInLoop.txt"));
+            var reader = new TokenReader(tokenizer);
 
+            Assert.Throws<SyntaxError>(delegate
+            {
+                Parser.Parser.parseLoopBody(reader);
+            });
+        }
+
+        [Test]
+        public void negativeConditionVarDefinitionTest()
+        {
+            var tokenizerIf = new Tokenizer.Tokenizer(getTestFilePath("varInIf.txt"));
+            var readerIf = new TokenReader(tokenizerIf);
+            
+            var tokenizerElse = new Tokenizer.Tokenizer(getTestFilePath("varInElse.txt"));
+            var readerElse = new TokenReader(tokenizerElse);
+
+            Assert.Throws<SyntaxError>(delegate
+            {
+                Parser.Parser.parseLoopBody(readerIf);
+            });
+            Assert.Throws<SyntaxError>(delegate
+            {
+                Parser.Parser.parseLoopBody(readerElse);
+            });
+        }
 
         private static string getTestFilePath(string fileName)
         {
-            return "Tests/testFiles/" + fileName;
+            return TestUtils.getTestFilePath(fileName);
         }
     }
 }
