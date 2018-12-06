@@ -14,9 +14,9 @@ namespace Erasystemlevel.Tests
         {
             Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("test_reading.txt"));
             TokenReader reader = new TokenReader(tokenizer);
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "1").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "2").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "3").ToJsonString());
         }
 
         [Test]
@@ -24,13 +24,13 @@ namespace Erasystemlevel.Tests
         {
             Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("test_reading.txt"));
             TokenReader reader = new TokenReader(tokenizer);
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "1").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "2").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "3").ToJsonString());
             reader.saveReadedTokens();
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "1").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "2").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "3").ToJsonString());
         }
 
         [Test]

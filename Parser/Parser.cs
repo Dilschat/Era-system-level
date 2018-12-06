@@ -670,7 +670,7 @@ namespace Erasystemlevel.Parser
                         Token newToken = reader.readNextToken();
                         if (!nextToken.GetValue().Equals("goto"))
                         {
-                            throw new SyntaxError("");
+                            throw new SyntaxError("Goto expected");
                         }
 
                         AstNode goTo = new AstNode(newToken);
