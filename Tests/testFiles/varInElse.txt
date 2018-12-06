@@ -1,0 +1,4 @@
+if 4 > 8 do end
+else do
+    int a := 10;
+end
