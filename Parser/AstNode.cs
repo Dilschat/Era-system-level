@@ -8,7 +8,7 @@ namespace Erasystemlevel.Parser
     {
         private object value;
         private NodeType type;
-        private ArrayList childs = new ArrayList();
+        private readonly ArrayList childs = new ArrayList();
 
         public enum NodeType
         {
@@ -65,19 +65,9 @@ namespace Erasystemlevel.Parser
             Step
         }
 
-        public AstNode(NodeType type, string value)
-        {
-            this.type = type;
-            this.value = value;
-        }
-
         public void SetNodeType(NodeType type)
         {
             this.type = type;
-        }
-
-        public AstNode()
-        {
         }
 
         public AstNode(object value)
@@ -97,17 +87,12 @@ namespace Erasystemlevel.Parser
 
         public object getValue()
         {
-            return this.value;
+            return value;
         }
 
         public void addChild(AstNode node)
         {
             childs.Add(node);
-        }
-
-        public void cleanChild()
-        {
-            childs = new ArrayList();
         }
 
         public ArrayList getChilds()

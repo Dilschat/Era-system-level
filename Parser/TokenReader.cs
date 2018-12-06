@@ -8,15 +8,14 @@ namespace Erasystemlevel.Parser
         private readonly Tokenizer.Tokenizer tokenizer;
         private readonly Stack<Token> lookaheadBuffer = new Stack<Token>();
         private readonly Stack<Token> savingBuffer = new Stack<Token>();
-//        private Token lastToken;
-        
+
 
         public TokenReader(Tokenizer.Tokenizer tokenizer)
         {
             this.tokenizer = tokenizer;
         }
 
-        public void SaveReadedTokens()
+        public void SaveReadTokens()
         {
             while (lookaheadBuffer.Count > 0)
             {
