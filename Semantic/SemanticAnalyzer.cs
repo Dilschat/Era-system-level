@@ -17,7 +17,7 @@ namespace Erasystemlevel.Semantic
 
         public void AnalyzeTree(AstNode tree)
         {
-            ArrayList childs = tree.getChilds();
+            List<AstNode> childs = tree.getChilds();
             if (tree.GetNodeType().Equals(AstNode.NodeType.Routine))
             {
                 CallTableEntry entry = new CallTableEntry();
@@ -28,17 +28,17 @@ namespace Erasystemlevel.Semantic
                         entry.functionType= AnalyzeAttribute(i);
                     }else if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
                     {
-                        entry.functionType= AnalyzeName(i);
+                        entry.functionName= AnalyzeName(i);
 
                     }
                     else if (i.GetNodeType().Equals(AstNode.NodeType.Parameters))
                     {
-                        entry.functionType= AnalyzeParameters(i);
+                        entry.parameters= AnalyzeParameters(i);
 
                     }
                     else if (i.GetNodeType().Equals(AstNode.NodeType.Results))
                     {
-                        entry.functionType= AnalyzeResults(i);
+                        entry.results= AnalyzeResults(i);
 
                     }
                 }
@@ -57,22 +57,29 @@ namespace Erasystemlevel.Semantic
             return astNode.getValue().ToString();
         }
 
-        private string AnalyzeParameters(AstNode astNode)
+        private ArrayList AnalyzeParameters(AstNode astNode)
         {
             
-            ArrayList childs = astNode.getChilds();
+            List<AstNode> childs = astNode.getChilds();
             ArrayList parameters = new ArrayList();
             foreach (AstNode i in childs)
             {
-                parameters.Add(((Token) ( i.getChilds()[0]).getChilds()[0]).GetValue());
+                parameters.Add(((Token)i.getChilds()[0].getChilds()[0].getValue()).GetValue());
             }
 
-            throw new System.NotImplementedException();
+            return parameters;
         }
 
-        private string AnalyzeResults(AstNode astNode)
+        private ArrayList AnalyzeResults(AstNode astNode)
         {
-            throw new System.NotImplementedException();
+            List<AstNode> childs = astNode.getChilds();
+            ArrayList parameters = new ArrayList();
+            foreach (AstNode i in childs)
+            {
+                parameters.Add(((Token)i.getChilds()[0].getChilds()[0].getValue()).GetValue());
+            }
+
+            return parameters;
         }
 
         private string AnalyzeAttribute(AstNode astNode)
