@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Erasystemlevel.Tokenizer;
+
 namespace Erasystemlevel.Parser
 {
     public class TokenReader
     {
-        private Tokenizer.Tokenizer tokenizer;
-        private Stack<Token> lookaheadBuffer = new Stack<Token>();
-        private Stack<Token> savingBuffer = new Stack<Token>();
+        private readonly Tokenizer.Tokenizer tokenizer;
+        private readonly Stack<Token> lookaheadBuffer = new Stack<Token>();
+        private readonly Stack<Token> savingBuffer = new Stack<Token>();
+
+
         public TokenReader(Tokenizer.Tokenizer tokenizer)
         {
             this.tokenizer = tokenizer;
         }
 
-       public void saveReadedTokens()
+        public void SaveReadTokens()
         {
             while (lookaheadBuffer.Count > 0)
             {
@@ -28,7 +30,8 @@ namespace Erasystemlevel.Parser
                 lookaheadBuffer.Push(savingBuffer.Peek());
                 return savingBuffer.Pop();
             }
-            Token nextToken = tokenizer.Tokenize();
+
+            var nextToken = tokenizer.Tokenize();
             lookaheadBuffer.Push(nextToken);
             return nextToken;
         }

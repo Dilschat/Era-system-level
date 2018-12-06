@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Erasystemlevel.Parser
 {
@@ -7,7 +8,7 @@ namespace Erasystemlevel.Parser
     {
         private object value;
         private NodeType type;
-        private ArrayList childs = new ArrayList();
+        private readonly ArrayList childs = new ArrayList();
 
         public enum NodeType
         {
@@ -64,19 +65,9 @@ namespace Erasystemlevel.Parser
             Step
         }
 
-        public AstNode(NodeType type, string value)
-        {
-            this.type = type;
-            this.value = value;
-        }
-
         public void SetNodeType(NodeType type)
         {
             this.type = type;
-        }
-
-        public AstNode()
-        {
         }
 
         public AstNode(object value)
@@ -96,17 +87,12 @@ namespace Erasystemlevel.Parser
 
         public object getValue()
         {
-            return this.value;
+            return value;
         }
 
         public void addChild(AstNode node)
         {
             childs.Add(node);
-        }
-
-        public void cleanChild()
-        {
-            childs = new ArrayList();
         }
 
         public ArrayList getChilds()
@@ -124,7 +110,7 @@ namespace Erasystemlevel.Parser
             var thisChilds = getChilds();
             var objChilds = ((AstNode) obj).getChilds();
 
-            if (thisChilds.Count != (objChilds.Count))
+            if (thisChilds.Count != objChilds.Count)
             {
                 return false;
             }
@@ -152,14 +138,10 @@ namespace Erasystemlevel.Parser
             public string ToString()
         {
             var childsJsons = "";
-            for (var i = 0; i < childs.Count; i++)
+            foreach (var i in childs)
             {
-                var childsList = childs[i].ToString().Split('\n');
-                var formattedChilds = "";
-                for (var j = 0; j < childsList.Length; j++)
-                {
-                    formattedChilds = formattedChilds + "  " + childsList[j] + "\n";
-                }
+                var childsList = i.ToString().Split('\n');
+                var formattedChilds = childsList.Aggregate("", (current, j) => current + "  " + j + "\n");
 
                 childsJsons = childsJsons + formattedChilds;
             }
