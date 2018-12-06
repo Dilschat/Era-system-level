@@ -1,7 +1,7 @@
 ﻿using System;
 using Erasystemlevel.Exception;
 
-namespace EraSystemLevel
+namespace Erasystemlevel
 {
     class Run
     {

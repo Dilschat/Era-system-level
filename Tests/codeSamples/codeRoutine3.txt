@@ -1,0 +1,6 @@
+entry routine func ()
+do
+    for i from 1 to 2 step 1
+        loop
+        end
+end

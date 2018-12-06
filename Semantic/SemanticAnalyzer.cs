@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Erasystemlevel.Parser;
 
-namespace EraSystemLevel.Semantic
+namespace Erasystemlevel.Semantic
 {
     public class SemanticAnalyzer
     {

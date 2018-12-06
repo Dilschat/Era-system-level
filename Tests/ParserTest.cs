@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
 using NUnit.Framework;
@@ -13,9 +14,9 @@ namespace Erasystemlevel.Tests
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("test_reading.txt"));
             var reader = new TokenReader(tokenizer);
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "1").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "2").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "3").ToJsonString());
         }
 
         [Test]
@@ -23,13 +24,13 @@ namespace Erasystemlevel.Tests
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("test_reading.txt"));
             var reader = new TokenReader(tokenizer);
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
-            reader.SaveReadTokens();
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
-            Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "1").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "2").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "3").ToJsonString());
+            reader.saveReadTokens();
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "1").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "2").ToJsonString());
+            Assert.AreEqual(reader.readNextToken().ToJsonString(), new Token(Token.TokenType.Number, "3").ToJsonString());
         }
 
         [Test]
@@ -71,8 +72,7 @@ namespace Erasystemlevel.Tests
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseArrayElement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Identifier, "bla"));
-            var childs = new ArrayList();
-            childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
+            var childs = new ArrayList {new AstNode(new Token(Token.TokenType.Number, "2"))};
             var curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -94,8 +94,7 @@ namespace Erasystemlevel.Tests
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseExplicitAddress(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "*"));
-            var childs = new ArrayList();
-            childs.Add(new AstNode(new Token(Token.TokenType.Number, "323")));
+            var childs = new ArrayList {new AstNode(new Token(Token.TokenType.Number, "323"))};
             var curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -116,7 +115,8 @@ namespace Erasystemlevel.Tests
 
             node = Parser.Parser.parseDereference(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "*"));
-            childs = new ArrayList {new AstNode(new Token(Token.TokenType.Register, "R0"))};
+            childs = new ArrayList();
+            childs.Add(new AstNode(new Token(Token.TokenType.Register, "R0")));
             curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -227,7 +227,7 @@ namespace Erasystemlevel.Tests
 
 
         [Test]
-        public void parseWhileTest() //TODO vanishing syntax error inside loopbody
+        public void parseWhileTest() 
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("while.txt"));
             var reader = new TokenReader(tokenizer);
@@ -512,7 +512,7 @@ namespace Erasystemlevel.Tests
         }
 
         [Test]
-        public void ParseRoutinebodyTest()
+        public void parseRoutinebodyTest()
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("routineBody.txt"));
             var reader = new TokenReader(tokenizer);

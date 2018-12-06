@@ -1,5 +1,5 @@
 module myModule
-routine func(int a): R1,R2
+routine func(int a):> R1,R2
 do
     short id := 2, id1 := 3;
     const id = 2, id1 = 3;
