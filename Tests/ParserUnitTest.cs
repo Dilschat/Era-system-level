@@ -455,7 +455,7 @@ namespace Erasystemlevel.Tests
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("varDefinition.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseVarDefinition(reader);
-            Assert.AreEqual(node.getValue(), new Token(Token.TokenType.Operator, ":="));
+            Assert.AreEqual(node.getValue(), new Token(Token.TokenType.Operator, "[]"));
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList {new AstNode(new Token(Token.TokenType.Identifier, "dilchat"))};
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));

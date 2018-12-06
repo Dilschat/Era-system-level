@@ -22,5 +22,10 @@ namespace Erasystemlevel.Semantic
             var val = (SymbolTableEntry) obj;
             return type.Equals(val.type) && name.Equals(val.name);
         }
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
 }
