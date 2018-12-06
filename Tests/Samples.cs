@@ -86,6 +86,39 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.ParseUnit(reader);
             Console.WriteLine(node.ToString());
         }
+        
+        [Test]
+        public void routineTest1Case()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("codeRoutine1.txt"));
+            TokenReader reader = new TokenReader(tokenizer);
+            AstNode node = Parser.Parser.ParseUnit(reader);
+            Console.WriteLine(node.ToString());
+        }
+        [Test]
+        public void routineTest2Case()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("codeRoutine2.txt"));
+            TokenReader reader = new TokenReader(tokenizer);
+            AstNode node = Parser.Parser.ParseUnit(reader);
+            Console.WriteLine(node.ToString());
+        }
+        [Test]
+        public void routineTest3Case()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("codeRoutine3.txt"));
+            TokenReader reader = new TokenReader(tokenizer);
+            AstNode node = Parser.Parser.ParseUnit(reader);
+            Console.WriteLine(node.ToString());
+        }
+        [Test]
+        public void routineTest4Case()
+        {
+            Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("codeRoutine4.txt"));
+            TokenReader reader = new TokenReader(tokenizer);
+            AstNode node = Parser.Parser.ParseUnit(reader);
+            Console.WriteLine(node.ToString());
+        }
         private static string getTestFilePath(string fileName)
         {
             return "Tests/codeSamples/" + fileName;

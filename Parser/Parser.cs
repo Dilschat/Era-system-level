@@ -530,7 +530,7 @@ namespace Erasystemlevel.Parser
         {
             Token nextToken = reader.readNextToken();
             checkToken(nextToken);
-            //reader.saveReadedTokens();
+            reader.saveReadedTokens();
             AstNode node = new AstNode(AstNode.NodeType.Statement);
             try
             {
@@ -1493,6 +1493,7 @@ namespace Erasystemlevel.Parser
                 AstNode forNode = new AstNode(nextToken);
                 forStatement =forNode;
                 forNode.addChild(parseIdentifier(reader));
+                reader.clear();
                 nextToken = reader.readNextToken();
             }
 
@@ -1544,6 +1545,7 @@ namespace Erasystemlevel.Parser
                 stepNode.SetNodeType(AstNode.NodeType.Step);
                 forStatement.addChild(stepNode);
             }
+            reader.saveReadedTokens();
             forStatement.addChild(parseLoopBody(reader));
             reader.clear();
             forStatement.SetNodeType(AstNode.NodeType.For);
