@@ -71,8 +71,7 @@ namespace Erasystemlevel.Tests
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseArrayElement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Identifier, "bla"));
-            var childs = new ArrayList();
-            childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
+            var childs = new ArrayList {new AstNode(new Token(Token.TokenType.Number, "2"))};
             var curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -227,15 +226,15 @@ namespace Erasystemlevel.Tests
 
 
         [Test]
-        public void parseWhileTest() //TODO vanishing syntax error inside loopbody
+        public void parseWhileTest() 
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("while.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseWhile(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.While);
             var curChilds = node.getChilds();
-            Assert.AreEqual(((AstNode) curChilds[0]).getValue(), new Token(Token.TokenType.Operator, ">"));
-            Assert.AreEqual(((AstNode) curChilds[1]).getValue(), AstNode.NodeType.LoopBody);
+            Assert.AreEqual(curChilds[0].getValue(), new Token(Token.TokenType.Operator, ">"));
+            Assert.AreEqual(curChilds[1].getValue(), AstNode.NodeType.LoopBody);
         }
 
         [Test]
@@ -247,9 +246,9 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "for"));
             var childs = node.getChilds();
             Assert.AreEqual(childs[0], new AstNode(new Token(Token.TokenType.Identifier, "i")));
-            Assert.AreEqual(((AstNode) childs[1]).getValue(), new Token(Token.TokenType.Keyword, "from"));
-            Assert.AreEqual(((AstNode) childs[2]).getValue(), new Token(Token.TokenType.Keyword, "to"));
-            Assert.AreEqual(((AstNode) childs[3]).getValue(), new Token(Token.TokenType.Keyword, "step"));
+            Assert.AreEqual(childs[1].getValue(), new Token(Token.TokenType.Keyword, "from"));
+            Assert.AreEqual(childs[2].getValue(), new Token(Token.TokenType.Keyword, "to"));
+            Assert.AreEqual(childs[3].getValue(), new Token(Token.TokenType.Keyword, "step"));
         }
 
         [Test]
@@ -499,7 +498,7 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList
             {
-                new AstNode(new Token(Token.TokenType.Keyword, "byte")),
+                new AstNode(new Token(Token.TokenType.Keyword, "byte"))
             };
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -544,9 +543,9 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
             Assert.AreEqual(curChilds[0], new AstNode(new Token(Token.TokenType.Keyword, "start")));
             Assert.AreEqual(curChilds[1], new AstNode(new Token(Token.TokenType.Identifier, "func")));
-            Assert.AreEqual(((AstNode) curChilds[2]).getValue(), AstNode.NodeType.Parameters);
-            Assert.AreEqual(((AstNode) curChilds[3]).getValue(), AstNode.NodeType.Results);
-            Assert.AreEqual(((AstNode) curChilds[4]).getValue(), AstNode.NodeType.RoutineBody);
+            Assert.AreEqual(curChilds[2].getValue(), AstNode.NodeType.Parameters);
+            Assert.AreEqual(curChilds[3].getValue(), AstNode.NodeType.Results);
+            Assert.AreEqual(curChilds[4].getValue(), AstNode.NodeType.RoutineBody);
         }
 
         [Test]
@@ -559,7 +558,7 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList
             {
-                new AstNode(new Token(Token.TokenType.Keyword, "byte")),
+                new AstNode(new Token(Token.TokenType.Keyword, "byte"))
             };
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -568,7 +567,7 @@ namespace Erasystemlevel.Tests
             varExpression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "dilchat")));
             varExpression.addChild(expression);
             expectedChilds.Add(varExpression);
-            Assert.AreEqual(((AstNode) curChilds[0]).getChilds(), expectedChilds);
+            Assert.AreEqual(curChilds[0].getChilds(), expectedChilds);
         }
 
         [Test]
@@ -597,7 +596,7 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList
             {
-                new AstNode(new Token(Token.TokenType.Keyword, "byte")),
+                new AstNode(new Token(Token.TokenType.Keyword, "byte"))
             };
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -606,7 +605,7 @@ namespace Erasystemlevel.Tests
             varExpression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "dilchat")));
             varExpression.addChild(expression);
             expectedChilds.Add(varExpression);
-            Assert.AreEqual(((AstNode) curChilds[0]).getChilds(), expectedChilds);
+            Assert.AreEqual(curChilds[0].getChilds(), expectedChilds);
         }
 
         [Test]
@@ -619,7 +618,7 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList
             {
-                new AstNode(new Token(Token.TokenType.Keyword, "byte")),
+                new AstNode(new Token(Token.TokenType.Keyword, "byte"))
             };
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -628,7 +627,7 @@ namespace Erasystemlevel.Tests
             varExpression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "dilchat")));
             varExpression.addChild(expression);
             expectedChilds.Add(varExpression);
-            Assert.AreEqual(((AstNode) curChilds[0]).getChilds(), expectedChilds);
+            Assert.AreEqual(curChilds[0].getChilds(), expectedChilds);
         }
 
         [Test]
@@ -641,7 +640,7 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList
             {
-                new AstNode(new Token(Token.TokenType.Keyword, "byte")),
+                new AstNode(new Token(Token.TokenType.Keyword, "byte"))
             };
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -811,7 +810,7 @@ namespace Erasystemlevel.Tests
             var curChilds = node.getChilds();
 
 
-            Assert.AreEqual(((AstNode) curChilds[0]).GetNodeType(), AstNode.NodeType.Statement);
+            Assert.AreEqual(curChilds[0].GetNodeType(), AstNode.NodeType.Statement);
         }
 
 

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
@@ -7,7 +9,7 @@ namespace Erasystemlevel.Generator
 {
     public class AssemblyBuffer
     {
-        private LinkedList<AstNode> statements;
+        private LinkedList<AstNode> statements = new LinkedList<AstNode>();
 
         public void put(AstNode node)
         {
@@ -27,21 +29,24 @@ namespace Erasystemlevel.Generator
                 asmCode.Append(statementToString(item) + "\n");
             }
 
-            return base.ToString();
+            return asmCode.ToString();
         }
 
-        private static string statementToString(AstNode item)
+
+        public static string statementToString(AstNode item)
         {
+            var val = item.getValue().ToString();
             var childs = item.getChilds();
+            
             var left = childs[0];
             var right = childs[1];
 
-            var leftRegister = (string) left.getValue();
-            var rightRegister = (string) right.getValue();
+            var leftRegister = left.getValue().ToString();
+            var rightRegister = right.getValue().ToString();
 
             if (item.GetNodeType() == AstNode.NodeType.OperationOnRegisters)
             {
-                if (item.getValue().Equals(":="))
+                if (val.Equals(":="))
                 {
                     if (leftRegister.Equals("*"))
                     {
@@ -59,8 +64,6 @@ namespace Erasystemlevel.Generator
 
             if (item.GetNodeType() == AstNode.NodeType.AssemblerStatement)
             {
-                var val = item.getValue().ToString();
-
                 if (val.Equals("skip") || val.Equals("stop"))
                 {
                     return val;
@@ -75,6 +78,8 @@ namespace Erasystemlevel.Generator
 
                     return val + " " + condRegister + " " + gotoNode.getValue() + " " + addrRegister;
                 }
+                
+                Console.WriteLine(val);
             }
 
             throw new GenerationError("Invalid assembly statement supplied");
