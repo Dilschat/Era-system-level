@@ -1,3 +1,1 @@
-int dilchat[1+1];
-const a = 1;
-routine a;
+byte dilchat := 1+1;
