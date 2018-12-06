@@ -63,14 +63,17 @@ namespace Erasystemlevel.Semantic
         {
             if (tree.GetNodeType().Equals(AstNode.NodeType.ConstDefinition))
             {
-                SymbolTableEntry entry = new SymbolTableEntry();
-                entry.type = "int";
-                entry.name = ((Token) tree.getChilds()[0].getValue()).GetValue();
+                SymbolTableEntry entry = new SymbolTableEntry
+                {
+                    type = "int", name = ((Token) tree.getChilds()[0].getValue()).GetValue()
+                };
             }else if(tree.GetNodeType().Equals(AstNode.NodeType.Variable))
             {
                 List<AstNode> childs = tree.getChilds();
+                var type = ((Token) childs[0].getValue()).GetValue();
                 
-                
+
+
             }
         }
         
