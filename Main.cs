@@ -1,5 +1,6 @@
 ﻿using System;
 using Erasystemlevel.Exception;
+using EraSystemLevel;
 
 namespace Erasystemlevel
 {
@@ -24,6 +25,11 @@ namespace Erasystemlevel
             catch (SemanticError e)
             {
                 Console.WriteLine("Semantic error:", e);
+                return;
+            }
+            catch (GenerationError e)
+            {
+                Console.WriteLine("Generation error:", e);
                 return;
             }
 

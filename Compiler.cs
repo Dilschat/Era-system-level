@@ -1,18 +1,18 @@
 using System;
+using Erasystemlevel.Generator;
 using Erasystemlevel.Parser;
+using Erasystemlevel.Semantic;
 using Erasystemlevel.Tokenizer;
-using EraSystemLevel.Generator;
-using EraSystemLevel.Semantic;
 
 namespace EraSystemLevel
 {
     public class Compiler
     {
-        private bool debug;
+        private readonly bool _debug;
 
         public Compiler(bool debug)
         {
-            this.debug = debug;
+            this._debug = debug;
         }
 
         public string compile(string filepath)
@@ -34,7 +34,7 @@ namespace EraSystemLevel
 
         private void printDebug(string line, object obj)
         {
-            if (debug)
+            if (_debug)
             {
                 Console.WriteLine(line, obj);
             }
@@ -42,7 +42,7 @@ namespace EraSystemLevel
 
         private void printDebug(string line)
         {
-            if (debug)
+            if (_debug)
             {
                 Console.WriteLine(line);
             }
