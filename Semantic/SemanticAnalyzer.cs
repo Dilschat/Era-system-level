@@ -9,14 +9,20 @@ namespace Erasystemlevel.Semantic
     {
         public SymbolTable symbolTable;
         public CallTable callTable;
+        private AstNode tree;
         
         public SemanticAnalyzer(AstNode tree)
         {
             callTable = new CallTable();
             symbolTable = new SymbolTable();
+            this.tree = tree;
         }
 
-        public void AnalyzeTree(AstNode tree)
+        public void generateTables()
+        {
+            AnalyzeTree(tree);
+        }
+        private void AnalyzeTree(AstNode tree)
         {
             List<AstNode> childs = tree.getChilds();
             if (tree.GetNodeType().Equals(AstNode.NodeType.Routine))
@@ -71,6 +77,15 @@ namespace Erasystemlevel.Semantic
             {
                 List<AstNode> childs = tree.getChilds();
                 var type = ((Token) childs[0].getValue()).GetValue();
+                for (int i = 1; i < childs.Count; i++)
+                {
+                    SymbolTableEntry entry = new SymbolTableEntry
+                    {
+
+                        type = type, name = ((Token) childs[i].getChilds()[0].getValue()).GetValue()
+
+                    };
+                }
                 
 
 
