@@ -1,0 +1,6 @@
+start routine func (int a, int b)
+do
+    int a :=2+2;
+    int b :=2*2;
+    const id = 2, id1 = 3;
+end

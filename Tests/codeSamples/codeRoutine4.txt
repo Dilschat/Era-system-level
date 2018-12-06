@@ -1,0 +1,6 @@
+entry routine func ()
+do
+     for i 
+        loop
+        end
+end
