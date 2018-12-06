@@ -6,11 +6,9 @@ namespace HelloWorld.Generator
     {
         private AstNode root;
         // todo: symbol table
-        
-        CodeGenerator(SemanticAnalyzer structure)
+
+        private CodeGenerator(SemanticAnalyzer structure)
         {
-            
         }
     }
-    
 }
