@@ -330,7 +330,7 @@ namespace Erasystemlevel.Tests
         {
             Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("assigment.txt"));
             TokenReader reader = new TokenReader(tokenizer);
-            AstNode node = Parser.Parser.parseAssigment(reader);
+            AstNode node = Parser.Parser.parseAssignment(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, ":="));
             node.getChilds();
             ArrayList expectedChilds = new ArrayList();
