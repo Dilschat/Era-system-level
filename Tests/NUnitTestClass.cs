@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
 using NUnit.Framework;
@@ -27,7 +28,7 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
-            reader.saveReadedTokens();
+            reader.saveReadTokens();
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "1").ToString());
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "2").ToString());
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
@@ -40,7 +41,7 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode breakNode = Parser.Parser.parseBreak(reader);
             Assert.AreEqual(((Token) breakNode.getValue()), new Token(Token.TokenType.Keyword, "break"));
-            Assert.AreEqual(new ArrayList(), breakNode.getChilds());
+            Assert.AreEqual(new List<AstNode>(), breakNode.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
@@ -51,7 +52,7 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseIdentifier(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Identifier, "player"));
-            Assert.AreEqual(new ArrayList(), node.getChilds());
+            Assert.AreEqual(new List<AstNode>(), node.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
@@ -72,9 +73,9 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseArrayElement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Identifier, "bla"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
@@ -82,7 +83,7 @@ namespace Erasystemlevel.Tests
             reader = new TokenReader(tokenizer);
             node = Parser.Parser.parseDataElement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Identifier, "bla"));
-            childs = new ArrayList();
+            childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
             curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
@@ -96,9 +97,9 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseExplicitAddress(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "*"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "323")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
@@ -111,15 +112,15 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseDereference(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "*"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "id")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
             node = Parser.Parser.parseDereference(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "*"));
-            childs = new ArrayList();
+            childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Register, "R0")));
             curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
@@ -133,7 +134,7 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseVariableReference(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Identifier, "player"));
-            Assert.AreEqual(new ArrayList(), node.getChilds());
+            Assert.AreEqual(new List<AstNode>(), node.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
@@ -148,7 +149,7 @@ namespace Erasystemlevel.Tests
             AstNode b = new AstNode("");
             a.Equals(b);
 
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "player")));
             Assert.AreEqual(childs, node.getChilds());
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -181,9 +182,9 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseAddress(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "&"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "var")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
@@ -201,9 +202,9 @@ namespace Erasystemlevel.Tests
             reader = new TokenReader(tokenizer);
             node = Parser.Parser.parseOperand(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "&"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "var")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
@@ -222,10 +223,10 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseSwap(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "<=>"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "man")));
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "woman")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
@@ -238,7 +239,7 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseWhile(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.While);
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(((AstNode) curChilds[0]).getValue(), new Token(Token.TokenType.Operator, ">"));
             Assert.AreEqual(((AstNode) curChilds[1]).getValue(), AstNode.NodeType.LoopBody);
         }
@@ -250,7 +251,7 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseFor(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "for"));
-            ArrayList childs = node.getChilds();
+            List<AstNode> childs = node.getChilds();
             Assert.AreEqual(childs[0], new AstNode(new Token(Token.TokenType.Identifier, "i")));
             Assert.AreEqual(((AstNode) childs[1]).getValue(), new Token(Token.TokenType.Keyword, "from"));
             Assert.AreEqual(((AstNode) childs[2]).getValue(), new Token(Token.TokenType.Keyword, "to"));
@@ -265,14 +266,14 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseExtensionStatement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, ":="));
             node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "id")));
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
             node = Parser.Parser.parseExtensionStatement(reader);
             Assert.AreEqual(node.getValue(), "Call");
 
-            ArrayList curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "func")));
             AstNode parameters = new AstNode("CallParameters");
             parameters.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
@@ -283,7 +284,7 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(node.getValue(), "Call");
 
             curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             AstNode funcCall = new AstNode(new Token(Token.TokenType.Delimiter, "."));
             funcCall.addChild(new AstNode(new Token(Token.TokenType.Identifier, "obj")));
             funcCall.addChild(new AstNode(new Token(Token.TokenType.Identifier, "func")));
@@ -300,16 +301,16 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseExpression(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "+"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "1")));
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
             node = Parser.Parser.parseExpression(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "&"));
-            childs = new ArrayList();
+            childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             curChilds = node.getChilds();
             Assert.AreEqual(childs, curChilds);
@@ -329,9 +330,9 @@ namespace Erasystemlevel.Tests
             reader = new TokenReader(tokenizer);
             AstNode node1 = Parser.Parser.parsePrimary(reader);
             Assert.AreEqual((Token) node1.getValue(), new Token(Token.TokenType.Identifier, "bla"));
-            ArrayList childs = new ArrayList();
+            List<AstNode> childs = new List<AstNode>();
             childs.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
-            ArrayList curChilds = node1.getChilds();
+            List<AstNode> curChilds = node1.getChilds();
             Assert.AreEqual(childs, curChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
@@ -341,10 +342,10 @@ namespace Erasystemlevel.Tests
         {
             Tokenizer.Tokenizer tokenizer = new Tokenizer.Tokenizer(getTestFilePath("assigment.txt"));
             TokenReader reader = new TokenReader(tokenizer);
-            AstNode node = Parser.Parser.parseAssigment(reader);
+            AstNode node = Parser.Parser.parseAssignment(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, ":="));
             node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "id")));
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
         }
@@ -357,7 +358,7 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseDirective(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "format"));
             node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number, "8")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
@@ -407,7 +408,7 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseResults(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Results);
             node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R1")));
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R2")));
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R3")));
@@ -416,14 +417,14 @@ namespace Erasystemlevel.Tests
             node = Parser.Parser.parseResults(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Results);
             node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R1")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
 
             node = Parser.Parser.parseResults(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Results);
             node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R1")));
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R2")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -437,7 +438,7 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseParameter(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "int"));
             node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "parameter")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
             reader.clear();
@@ -455,7 +456,7 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseParameters(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Parameters);
             node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R0")));
         }
 
@@ -466,8 +467,8 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseConstDefinition(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, "="));
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "dilchat")));
             AstNode expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -483,8 +484,8 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseVarDefinition(reader);
             Assert.AreEqual(node.getValue(), new Token(Token.TokenType.Operator, ":="));
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "dilchat")));
             AstNode expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -501,7 +502,7 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.parseVariable(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Variable);
             var curChilds = node.getChilds();
-            var expectedChilds = new ArrayList
+            var expectedChilds = new List<AstNode>
             {
                 new AstNode(new Token(Token.TokenType.Keyword, "byte")),
             };
@@ -561,7 +562,7 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.parseModule(reader);
             Assert.AreEqual(node.getValue(), new AstNode(new Token(Token.TokenType.Identifier, "id")));
             var curChilds = node.getChilds();
-            var expectedChilds = new ArrayList
+            var expectedChilds = new List<AstNode>
             {
                 new AstNode(new Token(Token.TokenType.Keyword, "byte")),
             };
@@ -583,7 +584,7 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.parseData(reader);
             Assert.AreEqual(node.getValue(), new AstNode(new Token(Token.TokenType.Identifier, "id")));
             var curChilds = node.getChilds();
-            var expectedChilds = new ArrayList();
+            var expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number, "1")));
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number, "2")));
             Assert.AreEqual(curChilds, expectedChilds);
@@ -597,7 +598,7 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.parseCode(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Code);
             var curChilds = node.getChilds();
-            var expectedChilds = new ArrayList
+            var expectedChilds = new List<AstNode>
             {
                 new AstNode(new Token(Token.TokenType.Keyword, "byte")),
             };
@@ -619,7 +620,7 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.ParseUnit(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Code);
             var curChilds = node.getChilds();
-            var expectedChilds = new ArrayList
+            var expectedChilds = new List<AstNode>
             {
                 new AstNode(new Token(Token.TokenType.Keyword, "byte")),
             };
@@ -641,7 +642,7 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.parseDeclaration(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Variable);
             var curChilds = node.getChilds();
-            var expectedChilds = new ArrayList
+            var expectedChilds = new List<AstNode>
             {
                 new AstNode(new Token(Token.TokenType.Keyword, "byte")),
             };
@@ -662,8 +663,8 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseConstant(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "const"));
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             AstNode constDef = new AstNode(new Token(Token.TokenType.Operator, "="));
             constDef.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             constDef.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -679,7 +680,7 @@ namespace Erasystemlevel.Tests
             node = Parser.Parser.parseConstant(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "const"));
             curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             constDef = new AstNode(new Token(Token.TokenType.Operator, "="));
             constDef.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             constDef.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
@@ -696,8 +697,8 @@ namespace Erasystemlevel.Tests
             TokenReader reader = new TokenReader(tokenizer);
             AstNode node = Parser.Parser.parseAssemblerStatement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "skip"));
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Number, "1")));
             Assert.AreEqual(curChilds, expectedChilds);
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
@@ -710,7 +711,7 @@ namespace Erasystemlevel.Tests
             node = Parser.Parser.parseAssemblerStatement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, ":="));
             curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R0")));
             AstNode dereference = new AstNode(new Token(Token.TokenType.Operator, "*"));
             dereference.addChild(new AstNode(new Token(Token.TokenType.Register, "R1")));
@@ -722,7 +723,7 @@ namespace Erasystemlevel.Tests
             node = Parser.Parser.parseAssemblerStatement(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Operator, ":="));
             curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Register, "R0")));
             dereference = new AstNode(new Token(Token.TokenType.Register, "R1"));
             expectedChilds.Add(dereference);
@@ -738,8 +739,8 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseCall(reader);
             Assert.AreEqual(node.getValue(), "Call");
 
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "func")));
             AstNode parameters = new AstNode("CallParameters");
             parameters.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
@@ -750,7 +751,7 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(node.getValue(), "Call");
 
             curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             AstNode funcCall = new AstNode(new Token(Token.TokenType.Delimiter, "."));
             funcCall.addChild(new AstNode(new Token(Token.TokenType.Identifier, "obj")));
             funcCall.addChild(new AstNode(new Token(Token.TokenType.Identifier, "func")));
@@ -768,8 +769,8 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseIf(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "if"));
 
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             AstNode expression = new AstNode(new Token(Token.TokenType.Operator, ">"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "2")));
@@ -788,8 +789,8 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseStatement(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Statement);
 
-            ArrayList curChilds = node.getChilds();
-            ArrayList expectedChilds = new ArrayList();
+            List<AstNode> curChilds = node.getChilds();
+            List<AstNode> expectedChilds = new List<AstNode>();
             AstNode gotoNode = new AstNode(new Token(Token.TokenType.Keyword, "goto"));
             gotoNode.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             expectedChilds.Add(gotoNode);
@@ -799,7 +800,7 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Statement);
 
             curChilds = node.getChilds();
-            expectedChilds = new ArrayList();
+            expectedChilds = new List<AstNode>();
             expectedChilds.Add(new AstNode(new Token(Token.TokenType.Identifier, "id")));
             gotoNode = new AstNode(new Token(Token.TokenType.Keyword, "goto"));
             gotoNode.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
@@ -815,7 +816,7 @@ namespace Erasystemlevel.Tests
             AstNode node = Parser.Parser.parseLoopBody(reader);
             Assert.AreEqual(node.GetNodeType(), AstNode.NodeType.LoopBody);
 
-            ArrayList curChilds = node.getChilds();
+            List<AstNode> curChilds = node.getChilds();
 
 
             Assert.AreEqual(((AstNode) curChilds[0]).GetNodeType(), AstNode.NodeType.Statement);

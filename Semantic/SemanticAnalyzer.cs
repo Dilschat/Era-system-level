@@ -64,7 +64,7 @@ namespace EraSystemLevel.Semantic
             ArrayList parameters = new ArrayList();
             foreach (AstNode i in childs)
             {
-                parameters.Add(((Token) ((AstNode) i.getChilds()[0]).getChilds()[0]).GetValue());
+                parameters.Add(((Token) ( i.getChilds()[0]).getChilds()[0]).GetValue());
             }
 
             throw new System.NotImplementedException();
