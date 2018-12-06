@@ -9,7 +9,6 @@ namespace Erasystemlevel.Parser
     {
         public static AstNode ParseUnit(TokenReader reader)
         {
-            
             try
             {
                 AstNode node = parseCode(reader);
