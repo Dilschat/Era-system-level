@@ -118,7 +118,6 @@ namespace Erasystemlevel.Semantic
             {
                 results.Add(((Token)i.getValue()).GetValue());
             }
-
             return results;
         }
 
