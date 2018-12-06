@@ -66,10 +66,11 @@ namespace Erasystemlevel.Parser
             var code = new AstNode(AstNode.NodeType.Code);
             if (!nextToken.GetValue().Equals("code"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse code");
             }
 
+            reader.clear();
             while (true)
             {
                 try
@@ -111,22 +112,22 @@ namespace Erasystemlevel.Parser
                     return code;
                 }
 
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse code");
             }
         }
 
         public static AstNode parseData(TokenReader reader)
         {
-            Token nextToken = reader.readNextToken();
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("data"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse data");
             }
 
             reader.clear();
-            AstNode node = new AstNode(parseIdentifier(reader));
+            var node = new AstNode(parseIdentifier(reader));
             reader.clear();
             try
             {
@@ -167,19 +168,19 @@ namespace Erasystemlevel.Parser
             {
                 node.addChild(parseAttribute(reader));
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                Console.WriteLine(e);
             }
 
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("routine"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse routine");
             }
 
             node.addChild(parseIdentifier(reader));
+            reader.clear();
             try
             {
                 node.addChild(parseParameters(reader));
@@ -191,9 +192,9 @@ namespace Erasystemlevel.Parser
 
                 reader.clear();
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                Console.WriteLine(e);
+                reader.saveReadTokens();
             }
 
             nextToken = reader.readNextToken();
@@ -212,8 +213,10 @@ namespace Erasystemlevel.Parser
                 node.SetNodeType(AstNode.NodeType.Routine);
                 return node;
             }
-
-            reader.SaveReadTokens();
+            else
+            {
+                reader.saveReadTokens();
+            }
 
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("do")) throw new SyntaxError("Can't parse routine");
@@ -222,8 +225,8 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("end"))
             {
-                reader.SaveReadTokens();
-                throw new SyntaxError("Can't parse routine");
+                reader.saveReadTokens();
+                throw new SyntaxError("");
             }
 
             reader.clear();
@@ -236,7 +239,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("module"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse module");
             }
 
@@ -247,11 +250,18 @@ namespace Erasystemlevel.Parser
             {
                 try
                 {
+                    nextToken = reader.readNextToken();
+                    if (nextToken == null)
+                    {
+                        return node;
+                    }
+
+                    reader.saveReadTokens();
                     node.addChild(parseDeclaration(reader));
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     break;
                 }
             }
@@ -259,7 +269,7 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("end"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse module");
             }
 
@@ -289,7 +299,7 @@ namespace Erasystemlevel.Parser
                 }
                 else
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     throw new SyntaxError("Can't parse variable");
                 }
             }
@@ -301,7 +311,7 @@ namespace Erasystemlevel.Parser
             checkToken(nextToken);
             if (!nextToken.GetValue().Equals("const"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse constant");
             }
 
@@ -322,7 +332,7 @@ namespace Erasystemlevel.Parser
                 }
                 else
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     throw new SyntaxError("Can't parse constant");
                 }
             }
@@ -330,18 +340,21 @@ namespace Erasystemlevel.Parser
 
         private static void checkToken(Token nextToken)
         {
-            if (nextToken == null) throw new ArgumentNullException(nameof(nextToken));
+            if (nextToken == null)
+            {
+                throw new SyntaxError("Can't check token");
+            }
         }
 
         public static AstNode parseIdentifier(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
             if (nextToken.GetTokenType() == Token.TokenType.Identifier) return new AstNode(nextToken);
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
             throw new SyntaxError("Can't parse identifier");
         }
 
-        public static AstNode parseLiteral(TokenReader reader) //Literal:  Numeric
+        public static AstNode parseLiteral(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
             if (nextToken.GetTokenType() == Token.TokenType.Number)
@@ -350,7 +363,7 @@ namespace Erasystemlevel.Parser
                 return new AstNode(nextToken);
             }
 
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
             throw new SyntaxError("Can't parse literal");
         }
 
@@ -359,38 +372,29 @@ namespace Erasystemlevel.Parser
             var variable = new AstNode("Declaration");
             try
             {
-//                variable.addChild(parseVariable(reader));
-//                reader.clear();
-//                return variable;
                 return parseVariable(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                variable.addChild(parseConstant(reader));
-//                reader.clear();
-//                return variable;
                 return parseConstant(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                variable.addChild(parseRoutine(reader));
-//                reader.clear();
-//                return variable;
                 return parseRoutine(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             throw new SyntaxError("Can't parse declaration");
@@ -423,7 +427,7 @@ namespace Erasystemlevel.Parser
             }
 
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 node.SetNodeType(AstNode.NodeType.VarDefinition);
                 return node;
             }
@@ -434,13 +438,13 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (nextToken == null)
             {
-                throw new SyntaxError("Can't parse type");
+                throw new SyntaxError("");
             }
 
             if (nextToken.GetTokenType() != Token.TokenType.Keyword)
             {
-                reader.SaveReadTokens();
-                throw new SyntaxError("Can't parse type");
+                reader.saveReadTokens();
+                throw new SyntaxError("Can't parse type (token: " + nextToken.ToJsonString() + ")");
             }
 
             if (nextToken.GetValue().Equals("int"))
@@ -461,7 +465,7 @@ namespace Erasystemlevel.Parser
                 return new AstNode(nextToken);
             }
 
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
             throw new SyntaxError("Can't parse type");
         }
 
@@ -483,13 +487,13 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     throw new SyntaxError("Can't parse expression");
                 }
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 return firstOperand;
             }
         }
@@ -501,7 +505,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("="))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse constDefinition");
             }
 
@@ -516,7 +520,7 @@ namespace Erasystemlevel.Parser
         {
             var nextToken = reader.readNextToken();
             checkToken(nextToken);
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
             var node = new AstNode(AstNode.NodeType.Statement);
             try
             {
@@ -524,7 +528,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -536,7 +540,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -548,7 +552,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -560,7 +564,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Cant parse statement");
             }
         }
@@ -569,16 +573,17 @@ namespace Erasystemlevel.Parser
         {
             var nextToken = reader.readNextToken();
             var node = new AstNode("Label");
+            checkToken(nextToken);
             if (!nextToken.GetValue().Equals("<"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse label");
             }
 
             nextToken = reader.readNextToken();
             if (nextToken.GetTokenType() != Token.TokenType.Identifier)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse label");
             }
 
@@ -586,7 +591,7 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(">"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse label");
             }
 
@@ -597,7 +602,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseAssemblerStatement(TokenReader reader)
         {
-            AstNode node;
+            var node = new AstNode("AssemblerStatement");
             var nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("skip"))
             {
@@ -611,7 +616,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
                     return node;
@@ -630,7 +635,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
                     return node;
@@ -641,7 +646,7 @@ namespace Erasystemlevel.Parser
                 {":=", "+=", ">>=", "-=", "<<=", "|=", "&=", "^=", "<=", ">=", "?="});
             try
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 node = parseOperationOnRegisters(operators, reader);
             }
             catch (SyntaxError)
@@ -655,7 +660,7 @@ namespace Erasystemlevel.Parser
                         var newToken = reader.readNextToken();
                         if (!nextToken.GetValue().Equals("goto"))
                         {
-                            throw new SyntaxError("Can't parse assembler statement");
+                            throw new SyntaxError("Goto expected");
                         }
 
                         var goTo = new AstNode(newToken);
@@ -664,13 +669,13 @@ namespace Erasystemlevel.Parser
                     }
                     else
                     {
-                        reader.SaveReadTokens();
+                        reader.saveReadTokens();
                         throw new SyntaxError("Can't parse assembler statement");
                     }
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     throw new SyntaxError("Can't parse assembler statement");
                 }
             }
@@ -689,7 +694,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             if (leftOperand != null && ((Token) leftOperand.getValue()).GetValue().Equals("*"))
@@ -703,10 +708,11 @@ namespace Erasystemlevel.Parser
 
             var operation = reader.readNextToken();
             var exists = operators.Any(i => i.Equals(operation.GetValue()));
+
             reader.clear();
             if (exists == false)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse operation on registers");
             }
 
@@ -717,16 +723,23 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
-            if (rightOperand != null && ((Token) rightOperand.getValue()).GetValue().Equals("*"))
+            try
             {
-                rightOperand.addChild(parseRegister(reader));
+                if (rightOperand != null && ((Token) rightOperand.getValue()).GetValue().Equals("*"))
+                {
+                    rightOperand.addChild(parseRegister(reader));
+                }
+                else
+                {
+                    rightOperand = parseRegister(reader);
+                }
             }
-            else
+            catch (SyntaxError)
             {
-                rightOperand = parseRegister(reader);
+                rightOperand = parseExpression(reader);
             }
 
             var node = new AstNode(operation);
@@ -740,6 +753,7 @@ namespace Erasystemlevel.Parser
         public static AstNode parseAttribute(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
+            checkToken(nextToken);
             if (nextToken.GetValue().Equals("start"))
             {
                 reader.clear();
@@ -752,7 +766,7 @@ namespace Erasystemlevel.Parser
                 return new AstNode(nextToken);
             }
 
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
             throw new SyntaxError("Can't parse attribute");
         }
 
@@ -762,10 +776,11 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("("))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Cant parse parameters");
             }
 
+            reader.clear();
             try
             {
                 node.addChild(parseParameter(reader));
@@ -773,7 +788,7 @@ namespace Erasystemlevel.Parser
             }
             catch
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 node.SetNodeType(AstNode.NodeType.Parameters);
                 return node;
             }
@@ -787,14 +802,14 @@ namespace Erasystemlevel.Parser
                 }
                 else
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     break;
                 }
             }
 
             if (!nextToken.GetValue().Equals(")"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Cant parse parameters");
             }
 
@@ -817,7 +832,7 @@ namespace Erasystemlevel.Parser
                 }
                 else
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.Results);
                     return node;
@@ -837,7 +852,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -846,7 +861,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Cant parse parameter");
             }
         }
@@ -863,7 +878,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                 }
 
                 try
@@ -873,7 +888,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                 }
 
                 try
@@ -883,7 +898,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                 }
 
                 break;
@@ -903,7 +918,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -913,7 +928,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -923,7 +938,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -933,7 +948,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -943,7 +958,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -953,7 +968,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             throw new SyntaxError("Cant parse primary");
@@ -970,7 +985,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("*"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse deference");
             }
 
@@ -983,7 +998,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -994,7 +1009,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             throw new SyntaxError("Cant parse dereference");
@@ -1006,7 +1021,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("["))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse array element");
             }
 
@@ -1014,7 +1029,7 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("]"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse array element");
             }
 
@@ -1028,7 +1043,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("["))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse data element");
             }
 
@@ -1036,7 +1051,7 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("]"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse data element");
             }
 
@@ -1050,7 +1065,7 @@ namespace Erasystemlevel.Parser
             var explicitAddress = new AstNode(nextToken);
             if (!nextToken.GetValue().Equals("*"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse explicit address");
             }
 
@@ -1068,7 +1083,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -1078,7 +1093,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -1088,7 +1103,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
@@ -1098,7 +1113,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse operand");
             }
         }
@@ -1109,7 +1124,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("&"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse address");
             }
 
@@ -1121,17 +1136,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseReceiver(TokenReader reader)
         {
-            var receiver = new AstNode("Receiver");
-            var nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("this"))
-            {
-                reader.SaveReadTokens();
-                throw new SyntaxError("Can't parse receiver");
-            }
-
-            receiver.setValue(nextToken);
-            reader.clear();
-            return receiver;
+            return parsePrimary(reader);
         }
 
         private static AstNode parseOperator(TokenReader reader)
@@ -1143,6 +1148,7 @@ namespace Erasystemlevel.Parser
             return new AstNode(nextToken);
         }
 
+
         public static AstNode parseRegister(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
@@ -1152,7 +1158,7 @@ namespace Erasystemlevel.Parser
                 return new AstNode(nextToken);
             }
 
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
             throw new SyntaxError("Can't parse register");
         }
 
@@ -1162,7 +1168,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("format"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse directive");
             }
 
@@ -1175,7 +1181,7 @@ namespace Erasystemlevel.Parser
             }
             else
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse directive");
             }
 
@@ -1188,107 +1194,74 @@ namespace Erasystemlevel.Parser
             var node = new AstNode("ExtensionStatement");
             try
             {
-//                node.addChild(parseAssignment(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseAssignment(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseCall(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseCall(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseIf(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseIf(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseWhile(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseWhile(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseFor(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseFor(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseBreak(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseBreak(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseSwap(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
-
                 return parseSwap(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             try
             {
-//                node.addChild(parseGoto(reader));
-//                reader.clear();
-//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
-//                return node;
                 return parseGoto(reader);
             }
             catch (SyntaxError)
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             throw new SyntaxError("Can't parse extension statement");
@@ -1299,7 +1272,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("if"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse if");
             }
 
@@ -1313,7 +1286,7 @@ namespace Erasystemlevel.Parser
             }
             else
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
             }
 
             reader.clear();
@@ -1326,7 +1299,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("do"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse if body");
             }
 
@@ -1337,12 +1310,13 @@ namespace Erasystemlevel.Parser
                 return new AstNode("RoutineBody");
             }
 
-            reader.SaveReadTokens();
+            reader.saveReadTokens();
+
             var ifBody = parseRoutineBody(reader);
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("end"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse if body");
             }
 
@@ -1351,7 +1325,8 @@ namespace Erasystemlevel.Parser
             return ifBody;
         }
 
-        public static AstNode parseCall(TokenReader reader)
+        public static AstNode
+            parseCall(TokenReader reader)
         {
             var call = new AstNode("Call");
             var primary = parsePrimary(reader);
@@ -1370,7 +1345,7 @@ namespace Erasystemlevel.Parser
                 var value = (Token) primary.getValue();
                 if (!value.GetTokenType().Equals(Token.TokenType.Identifier))
                 {
-                    throw new SyntaxError("Can't parse call");
+                    throw new SyntaxError("Can't parse if body");
                 }
 
                 call.addChild(primary);
@@ -1378,8 +1353,8 @@ namespace Erasystemlevel.Parser
 
             if (!nextToken.GetValue().Equals("("))
             {
-                reader.SaveReadTokens();
-                throw new SyntaxError("Can't parse call");
+                reader.saveReadTokens();
+                throw new SyntaxError("Can't parse if body");
             }
 
             reader.clear();
@@ -1387,8 +1362,8 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(";"))
             {
-                reader.SaveReadTokens();
-                throw new SyntaxError("Can't parse call");
+                reader.saveReadTokens();
+                throw new SyntaxError("Can't parse if body");
             }
 
             reader.clear();
@@ -1427,7 +1402,7 @@ namespace Erasystemlevel.Parser
 
                 if (!nextToken.GetValue().Equals(")"))
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     throw new SyntaxError("Can't parse call parameters");
                 }
 
@@ -1443,7 +1418,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("end"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse for");
             }
 
@@ -1452,6 +1427,7 @@ namespace Erasystemlevel.Parser
                 var forNode = new AstNode(nextToken);
                 forStatement = forNode;
                 forNode.addChild(parseIdentifier(reader));
+                reader.clear();
                 nextToken = reader.readNextToken();
             }
 
@@ -1504,6 +1480,7 @@ namespace Erasystemlevel.Parser
                 forStatement.addChild(stepNode);
             }
 
+            reader.saveReadTokens();
             forStatement.addChild(parseLoopBody(reader));
             reader.clear();
             forStatement.SetNodeType(AstNode.NodeType.For);
@@ -1527,7 +1504,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                 }
             }
 
@@ -1543,7 +1520,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("loop"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse loop body");
             }
 
@@ -1556,11 +1533,11 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError)
                 {
-                    reader.SaveReadTokens();
+                    reader.saveReadTokens();
                     nextToken = reader.readNextToken();
                     if (!nextToken.GetValue().Equals("end"))
                     {
-                        reader.SaveReadTokens();
+                        reader.saveReadTokens();
                         throw new SyntaxError("Can't parse loop body");
                     }
 
@@ -1577,13 +1554,20 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("break"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse break");
             }
 
             breakNode.setValue(nextToken);
             reader.clear();
             breakNode.SetNodeType(AstNode.NodeType.Break);
+            nextToken = reader.readNextToken();
+            checkToken(nextToken);
+            if (!nextToken.GetValue().Equals(";"))
+            {
+                throw new SyntaxError("Can't parse break");
+            }
+
             return breakNode;
         }
 
@@ -1594,7 +1578,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("<=>"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse swap");
             }
 
@@ -1603,7 +1587,7 @@ namespace Erasystemlevel.Parser
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(";"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse swap");
             }
 
@@ -1614,16 +1598,16 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseGoto(TokenReader reader)
         {
-            var goGo = new AstNode("goto");
+            var goTo = new AstNode("goto");
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("goto"))
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse goto");
             }
 
-            goGo.setValue(nextToken);
-            goGo.addChild(parseIdentifier(reader));
+            goTo.setValue(nextToken);
+            goTo.addChild(parseIdentifier(reader));
             var delimiter = reader.readNextToken();
             if (!delimiter.GetValue().Equals(";"))
             {
@@ -1631,8 +1615,8 @@ namespace Erasystemlevel.Parser
             }
 
             reader.clear();
-            goGo.SetNodeType(AstNode.NodeType.Goto);
-            return goGo;
+            goTo.SetNodeType(AstNode.NodeType.Goto);
+            return goTo;
         }
 
         public static AstNode parseAssignment(TokenReader reader)
@@ -1646,7 +1630,7 @@ namespace Erasystemlevel.Parser
             }
             else
             {
-                reader.SaveReadTokens();
+                reader.saveReadTokens();
                 throw new SyntaxError("Can't parse assignment");
             }
 

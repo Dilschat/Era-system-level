@@ -32,6 +32,11 @@ namespace Erasystemlevel.Tokenizer
             "this"
         });
 
+        readonly HashSet<string> whitespace = new HashSet<string>(new List<string>
+        {
+            "", "\n", "\r", " "
+        });
+
         private readonly StreamReader reader;
 
 
@@ -49,7 +54,7 @@ namespace Erasystemlevel.Tokenizer
             while (!reader.EndOfStream)
             {
                 var next = Convert.ToChar(reader.Read());
-                if (next.ToString() == "" || next.ToString() == "\n" || next.ToString() == " ")
+                if (whitespace.Contains(next.ToString()))
                 {
                     continue;
                 }
@@ -83,8 +88,7 @@ namespace Erasystemlevel.Tokenizer
 
                 if (keywords.Contains(currentToken))
                 {
-                    if (reader.EndOfStream || Convert.ToString(reader.Peek()).Equals(" ") ||
-                        Convert.ToString(reader.Peek()).Equals("/n"))
+                    if (reader.EndOfStream || whitespace.Contains(Convert.ToString(reader.Peek())))
                     {
                         return new Token(Token.TokenType.Keyword, currentToken);
                     }
@@ -98,8 +102,7 @@ namespace Erasystemlevel.Tokenizer
 
                 if (identifierRegex.IsMatch(currentToken))
                 {
-                    if (reader.EndOfStream || Convert.ToString(reader.Peek()).Equals(" ") ||
-                        Convert.ToString(reader.Peek()).Equals("/n"))
+                    if (reader.EndOfStream || reader.Peek() == ' ' || Convert.ToString(reader.Peek()).Equals("\n"))
                     {
                         return new Token(Token.TokenType.Identifier, currentToken);
                     }

@@ -19,14 +19,19 @@
             return value;
         }
 
-        override
-        public string ToString(){
+        
+        public string ToJsonString(){
             return "{ " + type + ":" + value + "}";
+        }
+
+        public override string ToString()
+        {
+            return value;
         }
 
         public override bool Equals(object obj)
         {
-            return obj != null && ToString().Equals(((Token) obj).ToString());
+            return obj != null && ToJsonString().Equals(((Token) obj).ToJsonString());
         }
 
     }
