@@ -1152,17 +1152,7 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseReceiver(TokenReader reader)
         {
-            AstNode receiver = new AstNode("Receiver");
-            Token nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("this"))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-
-            receiver.setValue(nextToken);
-            reader.clear();
-            return receiver;
+            return parsePrimary(reader);
         }
 
         public static AstNode parseOperator(TokenReader reader)

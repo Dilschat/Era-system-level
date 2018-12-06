@@ -8,7 +8,7 @@ namespace Erasystemlevel.Parser
     {
         private object value;
         private NodeType type;
-        private readonly ArrayList childs = new ArrayList();
+        private readonly List<AstNode> childs = new List<AstNode>();
 
         public enum NodeType
         {
@@ -95,7 +95,7 @@ namespace Erasystemlevel.Parser
             childs.Add(node);
         }
 
-        public ArrayList getChilds()
+        public List<AstNode> getChilds()
         {
             return childs;
         }
@@ -130,7 +130,7 @@ namespace Erasystemlevel.Parser
         {
             var hashCode = 1252435396;
             hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(value);
-            hashCode = hashCode * -1521134295 + EqualityComparer<ArrayList>.Default.GetHashCode(childs);
+            hashCode = hashCode * -1521134295 + EqualityComparer<List<AstNode>>.Default.GetHashCode(childs);
             return hashCode;
         }
 

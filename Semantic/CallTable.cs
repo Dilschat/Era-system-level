@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace EraSystemLevel.Semantic
@@ -9,6 +10,9 @@ namespace EraSystemLevel.Semantic
     
     public class CallTableEntry
     {
-        
+        public string functionName;
+        public string functionType;
+        public ArrayList parameters;
+        public ArrayList results;
     }
 }
