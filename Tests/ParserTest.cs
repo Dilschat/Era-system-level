@@ -155,7 +155,7 @@ namespace Erasystemlevel.Tests
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("receiver.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseReceiver(reader);
-            Assert.AreEqual(node, new AstNode(new Token(Token.TokenType.Keyword, "this")));
+            Assert.AreEqual(node, new AstNode(new Token(Token.TokenType.Identifier, "a")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
@@ -203,7 +203,7 @@ namespace Erasystemlevel.Tests
             tokenizer = new Tokenizer.Tokenizer(getTestFilePath("receiver.txt"));
             reader = new TokenReader(tokenizer);
             node = Parser.Parser.parseOperand(reader);
-            Assert.AreEqual(node, new AstNode(new Token(Token.TokenType.Keyword, "this")));
+            Assert.AreEqual(node, new AstNode(new Token(Token.TokenType.Identifier, "a")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
