@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
@@ -37,13 +38,41 @@ namespace Erasystemlevel.Generator
         {
             var val = item.getValue().ToString();
             var childs = item.getChilds();
-            
+
+            if (childs.Count != 2 && item.GetNodeType() == AstNode.NodeType.OperationOnRegisters)
+            {
+                throw new GenerationError("Invalid node supplied for operation on registers");
+            }
+
+            if (item.GetNodeType() == AstNode.NodeType.AssemblerStatement)
+            {
+                if (val.Equals("skip") || val.Equals("stop"))
+                {
+                    var asmCode = val;
+                    if (childs.Count == 1)
+                    {
+                        asmCode += " " + childs[0].getValue();
+                    }
+                    
+                    return asmCode + ";";
+                }
+
+                if (val.Equals("if"))
+                {
+                    var gotoNode = item.getChilds()[1];
+
+                    var condRegister = item.getChilds()[0].getValue();
+                    var addrRegister = gotoNode.getChilds()[0].getValue();
+
+                    return val + " " + condRegister + " " + gotoNode.getValue() + " " + addrRegister + ";";
+                }
+            }
+
             var left = childs[0];
             var right = childs[1];
 
             var leftRegister = left.getValue().ToString();
             var rightRegister = right.getValue().ToString();
-
             if (item.GetNodeType() == AstNode.NodeType.OperationOnRegisters)
             {
                 if (val.Equals(":="))
@@ -60,26 +89,6 @@ namespace Erasystemlevel.Generator
                 }
 
                 return leftRegister + " " + item.getValue() + " " + rightRegister + ";";
-            }
-
-            if (item.GetNodeType() == AstNode.NodeType.AssemblerStatement)
-            {
-                if (val.Equals("skip") || val.Equals("stop"))
-                {
-                    return val;
-                }
-
-                if (val.Equals("if"))
-                {
-                    var gotoNode = item.getChilds()[1];
-
-                    var condRegister = item.getChilds()[0].getValue();
-                    var addrRegister = gotoNode.getChilds()[0].getValue();
-
-                    return val + " " + condRegister + " " + gotoNode.getValue() + " " + addrRegister;
-                }
-                
-                Console.WriteLine(val);
             }
 
             throw new GenerationError("Invalid assembly statement supplied");
