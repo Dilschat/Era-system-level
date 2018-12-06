@@ -59,7 +59,10 @@ namespace Erasystemlevel.Parser
             Swap,
             Goto,
             Assignment,
-            VarDefinition
+            VarDefinition,
+            From,
+            To,
+            Step
         }
 
         public AstNode(NodeType type, string value)
