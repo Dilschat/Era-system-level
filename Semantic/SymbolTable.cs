@@ -9,6 +9,7 @@ namespace Erasystemlevel.Semantic
     
     public class SymbolTableEntry
     {
-        
+        public string type;
+        public string name;
     }
 }
