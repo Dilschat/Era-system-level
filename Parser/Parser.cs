@@ -743,13 +743,20 @@ namespace Erasystemlevel.Parser
                 reader.saveReadedTokens();
             }
 
-            if (rightOperand != null && ((Token) rightOperand.getValue()).GetValue().Equals("*"))
+            try
             {
-                rightOperand.addChild(parseRegister(reader));
+                if (rightOperand != null && ((Token) rightOperand.getValue()).GetValue().Equals("*"))
+                {
+                    rightOperand.addChild(parseRegister(reader));
+                }
+                else
+                {
+                    rightOperand = parseRegister(reader);
+                }
             }
-            else
+            catch (SyntaxError)
             {
-                rightOperand = parseRegister(reader);
+                rightOperand = parseExpression(reader);
             }
 
             AstNode node = new AstNode(operation);
