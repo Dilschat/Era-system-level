@@ -48,5 +48,19 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(output, "skip 2;");
         }
         
+        [Test]
+        public void IfTest()
+        {
+            var node = new AstNode(new Token(Token.TokenType.Keyword, "if"));
+            node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+            node.addChild(new AstNode(new Token(Token.TokenType.Register, "R0")));
+            var goTo = new AstNode(new Token(Token.TokenType.Keyword, "goto"));
+            node.addChild(goTo);
+            goTo.addChild(new AstNode(new Token(Token.TokenType.Register, "R1")));
+            
+            var output = AssemblyBuffer.statementToString(node);
+            Assert.AreEqual(output, "if R0 goto R1;");
+        }
+        
     }
 }
