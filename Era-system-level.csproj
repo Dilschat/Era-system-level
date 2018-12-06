@@ -24,6 +24,7 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Compiler.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Tokenizer\*" />
     <Compile Include="Parser\*" />
@@ -35,6 +36,7 @@
   <ItemGroup>
     <Folder Include="Tokenizer\" />
     <Folder Include="Parser\" />
+    <Folder Include="Semantic\" />
     <Folder Include="Generator\" />
     <Folder Include="Exception\" />
     <Folder Include="Tests\" />

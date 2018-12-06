@@ -232,7 +232,6 @@ namespace Erasystemlevel.Parser
             reader.clear();
             node.SetNodeType(AstNode.NodeType.Routine);
             return node;
-
         }
 
         public static AstNode parseModule(TokenReader reader)
@@ -1327,7 +1326,7 @@ namespace Erasystemlevel.Parser
         }
 
         public static AstNode
-            parseCall(TokenReader reader) 
+            parseCall(TokenReader reader)
         {
             var call = new AstNode("Call");
             var primary = parsePrimary(reader);
@@ -1413,7 +1412,7 @@ namespace Erasystemlevel.Parser
             }
         }
 
-        public static AstNode parseFor(TokenReader reader) 
+        public static AstNode parseFor(TokenReader reader)
         {
             var forStatement = new AstNode("For");
             var nextToken = reader.readNextToken();

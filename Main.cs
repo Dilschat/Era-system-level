@@ -1,9 +1,6 @@
 ﻿using System;
-using Erasystemlevel.Tokenizer;
 using Erasystemlevel.Exception;
-using Erasystemlevel.Parser;
-using Erasystemlevel.Generator;
-using Erasystemlevel.Semantic;
+using EraSystemLevel;
 
 namespace Erasystemlevel
 {
@@ -13,38 +10,30 @@ namespace Erasystemlevel
 
         private static void Main()
         {
-            var tokenizer = new Tokenizer.Tokenizer(CodeFile);
-            var tokenReader = new TokenReader(tokenizer);
+            var compiler = new Compiler(true);
 
-            AstNode tree;
+            string eraAsm;
             try
             {
-                tree = Parser.Parser.ParseUnit(tokenReader);
+                eraAsm = compiler.compile(CodeFile);
             }
             catch (SyntaxError e)
             {
                 Console.WriteLine("Syntax error:", e);
                 return;
             }
-
-            Console.WriteLine("Parse tree:", tree.ToString());
-
-            SemanticAnalyzer semantic;
-            try
-            {
-                semantic = new SemanticAnalyzer(tree);
-            }
             catch (SemanticError e)
             {
-                Console.WriteLine("Syntax error:", e);
+                Console.WriteLine("Semantic error:", e);
+                return;
+            }
+            catch (GenerationError e)
+            {
+                Console.WriteLine("Generation error:", e);
                 return;
             }
 
-            var codeGen = new CodeGenerator(tree, semantic.symbolTable, semantic.callTable);
-            var assembly = codeGen.assembly;
-
-            Console.WriteLine("Generated assembly:");
-            Console.WriteLine(assembly.ToString());
+            Console.WriteLine(eraAsm);
         }
     }
 }
