@@ -21,8 +21,6 @@ namespace EraSystemLevel.Generator
             {
                 statements.AddLast(node);
             }
-
-            // todo: check that this node is as assembly statement and then push it to statements list
         }
 
         public override string ToString()
