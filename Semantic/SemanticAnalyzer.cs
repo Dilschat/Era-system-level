@@ -44,13 +44,14 @@ namespace Erasystemlevel.Semantic
                     }
                     else if (i.GetNodeType().Equals(AstNode.NodeType.RoutineBody))
                     {
-                        entry.results= AnalyzeResults(i);
+                        AnalyzeSymbols(i);
 
                     }
                 }
             }
             else
             {
+                AnalyzeSymbols(tree);
                 foreach(AstNode i in childs)
                 {
                     AnalyzeTree(i);
@@ -58,6 +59,20 @@ namespace Erasystemlevel.Semantic
             }
         }
 
+        private void AnalyzeSymbols(AstNode tree)
+        {
+            if (tree.GetNodeType().Equals(AstNode.NodeType.ConstDefinition))
+            {
+                SymbolTableEntry entry = new SymbolTableEntry();
+                entry.type = "int";
+                entry.name = ((Token) tree.getChilds()[0].getValue()).GetValue();
+            }else if(tree.GetNodeType().Equals(AstNode.NodeType.Variable))
+            {
+                List<AstNode> childs = tree.getChilds();
+                
+            }
+        }
+        
         private string AnalyzeName(AstNode astNode)
         {
             return astNode.getValue().ToString();
