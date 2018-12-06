@@ -210,7 +210,7 @@ namespace Erasystemlevel.Tests
             tokenizer = new Tokenizer.Tokenizer(getTestFilePath("receiver.txt"));
             reader = new TokenReader(tokenizer);
             node = Parser.Parser.parseOperand(reader);
-            Assert.AreEqual(node, new AstNode(new Token(Token.TokenType.Identifier, "a")));
+            Assert.AreEqual(node, new AstNode(new Token(Token.TokenType.Keyword, "this")));
             Assert.AreEqual(reader.readNextToken(), new Token(Token.TokenType.Delimiter, ";"));
         }
 
