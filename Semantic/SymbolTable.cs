@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace EraSystemLevel.Semantic
+namespace Erasystemlevel.Semantic
 {
     public class SymbolTable: Dictionary<string, SymbolTableEntry>
     {

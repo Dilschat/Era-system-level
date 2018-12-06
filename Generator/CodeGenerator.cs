@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Erasystemlevel.Parser;
-using EraSystemLevel.Semantic;
+using Erasystemlevel.Semantic;
 
-namespace EraSystemLevel.Generator
+namespace Erasystemlevel.Generator
 {
     public class CodeGenerator
     {

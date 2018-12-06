@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace EraSystemLevel.Semantic
+namespace Erasystemlevel.Semantic
 {
     public class CallTable: Dictionary<string, CallTableEntry>
     {

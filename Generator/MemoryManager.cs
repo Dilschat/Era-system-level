@@ -1,4 +1,4 @@
-namespace EraSystemLevel.Generator
+namespace Erasystemlevel.Generator
 {
     public class MemoryManager
     {
