@@ -1,32 +1,98 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Erasystemlevel.Parser
 {
     public class AstNode
     {
-        private Object value;
-        private ArrayList childs = new ArrayList();
-        public AstNode(Object value)
+        private object value;
+        private NodeType type;
+        private readonly ArrayList childs = new ArrayList();
+
+        public enum NodeType
+        {
+            Unit,
+            Code,
+            Data,
+            Routine,
+            Module,
+            Variable,
+            Constant,
+            Identifier,
+            Literal,
+            Declaration,
+            Definition,
+            Type,
+            Expression,
+            ConstDefinition,
+            Statement,
+            Label,
+            AssemblerStatement,
+            OperationOnRegisters,
+            Attribute,
+            Parameters,
+            Results,
+            Parameter,
+            RoutineBody,
+            Primary,
+            VariableReference,
+            Deference,
+            ArrayElement,
+            DataElement,
+            ExplicitAddress,
+            Operand,
+            Address,
+            Receiver,
+            Operator,
+            Register,
+            Directive,
+            ExtensionStatement,
+            If,
+            IfBody,
+            Call,
+            CallParameters,
+            For,
+            While,
+            LoopBody,
+            Break,
+            Swap,
+            Goto,
+            Assignment,
+            VarDefinition,
+            From,
+            To,
+            Step
+        }
+
+        public void SetNodeType(NodeType type)
+        {
+            this.type = type;
+        }
+
+        public AstNode(object value)
         {
             this.value = value;
         }
 
-        public void setValue(Object value){
+        public NodeType GetNodeType()
+        {
+            return type;
+        }
+
+        public void setValue(object value)
+        {
             this.value = value;
         }
 
-        public Object getValue(){
-            return this.value;
+        public object getValue()
+        {
+            return value;
         }
 
-        public void addChild(AstNode node){
+        public void addChild(AstNode node)
+        {
             childs.Add(node);
-        }
-
-        public void cleanChild(){
-            childs = new ArrayList();
         }
 
         public ArrayList getChilds()
@@ -34,40 +100,31 @@ namespace Erasystemlevel.Parser
             return childs;
         }
 
-        public override bool Equals(Object obj)
+        public override bool Equals(object obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || GetType() != obj.GetType())
             {
                 return false;
             }
-            else
+
+            var thisChilds = getChilds();
+            var objChilds = ((AstNode) obj).getChilds();
+
+            if (thisChilds.Count != objChilds.Count)
             {
-                ArrayList thisChilds = this.getChilds();
-                ArrayList objChilds = ((AstNode)obj).getChilds();
+                return false;
+            }
 
-                if (thisChilds.Count != (objChilds.Count))
+            for (var i = 0; i < getChilds().Count; i++)
+            {
+                if (!thisChilds[i].Equals(objChilds[i]))
                 {
                     return false;
                 }
-                for( int i=0; i<this.getChilds().Count;i++)
-                {
-
-                    if (!thisChilds[i].Equals(objChilds[i]))
-                    {
-                        return false;
-                    }
-
-
-                }
-
             }
 
-                if (!this.getValue().Equals(((AstNode)obj).getValue()))
-                {
-                    return false;
-                }
-                return true;
-            }
+            return getValue().Equals(((AstNode) obj).getValue());
+        }
 
         public override int GetHashCode()
         {
@@ -76,27 +133,20 @@ namespace Erasystemlevel.Parser
             hashCode = hashCode * -1521134295 + EqualityComparer<ArrayList>.Default.GetHashCode(childs);
             return hashCode;
         }
+
         override
-        public String ToString()
+            public string ToString()
         {
-            string childsJsons = "";
-            for (int i = 0; i < childs.Count; i++)
+            var childsJsons = "";
+            foreach (var i in childs)
             {
-                string[] childsList = childs[i].ToString().Split('\n');
-                string formattedChilds = "";
-                for (int j = 0; j < childsList.Length; j++)
-                {
-                    formattedChilds = formattedChilds + "  " + childsList[j] + "\n";
-                }
+                var childsList = i.ToString().Split('\n');
+                var formattedChilds = childsList.Aggregate("", (current, j) => current + "  " + j + "\n");
+
                 childsJsons = childsJsons + formattedChilds;
             }
-            return value.ToString() + ":{\n" + childsJsons + "\n}";
+
+            return value + ":{\n" + childsJsons + "\n}";
         }
-
     }
-
-
-
-
 }
-

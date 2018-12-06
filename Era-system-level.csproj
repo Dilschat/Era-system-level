@@ -24,20 +24,18 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Generator\CodeGenerator.cs" />
-    <Compile Include="Generator\SemanticAnalyzer.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Tokenizer\Tokenizer.cs" />
-    <Compile Include="Tokenizer\Token.cs" />
-    <Compile Include="Parser\Parser.cs" />
-    <Compile Include="Parser\TokenReader.cs" />
-    <Compile Include="Parser\AstNode.cs" />
-    <Compile Include="Exception\SyntaxError.cs" />
-    <Compile Include="Tests\NUnitTestClass.cs" />
+    <Compile Include="Tokenizer\*" />
+    <Compile Include="Parser\*" />
+    <Compile Include="Semantic\*" />
+    <Compile Include="Generator\*" />
+    <Compile Include="Exception\*" />
+    <Compile Include="Tests\*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokenizer\" />
     <Folder Include="Parser\" />
+    <Folder Include="Generator\" />
     <Folder Include="Exception\" />
     <Folder Include="Tests\" />
   </ItemGroup>
@@ -50,28 +48,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\testFiles\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Tests\codeSamples\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="code.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="packages.config" />
-    <None Include="Tokenizer\text.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="text1.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\test_reading.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\Break.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\Identifier.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\goto.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\operator.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\swap.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\loopBody.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\while.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\for.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\extensionStatement.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\expression.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tests\receiver.txt" />
-    <None Include="Tests\Literal.txt" />
-    <None Include="Tests\Address.txt" />
-    <None Include="Tests\register.txt" />
-    <None Include="Tests\dereference.txt" />
-    <None Include="Tests\array_and_data_elements.txt" />
-    <None Include="Tests\explicitAddress.txt" />
-    <None Include="Tests\primary.txt" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

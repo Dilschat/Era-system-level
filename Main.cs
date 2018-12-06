@@ -1,35 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
 using Erasystemlevel.Tokenizer;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Text;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
-namespace HelloWorld
+using EraSystemLevel.Generator;
+using EraSystemLevel.Semantic;
+
+namespace EraSystemLevel
 {
-    class Hello
+    class Run
     {
+        private const string CodeFile = "code.txt";
+
         static void Main()
         {
-            Tokenizer t = new Tokenizer("text1.txt");
-            //Parser parser = new Parser(t);
+            var tokenizer = new Tokenizer(CodeFile);
+            var tokenReader = new TokenReader(tokenizer);
+
+            AstNode tree;
             try
             {
-                //AstNode n = parser.ParseUnit();
-                //Console.WriteLine(n.ToString());
+                tree = Parser.ParseUnit(tokenReader);
             }
             catch (SyntaxError e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Syntax error:", e);
+                return;
             }
-            
-                         //Tokenizer tok = new Tokenizer("/Users/dilsatsalihov/Projects/ERA-system-level/Era-system-level/Tokenizer/text.txt");
-            //LinkedList<Token> list = tok.Tokenize();
-            //while(list.Count!=0){
-            //Console.WriteLine(list.First.Value.ToString());
-            //list.RemoveFirst();
-            // }
+
+            Console.WriteLine("Parse tree:", tree.ToString());
+
+            SemanticAnalyzer semantic;
+            try
+            {
+                semantic = new SemanticAnalyzer(tree);
+            }
+            catch (SemanticError e)
+            {
+                Console.WriteLine("Syntax error:", e);
+                return;
+            }
+
+            var codeGen = new CodeGenerator(tree, semantic.symbolTable, semantic.callTable);
+            var assembly = codeGen.assembly;
+
+            Console.WriteLine("Generated assembly:");
+            Console.WriteLine(assembly.ToString());
         }
     }
 }

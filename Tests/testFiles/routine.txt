@@ -1,0 +1,4 @@
+start routine func (byte a):> R0
+do
+
+end

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Tokenizer;
+
 namespace Erasystemlevel.Parser
 {
-    public class Parser
+    public static class Parser
     {
-        public static AstNode ParseUnit(TokenReader reader){
+        public static AstNode ParseUnit(TokenReader reader)
+        {
             try
             {
-                AstNode node = Parser.parseCode(reader);
+                var node = parseCode(reader);
                 reader.clear();
                 return node;
             }
@@ -17,10 +20,11 @@ namespace Erasystemlevel.Parser
             {
                 Console.WriteLine(e);
             }
+
             Console.WriteLine('1');
             try
             {
-                AstNode node = Parser.parseData(reader);
+                var node = parseData(reader);
                 reader.clear();
                 return node;
             }
@@ -28,11 +32,12 @@ namespace Erasystemlevel.Parser
             {
                 Console.WriteLine(e);
             }
+
             Console.WriteLine('2');
 
             try
             {
-                AstNode node = Parser.parseModule(reader);
+                var node = parseModule(reader);
                 reader.clear();
                 return node;
             }
@@ -40,1257 +45,1621 @@ namespace Erasystemlevel.Parser
             {
                 Console.WriteLine(e);
             }
+
             try
             {
-                AstNode node = Parser.parseRoutine(reader);
+                var node = parseRoutine(reader);
                 reader.clear();
-                        return node;
+                return node;
             }
             catch (SyntaxError e)
             {
                 Console.WriteLine(e);
             }
-            throw new SyntaxError("");
 
+            throw new SyntaxError("Can't parse unit");
         }
 
-        public static AstNode parseCode(TokenReader reader){
-            Token nextToken = reader.readNextToken();
-            AstNode code = new AstNode("Code");
-            if (!(nextToken.GetValue().Equals("code")))
+        public static AstNode parseCode(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            var code = new AstNode(AstNode.NodeType.Code);
+            if (!nextToken.GetValue().Equals("code"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse code");
             }
-            nextToken = null;
+
             while (true)
             {
-
                 try
                 {
-                    code.addChild(Parser.parseVariable(reader));
+                    code.addChild(parseVariable(reader));
                     continue;
                 }
                 catch (SyntaxError e)
                 {
-
+                    Console.WriteLine(e);
                 }
+
                 try
                 {
-                    code.addChild(Parser.parseConstant(reader));
+                    code.addChild(parseConstant(reader));
                     continue;
                 }
                 catch (SyntaxError e)
                 {
-
+                    Console.WriteLine(e);
                 }
+
                 try
                 {
-                    code.addChild(Parser.parseStatement(reader));
+                    code.addChild(parseStatement(reader));
                     continue;
                 }
                 catch (SyntaxError e)
                 {
-
+                    Console.WriteLine(e);
                 }
+
                 nextToken = reader.readNextToken();
 
-                if (nextToken.GetValue().Equals("end")){
+                if (nextToken.GetValue().Equals("end"))
+                {
                     reader.clear();
-                            return code;
-                }else{
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
+                    code.SetNodeType(AstNode.NodeType.Code);
+                    return code;
                 }
 
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse code");
             }
-
         }
-        public static AstNode parseData(TokenReader reader){
+
+        public static AstNode parseData(TokenReader reader)
+        {
             Token nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("data"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse data");
             }
-            AstNode node = new AstNode("Data");
-            node.addChild(Parser.parseIdentifier(reader));
+
+            reader.clear();
+            AstNode node = new AstNode(parseIdentifier(reader));
+            reader.clear();
             try
             {
-                node.addChild(Parser.parseLiteral(reader));
+                node.addChild(parseLiteral(reader));
+                reader.clear();
             }
-            catch (SyntaxError e)
+
+            catch (SyntaxError)
+            {
+                nextToken = reader.readNextToken();
+                if (!nextToken.GetValue().Equals("end")) throw new SyntaxError("Can't parse data");
+                reader.clear();
+                node.SetNodeType(AstNode.NodeType.Data);
+                return node;
+            }
+
+            while (true)
             {
                 nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals("end"))
                 {
                     reader.clear();
+                    node.SetNodeType(AstNode.NodeType.Data);
+                    return node;
+                }
+
+                if (nextToken.GetValue().Equals(","))
+                {
+                    node.addChild(parseLiteral(reader));
+                }
+            }
+        }
+
+        public static AstNode parseRoutine(TokenReader reader)
+        {
+            var node = new AstNode(AstNode.NodeType.Routine);
+            try
+            {
+                node.addChild(parseAttribute(reader));
+            }
+            catch (SyntaxError e)
+            {
+                Console.WriteLine(e);
+            }
+
+            var nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("routine"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse routine");
+            }
+
+            node.addChild(parseIdentifier(reader));
+            try
+            {
+                node.addChild(parseParameters(reader));
+                nextToken = reader.readNextToken();
+                if (!nextToken.GetValue().Equals(")"))
+                {
+                    throw new SyntaxError("Can't parse routine");
+                }
+
+                reader.clear();
+            }
+            catch (SyntaxError e)
+            {
+                Console.WriteLine(e);
+            }
+
+            nextToken = reader.readNextToken();
+
+
+            if (nextToken.GetValue().Equals(":>"))
+            {
+                node.addChild(parseResults(reader));
+                nextToken = reader.readNextToken();
+            }
+
+
+            if (nextToken.GetValue().Equals(";"))
+            {
+                reader.clear();
+                node.SetNodeType(AstNode.NodeType.Routine);
+                return node;
+            }
+
+            reader.SaveReadTokens();
+
+            nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("do")) throw new SyntaxError("Can't parse routine");
+            reader.clear();
+            node.addChild(parseRoutineBody(reader));
+            nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("end"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse routine");
+            }
+
+            reader.clear();
+            node.SetNodeType(AstNode.NodeType.Routine);
+            return node;
+        }
+
+        public static AstNode parseModule(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("module"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse module");
+            }
+
+            reader.clear();
+            var node = new AstNode(parseIdentifier(reader));
+            reader.clear();
+            while (true)
+            {
+                try
+                {
+                    node.addChild(parseDeclaration(reader));
+                }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                    break;
+                }
+            }
+
+            nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("end"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse module");
+            }
+
+            reader.clear();
+            node.SetNodeType(AstNode.NodeType.Module);
+            return node;
+        }
+
+        public static AstNode parseVariable(TokenReader reader)
+        {
+            var node = new AstNode(AstNode.NodeType.Variable);
+            node.addChild(parseType(reader));
+            node.addChild(parseVarDefinition(reader));
+            var nextToken = reader.readNextToken();
+            while (true)
+            {
+                if (nextToken.GetValue().Equals(","))
+                {
+                    node.addChild(parseVarDefinition(reader));
+                    nextToken = reader.readNextToken();
+                }
+                else if (nextToken.GetValue().Equals(";"))
+                {
+                    reader.clear();
+                    node.SetNodeType(AstNode.NodeType.Variable);
                     return node;
                 }
                 else
                 {
-                    throw new SyntaxError("");
-
+                    reader.SaveReadTokens();
+                    throw new SyntaxError("Can't parse variable");
                 }
-
             }
+        }
+
+        public static AstNode parseConstant(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            checkToken(nextToken);
+            if (!nextToken.GetValue().Equals("const"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse constant");
+            }
+
+            var node = new AstNode(nextToken);
+            node.addChild(parseConstDefinition(reader));
             while (true)
             {
-
                 nextToken = reader.readNextToken();
-                if (nextToken.GetValue().Equals("end"))
-                {
-                    reader.clear();
-                            return node;
-                }
-                else if (nextToken.GetValue().Equals(","))
-                {
-                    node.addChild(Parser.parseLiteral(reader));
-                }
-            }
-        }
-
-        public static AstNode parseRoutine(TokenReader reader){
-            AstNode node = new AstNode("Routine");
-            try
-            {
-                node.addChild(Parser.parseAttribute(reader));
-            }catch(SyntaxError e){}
-            Token nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("routine"))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-            node.addChild(Parser.parseIdentifier(reader));
-            try
-            {
-                node.addChild(Parser.parseParameter(reader));
-            }catch(SyntaxError e){}
-            nextToken = reader.readNextToken();
-            if (nextToken.GetValue().Equals(":"))
-            {
-                node.addChild(Parser.parseResults(reader));
-            }
-            if (nextToken.GetValue().Equals(";"))
-            {
-                reader.clear();
-                        return node;
-            }
-            else if (nextToken.GetValue().Equals("do"))
-            {
-                node.addChild(Parser.parseRoutine(reader));
-                nextToken = reader.readNextToken();
-                if (!nextToken.GetValue().Equals("end"))
-                {
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
-                }
-                reader.clear();
-                return node;
-            }
-            throw new SyntaxError("");
-        }
-
-        public static AstNode parseModule(TokenReader reader){
-            Token nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("module"))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-            AstNode node = new AstNode("Module");
-            node.addChild(Parser.parseIdentifier(reader));
-            while (true)
-            {
-                try
-                {
-                    node.addChild(Parser.parseDeclaration(reader));
-                }
-                catch (SyntaxError e)
-                {
-                    reader.saveReadedTokens();
-                    break;
-                }
-            }
-            if (!nextToken.GetValue().Equals("end"))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-            reader.clear();
-            return node;
-        }
-
-        public static AstNode parseVariable(TokenReader reader){
-            AstNode node = new AstNode("Variable");
-            node.addChild(Parser.parseType(reader));
-            while (true)
-            {
-                node.addChild(Parser.parseVarDefinition(reader));
-                Token nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
-                    continue;
+                    node.addChild(parseConstDefinition(reader));
                 }
                 else if (nextToken.GetValue().Equals(";"))
                 {
                     reader.clear();
-                            return node;
+                    node.SetNodeType(AstNode.NodeType.Constant);
+                    return node;
                 }
                 else
                 {
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
+                    reader.SaveReadTokens();
+                    throw new SyntaxError("Can't parse constant");
                 }
             }
         }
 
-        public static AstNode parseConstant(TokenReader reader){
-            Token nextToken = reader.readNextToken();
-            if (!(nextToken.GetValue().Equals("const")))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-            AstNode node = new AstNode("Constant");
-            while (true)
-            {
-                node.addChild(Parser.parseConstDefinition(reader));
-                nextToken = reader.readNextToken();
-                if (nextToken.GetValue().Equals(","))
-                {
-                    node.addChild(Parser.parseConstDefinition(reader));
-                }
-                else if (nextToken.GetValue().Equals(";"))
-                {
-                    reader.clear();
-                            return node;
-                }
-                else
-                {
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
-                }
-            }
+        private static void checkToken(Token nextToken)
+        {
+            if (nextToken == null) throw new ArgumentNullException(nameof(nextToken));
         }
-
 
         public static AstNode parseIdentifier(TokenReader reader)
         {
-            Token nextToken = reader.readNextToken();
-            if (!(nextToken.GetTokenType() == Token.TokenType.Identifier))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-            //reader.clear();
-            return new AstNode(nextToken);
+            var nextToken = reader.readNextToken();
+            if (nextToken.GetTokenType() == Token.TokenType.Identifier) return new AstNode(nextToken);
+            reader.SaveReadTokens();
+            throw new SyntaxError("Can't parse identifier");
         }
 
         public static AstNode parseLiteral(TokenReader reader) //Literal:  Numeric
         {
-            Token nextToken = reader.readNextToken();
-            if(nextToken.GetTokenType()==Token.TokenType.Number){
+            var nextToken = reader.readNextToken();
+            if (nextToken.GetTokenType() == Token.TokenType.Number)
+            {
                 reader.clear();
                 return new AstNode(nextToken);
             }
-            throw new SyntaxError("");
+
+            reader.SaveReadTokens();
+            throw new SyntaxError("Can't parse literal");
         }
 
-        public static AstNode parseDeclaration(TokenReader reader){
-            AstNode variable = new AstNode("Declaration");
+        public static AstNode parseDeclaration(TokenReader reader)
+        {
+            var variable = new AstNode("Declaration");
             try
             {
-                variable.addChild(Parser.parseVariable(reader));
-                reader.clear();
-                        return variable;
+//                variable.addChild(parseVariable(reader));
+//                reader.clear();
+//                return variable;
+                return parseVariable(reader);
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                variable.addChild(Parser.parseConstant(reader));
-                reader.clear();
-                        return variable;
+//                variable.addChild(parseConstant(reader));
+//                reader.clear();
+//                return variable;
+                return parseConstant(reader);
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                variable.addChild(Parser.parseRoutine(reader));
-                reader.clear();
-                        return variable;
+//                variable.addChild(parseRoutine(reader));
+//                reader.clear();
+//                return variable;
+                return parseRoutine(reader);
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
-            throw new SyntaxError("");
+
+            throw new SyntaxError("Can't parse declaration");
         }
 
-        public static AstNode parseVarDefinition(TokenReader reader){ 
-            AstNode node = new AstNode("VarDefinition");
-            node.addChild(Parser.parseIdentifier(reader));
-            Token nextToken = reader.readNextToken();
-            if(nextToken.GetValue().Equals(":=")){
-                node.addChild(Parser.parseExpression(reader));
+        public static AstNode parseVarDefinition(TokenReader reader)
+        {
+            var node = new AstNode("VarDefinition");
+            node.addChild(parseIdentifier(reader));
+            var nextToken = reader.readNextToken();
+
+            if (nextToken.GetValue().Equals(":="))
+            {
+                node.setValue(nextToken);
+                node.addChild(parseExpression(reader));
                 reader.clear();
-                        return node;
+                node.SetNodeType(AstNode.NodeType.VarDefinition);
+                return node;
             }
-            else if(nextToken.GetValue().Equals("[")){
-                node.addChild(Parser.parseExpression(reader));
+
+            if (nextToken.GetValue().Equals("["))
+            {
+                node.setValue(new Token(Token.TokenType.Operator, ":="));
+                node.addChild(parseExpression(reader));
                 nextToken = reader.readNextToken();
-                if (nextToken.GetValue().Equals("]"))
-                {
-                    reader.clear();
-                            return node;
-                }else{
-                    throw new SyntaxError("");
-                }
+                if (!nextToken.GetValue().Equals("]")) throw new SyntaxError("Can't parse varDefinition");
+                reader.clear();
+                node.SetNodeType(AstNode.NodeType.VarDefinition);
+                return node;
+            }
 
-            }else{
-                reader.saveReadedTokens();
+            {
+                reader.SaveReadTokens();
+                node.SetNodeType(AstNode.NodeType.VarDefinition);
                 return node;
             }
         }
 
-        public static AstNode parseType(TokenReader reader){
-            Token nextToken = reader.readNextToken();
-            if (!(nextToken.GetTokenType() == Token.TokenType.Keyword))
+        public static AstNode parseType(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            if (nextToken == null)
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                throw new SyntaxError("Can't parse type");
             }
+
+            if (nextToken.GetTokenType() != Token.TokenType.Keyword)
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse type");
+            }
+
             if (nextToken.GetValue().Equals("int"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
+
             if (nextToken.GetValue().Equals("short"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
+
             if (nextToken.GetValue().Equals("byte"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
-            reader.saveReadedTokens();
-            throw new SyntaxError("");
+
+            reader.SaveReadTokens();
+            throw new SyntaxError("Can't parse type");
         }
 
-        public static AstNode parseExpression(TokenReader reader){
-            AstNode firstOPerand = Parser.parseOperand(reader);
+        public static AstNode parseExpression(TokenReader reader)
+        {
+            var firstOperand = parseOperand(reader);
 
             reader.clear();
             try
             {
-                AstNode node = Parser.parseOperator(reader);
+                var node = parseOperator(reader);
                 try
                 {
-                    node.addChild(firstOPerand);
-                    node.addChild(Parser.parseOperand(reader));
+                    node.addChild(firstOperand);
+                    node.addChild(parseOperand(reader));
                     reader.clear();
+                    node.SetNodeType(AstNode.NodeType.Expression);
                     return node;
                 }
                 catch (SyntaxError)
                 {
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
+                    reader.SaveReadTokens();
+                    throw new SyntaxError("Can't parse expression");
                 }
-            }catch (SyntaxError){
-                reader.saveReadedTokens();
-                return firstOPerand;
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+                return firstOperand;
             }
         }
 
-        public static AstNode parseConstDefinition(TokenReader reader){
-            AstNode node = new AstNode(null);
-            node.addChild(Parser.parseIdentifier(reader));
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseConstDefinition(TokenReader reader)
+        {
+            var node = new AstNode("ConstDefinition");
+            node.addChild(parseIdentifier(reader));
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("="))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse constDefinition");
             }
+
             node.setValue(nextToken);
-            node.addChild(Parser.parseExpression(reader));
+            node.addChild(parseExpression(reader));
             reader.clear();
-                    return node;
-        }
-
-        public static AstNode parseStatement(TokenReader reader){
-            AstNode node = new AstNode("Statement");
-            try
-            {
-                while (true)
-                {
-                    node.addChild(Parser.parseLabel(reader));
-                }
-            }
-            catch (SyntaxError e)
-            {
-                reader.saveReadedTokens();
-            }
-            try
-           {
-                node.addChild(Parser.parseAssemblerStatement(reader));
-                reader.clear();
-                        return node;
-            }
-            catch (SyntaxError e)
-            {
-                reader.saveReadedTokens();
-            }
-            try
-            {
-                node.addChild(Parser.parseExtensionStatement(reader));
-                reader.clear();
-                        return node;
-            }
-            catch (SyntaxError e)
-            {
-                reader.saveReadedTokens();
-            }
-            try
-            {
-                node.addChild(Parser.parseDirective(reader));
-                reader.clear();
-                        return node;
-
-            }
-            catch (SyntaxError e)
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Cant parse statement");
-            }
-            throw new SyntaxError("Cant parse statement");
-        }
-
-        public static AstNode parseLabel(TokenReader reader){
-            Token nextToken = reader.readNextToken();
-            AstNode node = new AstNode("Label");
-            if (!nextToken.GetValue().Equals("<"))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Can't parse error");
-            }
-            nextToken = reader.readNextToken();
-            if (!(nextToken.GetTokenType() == Token.TokenType.Identifier))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Can't parse error");
-
-            }
-            node.addChild(new AstNode(nextToken));
-            nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals(">"))
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Can't parse error");
-            }
-            reader.clear();
+            node.SetNodeType(AstNode.NodeType.ConstDefinition);
             return node;
         }
 
-        public static AstNode parseAssemblerStatement(TokenReader reader){
-            AstNode node = new AstNode("AssemblerStatement");
-            Token nextToken = reader.readNextToken();
-            if(nextToken.GetValue().Equals("skip")){
-                node.addChild(new AstNode(nextToken));
-                try{
-                    node.addChild(Parser.parseExpression(reader));
-                    reader.clear();
-                            return node;
-                }catch(SyntaxError e){
-                    reader.clear();
-                            return node;
-                }
-            }else if (nextToken.GetValue().Equals("stop"))
-            {
-                node.addChild(new AstNode(nextToken));
-                try
-                {
-                    node.addChild(Parser.parseExpression(reader));
-                    reader.clear();
-                            return node;
-                }
-                catch (SyntaxError e)
-                {
-                    reader.clear();
-                            return node;
-                }
-            }
-            List<string> operators =new List<string>(new string[]{ ":=", "+=", ">>=", "-=", "<<=", "|=", "&=", "^="
-            , "<=", ">=", "?="});
+        public static AstNode parseStatement(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            checkToken(nextToken);
+            reader.SaveReadTokens();
+            var node = new AstNode(AstNode.NodeType.Statement);
             try
             {
-                node.addChild(Parser.parseOperationOnRegisters(operators, reader));
-            }catch(SyntaxError e){
+                node.addChild(parseLabel(reader));
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            try
+            {
+                node.addChild(parseAssemblerStatement(reader));
+                reader.clear();
+                node.SetNodeType(AstNode.NodeType.Statement);
+                return node;
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            try
+            {
+                node.addChild(parseExtensionStatement(reader));
+                reader.clear();
+                node.SetNodeType(AstNode.NodeType.Statement);
+                return node;
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            try
+            {
+                node.addChild(parseDirective(reader));
+                reader.clear();
+                node.SetNodeType(AstNode.NodeType.Statement);
+                return node;
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Cant parse statement");
+            }
+        }
+
+        public static AstNode parseLabel(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            var node = new AstNode("Label");
+            if (!nextToken.GetValue().Equals("<"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse label");
+            }
+
+            nextToken = reader.readNextToken();
+            if (nextToken.GetTokenType() != Token.TokenType.Identifier)
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse label");
+            }
+
+            node.setValue(nextToken);
+            nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals(">"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse label");
+            }
+
+            reader.clear();
+            node.SetNodeType(AstNode.NodeType.Label);
+            return node;
+        }
+
+        public static AstNode parseAssemblerStatement(TokenReader reader)
+        {
+            AstNode node;
+            var nextToken = reader.readNextToken();
+            if (nextToken.GetValue().Equals("skip"))
+            {
+                node = new AstNode(nextToken);
+                try
+                {
+                    node.addChild(parseExpression(reader));
+                    reader.clear();
+                    node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    return node;
+                }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                    reader.clear();
+                    node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    return node;
+                }
+            }
+
+            if (nextToken.GetValue().Equals("stop"))
+            {
+                node = new AstNode(nextToken);
+                try
+                {
+                    node.addChild(parseExpression(reader));
+                    reader.clear();
+                    node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    return node;
+                }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                    reader.clear();
+                    node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    return node;
+                }
+            }
+
+            var operators = new List<string>(new[]
+                {":=", "+=", ">>=", "-=", "<<=", "|=", "&=", "^=", "<=", ">=", "?="});
+            try
+            {
+                reader.SaveReadTokens();
+                node = parseOperationOnRegisters(operators, reader);
+            }
+            catch (SyntaxError)
+            {
                 try
                 {
                     if (nextToken.GetValue().Equals("if"))
                     {
-                        node.addChild(new AstNode(nextToken));
-                        node.addChild(Parser.parseRegister(reader));
-                        Token newToken = reader.readNextToken();
-                        if(!nextToken.GetValue().Equals("goto")){
-                            throw new SyntaxError("");
+                        node = new AstNode(nextToken);
+                        node.addChild(parseRegister(reader));
+                        var newToken = reader.readNextToken();
+                        if (!nextToken.GetValue().Equals("goto"))
+                        {
+                            throw new SyntaxError("Can't parse assembler statement");
                         }
-                        node.addChild(new AstNode(newToken));
-                        node.addChild(Parser.parseRegister(reader));
-                    }else{
-                        reader.saveReadedTokens();
-                        throw new SyntaxError("");
+
+                        var goTo = new AstNode(newToken);
+                        goTo.addChild(parseRegister(reader));
+                        node.addChild(goTo);
                     }
-                }catch(SyntaxError){
-                    reader.saveReadedTokens();
-                    throw new SyntaxError("");
+                    else
+                    {
+                        reader.SaveReadTokens();
+                        throw new SyntaxError("Can't parse assembler statement");
+                    }
+                }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                    throw new SyntaxError("Can't parse assembler statement");
                 }
             }
+
             reader.clear();
+            node.SetNodeType(AstNode.NodeType.AssemblerStatement);
             return node;
         }
-        public static AstNode parseOperationOnRegisters(List<string> operators, TokenReader reader){
+
+        private static AstNode parseOperationOnRegisters(IEnumerable<string> operators, TokenReader reader)
+        {
             AstNode leftOperand = null;
             try
             {
-              leftOperand = Parser.parseOperator(reader);
-            }catch(SyntaxError e){}
-            if(leftOperand!=null && ((Token)leftOperand.getValue()).GetValue().Equals("*")){
-                leftOperand.addChild(Parser.parseRegister(reader));
-            }else{
-                leftOperand = Parser.parseRegister(reader);
+                leftOperand = parseOperator(reader);
             }
-            Token operation =reader.readNextToken();
-            bool exists = false;
-            for (int i = 0; i < operators.Count; i++){
-                if(operators[i].Equals(operation.GetValue())){
-                    exists = true;
-                }
-            }
-            if(exists==false){
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
-            }
-            AstNode rightOperand = null;
-
-            if (rightOperand != null && ((Token)rightOperand.getValue()).GetValue().Equals("*"))
+            catch (SyntaxError)
             {
-                rightOperand.addChild(Parser.parseRegister(reader));
+                reader.SaveReadTokens();
+            }
+
+            if (leftOperand != null && ((Token) leftOperand.getValue()).GetValue().Equals("*"))
+            {
+                leftOperand.addChild(parseRegister(reader));
             }
             else
             {
-                rightOperand = Parser.parseRegister(reader);
+                leftOperand = parseRegister(reader);
             }
-            AstNode node = new AstNode(operation);
+
+            var operation = reader.readNextToken();
+            var exists = operators.Any(i => i.Equals(operation.GetValue()));
+            reader.clear();
+            if (exists == false)
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse operation on registers");
+            }
+
+            AstNode rightOperand = null;
+            try
+            {
+                rightOperand = parseOperator(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            if (rightOperand != null && ((Token) rightOperand.getValue()).GetValue().Equals("*"))
+            {
+                rightOperand.addChild(parseRegister(reader));
+            }
+            else
+            {
+                rightOperand = parseRegister(reader);
+            }
+
+            var node = new AstNode(operation);
             node.addChild(leftOperand);
             node.addChild(rightOperand);
             reader.clear();
+            node.SetNodeType(AstNode.NodeType.OperationOnRegisters);
             return node;
-        
         }
 
-        public static AstNode parseAttribute(TokenReader reader){
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseAttribute(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("start"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
+
             if (nextToken.GetValue().Equals("entry"))
             {
                 reader.clear();
-                        return new AstNode(nextToken);
+                return new AstNode(nextToken);
             }
-            reader.saveReadedTokens();
-            throw new SyntaxError("Can't parse attribute");
 
+            reader.SaveReadTokens();
+            throw new SyntaxError("Can't parse attribute");
         }
-        public static AstNode parseParameters(TokenReader reader){
-            AstNode node = new AstNode("Parameters");
-            Token nextToken = reader.readNextToken();
+
+        public static AstNode parseParameters(TokenReader reader)
+        {
+            var node = new AstNode(AstNode.NodeType.Parameters);
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("("))
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
                 throw new SyntaxError("Cant parse parameters");
             }
+
+            try
+            {
+                node.addChild(parseParameter(reader));
+                nextToken = reader.readNextToken();
+            }
+            catch
+            {
+                reader.SaveReadTokens();
+                node.SetNodeType(AstNode.NodeType.Parameters);
+                return node;
+            }
+
             while (true)
             {
-                node.addChild(Parser.parseParameter(reader));
-                nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
-                    node.addChild(Parser.parseParameter(reader));
+                    node.addChild(parseParameter(reader));
+                    nextToken = reader.readNextToken();
                 }
                 else
                 {
+                    reader.SaveReadTokens();
                     break;
                 }
             }
+
             if (!nextToken.GetValue().Equals(")"))
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
                 throw new SyntaxError("Cant parse parameters");
             }
+
             reader.clear();
-                    return node;
+            node.SetNodeType(AstNode.NodeType.Parameters);
+            return node;
         }
 
-        public static AstNode parseResults(TokenReader reader){
-            AstNode node = new AstNode("Results");
+        public static AstNode parseResults(TokenReader reader)
+        {
+            var node = new AstNode(AstNode.NodeType.Results);
+            node.addChild(parseRegister(reader));
+            var nextToken = reader.readNextToken();
             while (true)
             {
-                node.addChild(Parser.parseRegister(reader));
-                Token nextToken = reader.readNextToken();
                 if (nextToken.GetValue().Equals(","))
                 {
-                    node.addChild(Parser.parseRegister(reader));
-                    continue;
+                    node.addChild(parseRegister(reader));
+                    nextToken = reader.readNextToken();
                 }
                 else
                 {
+                    reader.SaveReadTokens();
                     reader.clear();
+                    node.SetNodeType(AstNode.NodeType.Results);
                     return node;
                 }
             }
         }
 
-        public static AstNode parseParameter(TokenReader reader){
-            AstNode node = new AstNode("Parameter");
+        public static AstNode parseParameter(TokenReader reader)
+        {
             try
             {
-                node.addChild(Parser.parseType(reader));
-                node.addChild(Parser.parseIdentifier(reader));
+                var node = parseType(reader);
+                node.addChild(parseIdentifier(reader));
                 reader.clear();
+                node.SetNodeType(AstNode.NodeType.Parameter);
                 return node;
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                reader.saveReadedTokens();
-                node.cleanChild();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                node.addChild(Parser.parseRegister(reader));
-                reader.clear();
-                return node;
+                return parseRegister(reader);
             }
-            catch (SyntaxError e)
+            catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
                 throw new SyntaxError("Cant parse parameter");
             }
         }
 
-        public static AstNode parseRoutineBody(TokenReader reader){
-            AstNode node = new AstNode("RoutineBody");
+        public static AstNode parseRoutineBody(TokenReader reader)
+        {
+            var node = new AstNode(AstNode.NodeType.RoutineBody);
             while (true)
             {
                 try
                 {
-                    node.addChild(Parser.parseVariable(reader));
+                    node.addChild(parseVariable(reader));
                     continue;
                 }
-                    catch (SyntaxError e) { reader.saveReadedTokens(); }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                }
+
                 try
                 {
-                    node.addChild(Parser.parseConstant(reader));
+                    node.addChild(parseConstant(reader));
                     continue;
                 }
-                catch (SyntaxError e) { reader.saveReadedTokens(); }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                }
+
                 try
                 {
-                    node.addChild(Parser.parseStatement(reader));
+                    node.addChild(parseStatement(reader));
                     continue;
                 }
-                catch (SyntaxError e) { reader.saveReadedTokens(); }
+                catch (SyntaxError)
+                {
+                    reader.SaveReadTokens();
+                }
+
                 break;
             }
+
             reader.clear();
+            node.SetNodeType(AstNode.NodeType.RoutineBody);
             return node;
         }
 
-        public static AstNode parsePrimary(TokenReader reader){
+        public static AstNode parsePrimary(TokenReader reader)
+        {
+            try
+            {
+                reader.clear();
+                return parseDereference(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
 
             try
             {
-                //reader.clear();
-                return Parser.parseDereference(reader);
+                reader.clear();
+                return parseArrayElement(reader);
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                //reader.clear();
-                return Parser.parseArrayElement(reader);
+                reader.clear();
+                return parseDataElement(reader);
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                //reader.clear();
-                return Parser.parseDataElement(reader);
+                reader.clear();
+                return parseRegister(reader);
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                //reader.clear();
-                return Parser.parseRegister(reader);
+                reader.clear();
+                return parseExplicitAddress(reader);
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
-                //reader.clear();
-                return Parser.parseExplicitAddress(reader);
+                reader.clear();
+                return parseVariableReference(reader);
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
-            try
-            {
-                // reader.clear();
-                return Parser.parseVariableReference(reader);
-            }
-            catch (SyntaxError) { reader.saveReadedTokens(); }
+
             throw new SyntaxError("Cant parse primary");
         }
 
-        public static AstNode parseVariableReference(TokenReader reader){
-            return Parser.parseIdentifier(reader);
-           
+        public static AstNode parseVariableReference(TokenReader reader)
+        {
+            return parseIdentifier(reader);
         }
-        public static AstNode parseDereference(TokenReader reader){
-            AstNode dereference = new AstNode(null);
-            Token nextToken = reader.readNextToken();
+
+        public static AstNode parseDereference(TokenReader reader)
+        {
+            var dereference = new AstNode(null);
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("*"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse deference");
             }
+
             dereference.setValue(nextToken);
             try
             {
                 reader.clear();
-                dereference.addChild(Parser.parseVariableReference(reader));
+                dereference.addChild(parseVariableReference(reader));
                 return dereference;
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             try
             {
                 reader.clear();
-                dereference.addChild(Parser.parseRegister(reader));
+                dereference.addChild(parseRegister(reader));
                 return dereference;
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
             }
+
             throw new SyntaxError("Cant parse dereference");
         }
-       public static AstNode parseArrayElement(TokenReader reader)
+
+        public static AstNode parseArrayElement(TokenReader reader)
         {
-            AstNode arrayElement = Parser.parseVariableReference(reader);
-            Token nextToken = reader.readNextToken();
+            var arrayElement = parseVariableReference(reader);
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("["))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse array element");
             }
-            arrayElement.addChild(Parser.parseExpression(reader));
+
+            arrayElement.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("]"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse array element");
             }
+
             reader.clear();
             return arrayElement;
         }
 
         public static AstNode parseDataElement(TokenReader reader)
         {
-            AstNode dataElement = Parser.parseIdentifier(reader);
-            Token nextToken = reader.readNextToken();
+            var dataElement = parseIdentifier(reader);
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("["))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse data element");
             }
-            dataElement.addChild(Parser.parseExpression(reader));
+
+            dataElement.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("]"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse data element");
             }
+
             reader.clear();
             return dataElement;
         }
 
-        public static AstNode parseExplicitAddress(TokenReader reader){
-            Token nextToken = reader.readNextToken();
-            AstNode explicitAddress = new AstNode(nextToken);
+        public static AstNode parseExplicitAddress(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            var explicitAddress = new AstNode(nextToken);
             if (!nextToken.GetValue().Equals("*"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse explicit address");
             }
-            explicitAddress.addChild(Parser.parseLiteral(reader));
+
+            explicitAddress.addChild(parseLiteral(reader));
             reader.clear();
             return explicitAddress;
         }
 
-        public static AstNode parseOperand(TokenReader reader){
+        public static AstNode parseOperand(TokenReader reader)
+        {
             try
             {
                 reader.clear();
-                return Parser.parseReceiver(reader);
+                return parseReceiver(reader);
             }
             catch (SyntaxError)
             {
-                reader.saveReadedTokens();
-            }
-            try
-            {
-                reader.clear();
-                return Parser.parseLiteral(reader);
-            }
-            catch (SyntaxError)
-            {
-                reader.saveReadedTokens();
-            }
-            try
-            {
-                reader.clear();
-                return Parser.parseAddress(reader);
-            }
-            catch (SyntaxError)
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
             }
 
+            try
+            {
+                reader.clear();
+                return parseLiteral(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            try
+            {
+                reader.clear();
+                return parseIdentifier(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            try
+            {
+                reader.clear();
+                return parseAddress(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse operand");
+            }
         }
 
         public static AstNode parseAddress(TokenReader reader)
         {
-            AstNode address = new AstNode("Address");
-            Token nextToken = reader.readNextToken();
+            var address = new AstNode("Address");
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("&"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse address");
             }
+
             address.setValue(nextToken);
-            address.addChild(Parser.parseVariableReference(reader));
+            address.addChild(parseVariableReference(reader));
             reader.clear();
             return address;
         }
 
         public static AstNode parseReceiver(TokenReader reader)
         {
-            AstNode receiver = new AstNode("Receiver");
-            Token nextToken = reader.readNextToken();
+            var receiver = new AstNode("Receiver");
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("this"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse receiver");
             }
+
             receiver.setValue(nextToken);
             reader.clear();
             return receiver;
         }
 
-        public static AstNode parseOperator(TokenReader reader)
+        private static AstNode parseOperator(TokenReader reader)
         {
-            Token nextToken = reader.readNextToken();
-            Token.TokenType operatorType = Token.TokenType.Operator;
-            if (nextToken.GetTokenType().Equals(operatorType))
-            {
-                reader.clear();
-        ;
-                return new AstNode(nextToken);
-            }
-            throw new SyntaxError("");
+            var nextToken = reader.readNextToken();
+            const Token.TokenType operatorType = Token.TokenType.Operator;
+            if (!nextToken.GetTokenType().Equals(operatorType)) throw new SyntaxError("Can't parse operator");
+            reader.clear();
+            return new AstNode(nextToken);
         }
 
-        // Useless node 
-        //public static AstNode parsePrimitiveOperator()
-        //{
-        //    AstNode primitiveOperator = new AstNode(null);
-        //    Token nextToken = reader.readNextToken();
-        //    if (nextToken.GetValue().Equals("=") || nextToken.GetValue().Equals("/=")
-        //       || nextToken.GetValue().Equals("<") || nextToken.GetValue().Equals(">"))
-        //    {
-        //        primitiveOperator.setValue(nextToken.GetValue());
-        //    }
-        //    else
-        //    {
-        //        throw new SyntaxError("Can't parse register");
-        //    }
-        //    return primitiveOperator;
-        //}
-
-
-
-        public static AstNode parseRegister(TokenReader reader){
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseRegister(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
             if (nextToken.GetTokenType().Equals(Token.TokenType.Register))
             {
                 reader.clear();
                 return new AstNode(nextToken);
             }
-            else
-            {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Can't parse register");
-            }
 
-
-
+            reader.SaveReadTokens();
+            throw new SyntaxError("Can't parse register");
         }
 
-       public static AstNode parseDirective(TokenReader reader){
-            AstNode directive = new AstNode("Directive");
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseDirective(TokenReader reader)
+        {
+            var directive = new AstNode("Directive");
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("format"))
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
                 throw new SyntaxError("Can't parse directive");
             }
+
+            directive.setValue(nextToken);
             nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("8") || nextToken.GetValue().Equals("16")
-                || nextToken.GetValue().Equals("32"))
+                                                 || nextToken.GetValue().Equals("32"))
             {
                 directive.addChild(new AstNode(nextToken));
             }
             else
             {
-                reader.saveReadedTokens();
+                reader.SaveReadTokens();
                 throw new SyntaxError("Can't parse directive");
             }
+
             reader.clear();
             return directive;
         }
 
-        public static AstNode parseExtensionStatement(TokenReader reader){
-            AstNode node = new AstNode("ExtensionStatement");
+        public static AstNode parseExtensionStatement(TokenReader reader)
+        {
+            var node = new AstNode("ExtensionStatement");
             try
             {
-                node.addChild(Parser.parseAssigment(reader));
+//                node.addChild(parseAssignment(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseAssignment(reader);
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
-            try
+            catch (SyntaxError)
             {
-                node.addChild(Parser.parseCall(reader));
-                reader.clear();
-                        return node;
+                reader.SaveReadTokens();
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
-            try
-            {
-                node.addChild(Parser.parseIf(reader));
-                reader.clear();
-                        return node;
 
-            }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
             try
             {
-                node.addChild(Parser.parseWhile(reader));
-                reader.clear();
-                        return node;
-
+//                node.addChild(parseCall(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseCall(reader);
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
             try
             {
-                node.addChild(Parser.parseFor(reader));
-                reader.clear();
-                return node;
-
+//                node.addChild(parseIf(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseIf(reader);
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
             try
             {
-                node.addChild(Parser.parseBreak(reader));
-                reader.clear();
-                return node;
-
+//                node.addChild(parseWhile(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseWhile(reader);
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
             try
             {
-                node.addChild(Parser.parseSwap(reader));
-                reader.clear();
-                return node;
-
+//                node.addChild(parseFor(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseFor(reader);
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
             try
             {
-                node.addChild(Parser.parseGoto(reader));
-                reader.clear();
-                return node;
-
+//                node.addChild(parseBreak(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseBreak(reader);
             }
-            catch (SyntaxError e) { reader.saveReadedTokens(); }
-            throw new SyntaxError("");
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
 
+            try
+            {
+//                node.addChild(parseSwap(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+
+                return parseSwap(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            try
+            {
+//                node.addChild(parseGoto(reader));
+//                reader.clear();
+//                node.SetNodeType(AstNode.NodeType.ExtensionStatement);
+//                return node;
+                return parseGoto(reader);
+            }
+            catch (SyntaxError)
+            {
+                reader.SaveReadTokens();
+            }
+
+            throw new SyntaxError("Can't parse extension statement");
         }
 
-        public static AstNode parseIf(TokenReader reader) // if Expression do RoutineBody end
+        public static AstNode parseIf(TokenReader reader)
         {
-            Token nextToken = reader.readNextToken();
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("if"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse if");
             }
-            AstNode ifNode = new AstNode("if");
-            ifNode.addChild(Parser.parseExpression(reader));
+
+            var ifNode = new AstNode(nextToken);
+            ifNode.addChild(parseExpression(reader));
+            ifNode.addChild(parseIfBody(reader));
             nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("do"))
+            if (nextToken.GetValue().Equals("else"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                ifNode.addChild(parseIfBody(reader));
             }
-            ifNode.addChild(Parser.parseRoutineBody(reader));
-            if (!nextToken.GetValue().Equals("end"))
+            else
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
             }
+
             reader.clear();
+            ifNode.SetNodeType(AstNode.NodeType.If);
             return ifNode;
         }
 
-        public static AstNode parseCall(TokenReader reader) //Identifier(); // Identifier ( [Identifier {, Identifier}]
+        private static AstNode parseIfBody(TokenReader reader)
         {
-            AstNode call = new AstNode("Call");
-            call.addChild(Parser.parseIdentifier(reader));
-            call.addChild(Parser.parseCallParameters(reader));
-            reader.clear(); 
+            var nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("do"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse if body");
+            }
+
+            reader.clear();
+            nextToken = reader.readNextToken();
+            if (nextToken.GetValue().Equals("end"))
+            {
+                return new AstNode("RoutineBody");
+            }
+
+            reader.SaveReadTokens();
+            var ifBody = parseRoutineBody(reader);
+            nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals("end"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse if body");
+            }
+
+            reader.clear();
+            ifBody.SetNodeType(AstNode.NodeType.IfBody);
+            return ifBody;
+        }
+
+        public static AstNode parseCall(TokenReader reader)
+        {
+            var call = new AstNode("Call");
+            var primary = parsePrimary(reader);
+            var nextToken = reader.readNextToken();
+            if (nextToken.GetValue().Equals("."))
+            {
+                var identifier = parseIdentifier(reader);
+                var node = new AstNode(nextToken);
+                node.addChild(primary);
+                node.addChild(identifier);
+                call.addChild(node);
+                nextToken = reader.readNextToken();
+            }
+            else
+            {
+                var value = (Token) primary.getValue();
+                if (!value.GetTokenType().Equals(Token.TokenType.Identifier))
+                {
+                    throw new SyntaxError("Can't parse call");
+                }
+
+                call.addChild(primary);
+            }
+
+            if (!nextToken.GetValue().Equals("("))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse call");
+            }
+
+            reader.clear();
+            call.addChild(parseCallParameters(reader));
+            nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals(";"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse call");
+            }
+
+            reader.clear();
+            call.SetNodeType(AstNode.NodeType.Call);
             return call;
         }
 
-        public static AstNode parseCallParameters(TokenReader reader){
-            AstNode parameters = new AstNode("parameters");
-            Token nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("("))
+        private static AstNode parseCallParameters(TokenReader reader)
+        {
+            var parameters = new AstNode("CallParameters");
+            try
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                parameters.addChild(parseIdentifier(reader));
             }
+            catch (SyntaxError)
+            {
+                var nextToken = reader.readNextToken();
+                if (!nextToken.GetValue().Equals(")"))
+                {
+                    throw new SyntaxError("Can't parse call parameters");
+                }
+
+                reader.clear();
+                parameters.SetNodeType(AstNode.NodeType.CallParameters);
+                return parameters;
+            }
+
             while (true)
             {
-                    parameters.addChild(Parser.parseIdentifier(reader));
-                    nextToken = reader.readNextToken();
-                    if (nextToken.GetValue().Equals(","))
-                    {
-                        continue;
-                    }
-                    if (!nextToken.GetValue().Equals(")"))
-                    {
-                        reader.saveReadedTokens();
-                        throw new SyntaxError("");
-                    }
+                var nextToken = reader.readNextToken();
+                if (nextToken.GetValue().Equals(","))
+                {
+                    parameters.addChild(parseIdentifier(reader));
+                    continue;
+                }
+
+                if (!nextToken.GetValue().Equals(")"))
+                {
+                    reader.SaveReadTokens();
+                    throw new SyntaxError("Can't parse call parameters");
+                }
+
                 reader.clear();
-                        return parameters;
-                
+                parameters.SetNodeType(AstNode.NodeType.CallParameters);
+                return parameters;
             }
         }
 
-        public static AstNode parseFor(TokenReader reader) // default: from zero to inf step 1
+        public static AstNode parseFor(TokenReader reader)
         {
-            AstNode forStatement = new AstNode("For");
-            Token nextToken = reader.readNextToken();
+            var forStatement = new AstNode("For");
+            var nextToken = reader.readNextToken();
+            if (nextToken.GetValue().Equals("end"))
+            {
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse for");
+            }
+
             if (nextToken.GetValue().Equals("for"))
             {
-                AstNode forNode = new AstNode(nextToken);
-                forStatement.addChild(forNode);
-                forNode.addChild(Parser.parseIdentifier(reader));
+                var forNode = new AstNode(nextToken);
+                forStatement = forNode;
+                forNode.addChild(parseIdentifier(reader));
                 nextToken = reader.readNextToken();
             }
+
             if (nextToken.GetValue().Equals("from"))
             {
-                AstNode fromStatement = new AstNode(nextToken);
+                var fromStatement = new AstNode(nextToken);
+                fromStatement.addChild(parseExpression(reader));
+                fromStatement.SetNodeType(AstNode.NodeType.From);
                 forStatement.addChild(fromStatement);
-                fromStatement.addChild(Parser.parseExpression(reader));
                 nextToken = reader.readNextToken();
             }
+            else
+            {
+                var fromStatement = new AstNode(new Token(Token.TokenType.Keyword, "from"));
+                var expression = new AstNode(new Token(Token.TokenType.Number, "0"));
+                expression.SetNodeType(AstNode.NodeType.Expression);
+                fromStatement.addChild(expression);
+                fromStatement.SetNodeType(AstNode.NodeType.From);
+                forStatement.addChild(fromStatement);
+            }
+
             if (nextToken.GetValue().Equals("to"))
             {
-                AstNode toStatement = new AstNode(nextToken);
+                var toStatement = new AstNode(nextToken);
+                toStatement.addChild(parseExpression(reader));
+                toStatement.SetNodeType(AstNode.NodeType.To);
                 forStatement.addChild(toStatement);
-                toStatement.addChild(Parser.parseExpression(reader));
                 nextToken = reader.readNextToken();
             }
+            else
+            {
+                var toStatement = new AstNode(new Token(Token.TokenType.Keyword, "to"));
+                toStatement.addChild(new AstNode(new Token(Token.TokenType.Number, "0")));
+                toStatement.SetNodeType(AstNode.NodeType.To);
+                forStatement.addChild(toStatement);
+            }
+
             if (nextToken.GetValue().Equals("step"))
             {
-                AstNode stepNode = new AstNode(nextToken);
+                var stepNode = new AstNode(nextToken);
+                stepNode.addChild(parseExpression(reader));
+                stepNode.SetNodeType(AstNode.NodeType.Step);
                 forStatement.addChild(stepNode);
-                stepNode.addChild(Parser.parseExpression(reader));
             }
-            forStatement.addChild(Parser.parseLoopBody(reader));
+            else
+            {
+                var stepNode = new AstNode(new Token(Token.TokenType.Keyword, "step"));
+                stepNode.addChild(new AstNode(new Token(Token.TokenType.Number, "1")));
+                stepNode.SetNodeType(AstNode.NodeType.Step);
+                forStatement.addChild(stepNode);
+            }
+
+            forStatement.addChild(parseLoopBody(reader));
             reader.clear();
+            forStatement.SetNodeType(AstNode.NodeType.For);
             return forStatement;
         }
 
-        public static AstNode parseWhile(TokenReader reader){
-            AstNode whileStatement = new AstNode("while");
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseWhile(TokenReader reader)
+        {
+            var whileStatement = new AstNode(AstNode.NodeType.While);
+            var nextToken = reader.readNextToken();
+            if (nextToken.GetValue().Equals("end"))
+            {
+                throw new SyntaxError("Can't parse while");
+            }
+
             if (nextToken.GetValue().Equals("while"))
             {
                 try
                 {
-                    whileStatement.addChild(Parser.parseExpression(reader));
+                    whileStatement.addChild(parseExpression(reader));
                 }
-                catch (SyntaxError e)
+                catch (SyntaxError)
                 {
-                    reader.saveReadedTokens();
-                    whileStatement.addChild(Parser.parseLoopBody(reader));
-                    reader.clear();
-                            return whileStatement;
+                    reader.SaveReadTokens();
                 }
             }
-            whileStatement.addChild(Parser.parseLoopBody(reader));
+
+            whileStatement.addChild(parseLoopBody(reader));
             reader.clear();
+            whileStatement.SetNodeType(AstNode.NodeType.While);
             return whileStatement;
         }
 
-        public static AstNode parseLoopBody(TokenReader reader){
-            AstNode loopBody = new AstNode("loopbody");
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseLoopBody(TokenReader reader)
+        {
+            var loopBody = new AstNode(AstNode.NodeType.LoopBody);
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("loop"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse loop body");
             }
+
+            reader.clear();
             while (true)
             {
                 try
                 {
-                    loopBody.addChild(Parser.parseStatement(reader));
+                    loopBody.addChild(parseStatement(reader));
                 }
-                catch (SyntaxError e)
+                catch (SyntaxError)
                 {
-                    reader.saveReadedTokens();
+                    reader.SaveReadTokens();
                     nextToken = reader.readNextToken();
                     if (!nextToken.GetValue().Equals("end"))
                     {
-                        reader.saveReadedTokens();
-                        throw new SyntaxError("Can't parse loop");
-
+                        reader.SaveReadTokens();
+                        throw new SyntaxError("Can't parse loop body");
                     }
-                    reader.clear();
-                    return loopBody;
 
+                    reader.clear();
+                    loopBody.SetNodeType(AstNode.NodeType.LoopBody);
+                    return loopBody;
                 }
             }
-
         }
 
         public static AstNode parseBreak(TokenReader reader)
         {
-            AstNode breakNode = new AstNode(null);
-            Token nextToken = reader.readNextToken();
+            var breakNode = new AstNode(null);
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("break"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse break");
             }
+
             breakNode.setValue(nextToken);
             reader.clear();
+            breakNode.SetNodeType(AstNode.NodeType.Break);
             return breakNode;
         }
 
-         public static AstNode parseSwap(TokenReader reader){
-            AstNode swap = new AstNode(null);
-            swap.addChild(Parser.parsePrimary(reader));
-            Token nextToken = reader.readNextToken();
+        public static AstNode parseSwap(TokenReader reader)
+        {
+            var swap = new AstNode(null);
+            swap.addChild(parsePrimary(reader));
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("<=>"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse swap");
             }
+
             swap.setValue(nextToken);
-            swap.addChild(Parser.parsePrimary(reader));
+            swap.addChild(parsePrimary(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(";"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse swap");
             }
+
             reader.clear();
+            swap.SetNodeType(AstNode.NodeType.Swap);
             return swap;
         }
 
         public static AstNode parseGoto(TokenReader reader)
         {
-            AstNode go_to = new AstNode("goto");
-            Token nextToken = reader.readNextToken();
+            var goGo = new AstNode("goto");
+            var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("goto"))
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse goto");
             }
-            go_to.setValue(nextToken);
-            go_to.addChild(Parser.parseIdentifier(reader));
-            Token delim = reader.readNextToken();
-            if (!delim.GetValue().Equals(";"))
+
+            goGo.setValue(nextToken);
+            goGo.addChild(parseIdentifier(reader));
+            var delimiter = reader.readNextToken();
+            if (!delimiter.GetValue().Equals(";"))
             {
-                throw new SyntaxError("");
+                throw new SyntaxError("Can't parse goto");
             }
+
             reader.clear();
-            return go_to;
+            goGo.SetNodeType(AstNode.NodeType.Goto);
+            return goGo;
         }
 
-        public static AstNode parseAssigment(TokenReader reader)
+        public static AstNode parseAssignment(TokenReader reader)
         {
-            AstNode assigment = new AstNode(null);
-            assigment.addChild(Parser.parsePrimary(reader));
-            Token nextToken = reader.readNextToken();
+            var assignment = new AstNode(null);
+            assignment.addChild(parsePrimary(reader));
+            var nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals(":="))
             {
-                assigment.setValue(":=");
+                assignment.setValue(nextToken);
             }
             else
             {
-                reader.saveReadedTokens();
-                throw new SyntaxError("Can't parse assigment");
+                reader.SaveReadTokens();
+                throw new SyntaxError("Can't parse assignment");
             }
-            assigment.addChild(Parser.parseExpression(reader));
+
+            assignment.addChild(parseExpression(reader));
             nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals(";"))
             {
-                assigment.setValue(":=");
+                throw new SyntaxError("Can't parse assignment");
             }
+
             reader.clear();
-            return assigment;
+            assignment.SetNodeType(AstNode.NodeType.Assignment);
+            return assignment;
         }
-
-
     }
 }
