@@ -1,14 +1,29 @@
+using System.Collections.Generic;
 using Erasystemlevel.Parser;
+using EraSystemLevel.Semantic;
 
-namespace HelloWorld.Generator
+namespace EraSystemLevel.Generator
 {
     public class CodeGenerator
     {
-        private AstNode root;
-        // todo: symbol table
+        public AssemblyBuffer assembly;
 
-        private CodeGenerator(SemanticAnalyzer structure)
+        private AstNode root;
+        private MemoryManager memoryManager;
+
+        private SymbolTable symbolTable;
+        private CallTable callTable;
+
+        public CodeGenerator(AstNode tree, SymbolTable symbols, CallTable calls)
         {
+            root = tree;
+            symbolTable = symbols;
+            callTable = calls;
+
+            assembly = new AssemblyBuffer();
+            memoryManager = new MemoryManager(assembly);
+
+            // todo: generate
         }
     }
 }
