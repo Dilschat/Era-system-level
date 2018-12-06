@@ -4,7 +4,7 @@ using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
 
-namespace EraSystemLevel.Generator
+namespace Erasystemlevel.Generator
 {
     public class AssemblyBuffer
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
 
-namespace EraSystemLevel.Semantic
+namespace Erasystemlevel.Semantic
 {
     public class SemanticAnalyzer
     {

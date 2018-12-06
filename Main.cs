@@ -2,10 +2,10 @@
 using Erasystemlevel.Tokenizer;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
-using EraSystemLevel.Generator;
-using EraSystemLevel.Semantic;
+using Erasystemlevel.Generator;
+using Erasystemlevel.Semantic;
 
-namespace EraSystemLevel
+namespace Erasystemlevel
 {
     class Run
     {
@@ -13,13 +13,13 @@ namespace EraSystemLevel
 
         static void Main()
         {
-            var tokenizer = new Tokenizer(CodeFile);
+            var tokenizer = new Tokenizer.Tokenizer(CodeFile);
             var tokenReader = new TokenReader(tokenizer);
 
             AstNode tree;
             try
             {
-                tree = Parser.ParseUnit(tokenReader);
+                tree = Parser.Parser.ParseUnit(tokenReader);
             }
             catch (SyntaxError e)
             {
