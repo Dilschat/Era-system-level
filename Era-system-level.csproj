@@ -24,21 +24,18 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Generator\CodeGenerator.cs" />
-    <Compile Include="Generator\SemanticAnalyzer.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Tests\Samples.cs" />
-    <Compile Include="Tokenizer\Tokenizer.cs" />
-    <Compile Include="Tokenizer\Token.cs" />
-    <Compile Include="Parser\Parser.cs" />
-    <Compile Include="Parser\TokenReader.cs" />
-    <Compile Include="Parser\AstNode.cs" />
-    <Compile Include="Exception\SyntaxError.cs" />
-    <Compile Include="Tests\NUnitTestClass.cs" />
+    <Compile Include="Tokenizer\*" />
+    <Compile Include="Parser\*" />
+    <Compile Include="Semantic\*" />
+    <Compile Include="Generator\*" />
+    <Compile Include="Exception\*" />
+    <Compile Include="Tests\*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokenizer\" />
     <Folder Include="Parser\" />
+    <Folder Include="Generator\" />
     <Folder Include="Exception\" />
     <Folder Include="Tests\" />
   </ItemGroup>
@@ -51,15 +48,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Tests\testFiles\*" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Tests\codeSamples\*" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Tokenizer\text.txt" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="text1.txt" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Tests\codeSamples\codeData1.txt" />
-    <Content Include="Tests\codeSamples\codeData2.txt" />
+    <None Include="code.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
