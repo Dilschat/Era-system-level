@@ -36,6 +36,7 @@
   <ItemGroup>
     <Folder Include="Tokenizer\" />
     <Folder Include="Parser\" />
+    <Folder Include="Semantic\" />
     <Folder Include="Generator\" />
     <Folder Include="Exception\" />
     <Folder Include="Tests\" />
