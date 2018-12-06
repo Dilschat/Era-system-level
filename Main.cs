@@ -7,11 +7,11 @@ using Erasystemlevel.Semantic;
 
 namespace Erasystemlevel
 {
-    class Run
+    internal static class Run
     {
         private const string CodeFile = "code.txt";
 
-        static void Main()
+        private static void Main()
         {
             var tokenizer = new Tokenizer.Tokenizer(CodeFile);
             var tokenReader = new TokenReader(tokenizer);
