@@ -14,7 +14,7 @@ namespace Erasystemlevel.Tokenizer
         public Regex register = new Regex("\\bR([0-9]|[12][0-9]|3[01])\\b");
         HashSet<string> delimeters = new HashSet<string>(new List<string>()
         {
-            ";", ",", ".", "(", ")", "[", "]", "//"
+            ";", ",", ".", "(", ")", "[", "]", "//",":>"
         });
         HashSet<string> operators = new HashSet<string>(new List<string>()
         {
@@ -109,6 +109,7 @@ namespace Erasystemlevel.Tokenizer
                        return new Token(Token.TokenType.Number, currentToken);
 
                     }
+
 
 
             }

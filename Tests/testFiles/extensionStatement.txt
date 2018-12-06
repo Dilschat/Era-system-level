@@ -1,1 +1,3 @@
-﻿if a > b do break end
+﻿id := 2;
+func(a);
+obj.func();

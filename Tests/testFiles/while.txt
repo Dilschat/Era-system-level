@@ -1,1 +1,1 @@
-﻿while a > b loop a+1 end
+﻿while a > b loop a:=a+1; end
