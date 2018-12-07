@@ -84,7 +84,7 @@ namespace Erasystemlevel.Semantic
             // add module name to reservedNames
             reservedNames.Add(moduleName);
             // add to module table
-            Module module = new Module(moduleName);
+            Module module = new Module(node);
             List<AstNode> childes = node.getChilds();
             foreach (var i in childes)
             {
@@ -151,6 +151,10 @@ namespace Erasystemlevel.Semantic
         private void handleCode(AstNode node)
         {
             // add function `code` to basic module, may be wrapper above handleRoutine
+            Module code = new Module(basicModuleName);
+            code.addRoutine(node);
+            moduleTable.Add("code", code);
+            
         }
 
         private void validateRoutine(Module module, AstNode node)
@@ -163,6 +167,10 @@ namespace Erasystemlevel.Semantic
         private void validate()
         {
             // throw an exceptions if there is no `code` function in basic module
+            if (!moduleTable.ContainsKey("code"))
+            {
+                throw new SemanticError("No code provided");
+            }
         }
     }
 }
