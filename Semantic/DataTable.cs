@@ -33,6 +33,7 @@ namespace Erasystemlevel.Semantic
 
         public DataTableEntry(AstNode node)
         {
+            this.node = node;
             name = node.getValue().ToString();
         }
     }

@@ -1,4 +1,11 @@
-﻿code
+﻿entry rout   ine func ()
+do
+    for i from 1 to 2 step 1
+        loop
+        end
+end
+
+code
     const a = 5;
     const b = 3;
     //cst d = 5;

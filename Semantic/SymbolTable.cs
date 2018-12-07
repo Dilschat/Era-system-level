@@ -23,7 +23,6 @@ namespace Erasystemlevel.Semantic
 
         public SymbolTableEntry(AstNode node)
         {
-            // todo: extend to more data
             this.node = node;
             name = node.getChilds()[0].getValue().ToString();
 

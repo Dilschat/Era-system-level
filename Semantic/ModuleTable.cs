@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
@@ -30,12 +29,17 @@ namespace Erasystemlevel.Semantic
         public Module(AstNode node)
         {
             this.node = node;
-            name = node.getValue().ToString();
+            name = getName(node);
         }
 
         public Module(string name)
         {
             this.name = name;
+        }
+
+        public static string getName(AstNode node)
+        {
+            return ((AstNode) node.getValue()).getValue().ToString();
         }
 
         public void addVariable(AstNode node)
@@ -62,6 +66,7 @@ namespace Erasystemlevel.Semantic
         private void handleSymbol(AstNode node)
         {
             var entry = new SymbolTableEntry(node, maxVarId++);
+
             symbols.Add(entry.name, entry);
         }
 

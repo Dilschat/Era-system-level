@@ -28,6 +28,19 @@ namespace Erasystemlevel.Generator
             }
         }
 
+        public void putLine()
+        {
+            statements.AddLast(new AstNode(null));
+        }
+
+        public void putComment(string text)
+        {
+            var node = new AstNode(text);
+            node.SetNodeType(AstNode.NodeType.AsmComment);
+
+            statements.AddLast(node);
+        }
+
         public override string ToString()
         {
             var asmCode = new StringBuilder();
@@ -47,6 +60,16 @@ namespace Erasystemlevel.Generator
             if (childs.Count != 2 && item.GetNodeType() == AstNode.NodeType.OperationOnRegisters)
             {
                 throw new GenerationError("Invalid node supplied for operation on registers");
+            }
+
+            if (item.getValue() == null)
+            {
+                return "";
+            }
+
+            if (item.GetNodeType() == AstNode.NodeType.AsmComment)
+            {
+                return "// " + item.getValue().ToString();
             }
 
             if (item.GetNodeType() == AstNode.NodeType.Label)
@@ -76,14 +99,14 @@ namespace Erasystemlevel.Generator
         {
             var val = new List<string>();
             var childs = new List<AstNode>(item.getChilds());
-            for (var i = 1; i < childs.Count; i++)
+            foreach (var t in childs)
             {
-                val.Add(((Token) childs[i].getValue()).GetValue());
+                val.Add(((Token) t.getValue()).GetValue());
             }
 
-            var literals = string.Join(",", val.Select(x => x.ToString()).ToArray());
+            var literals = string.Join(", ", val.Select(x => x.ToString()).ToArray());
 
-            return "DATA" + literals;
+            return "DATA " + literals;
         }
 
         private static string generateLabel(AstNode item)

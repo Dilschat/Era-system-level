@@ -20,6 +20,7 @@ namespace Erasystemlevel.Parser
             Module,
             Variable,
             Constant,
+            AsmComment,
             Identifier,
             Literal,
             Declaration,
