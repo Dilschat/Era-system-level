@@ -41,8 +41,18 @@ namespace Erasystemlevel.Parser
         }
 
         public bool isEmpty()
+
         {
-            Token token = readNextToken();
+            Token token;
+            try
+            {
+                token = readNextToken();
+            }
+            catch (System.ObjectDisposedException)
+            {
+                return true;
+            }
+
             if (token == null)
             {
                 return true;

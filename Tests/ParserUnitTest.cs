@@ -593,7 +593,7 @@ namespace Erasystemlevel.Tests
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.ParseUnit(reader);
             Assert.AreEqual(node.getValue(), AstNode.NodeType.Unit);
-            var curChilds = node.getChilds();
+            var curChilds = node.getChilds()[0].getChilds();
             var expectedChilds = new ArrayList
             {
                 new AstNode(new Token(Token.TokenType.Keyword, "byte"))
