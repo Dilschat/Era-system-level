@@ -20,10 +20,42 @@ namespace Erasystemlevel.Generator
             symbolTable = symbols;
             callTable = calls;
 
+            reset();
+        }
+
+        public void generate()
+        {
+            allocateStatic();
+            generateStaticInitializer();
+            generateModulesRoutines();
+            generateCodeRoutine();
+        }
+
+        public void reset()
+        {
             assembly = new AssemblyBuffer();
             memoryManager = new MemoryManager(assembly);
-
-            // todo: generate
         }
+
+        private void allocateStatic()
+        {
+            // todo
+        }
+
+        private void generateStaticInitializer()
+        {
+            // todo
+        }
+
+        private void generateModulesRoutines()
+        {
+            // todo
+        }
+
+        private void generateCodeRoutine()
+        {
+            // todo
+        }
+        
     }
 }

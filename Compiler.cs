@@ -28,6 +28,7 @@ namespace EraSystemLevel
             //printDebug("Semantic tree:\n" + tree + "\n");
             
             var codeGen = new CodeGenerator(tree, semantic.symbolTable, semantic.callTable);
+            codeGen.generate();
 
             var asmCode = codeGen.assembly.ToString();
             printDebug("Generated assembly:\n" + asmCode + "\n");

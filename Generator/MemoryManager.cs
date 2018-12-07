@@ -1,13 +1,40 @@
+using System.Collections.Generic;
+using Erasystemlevel.Parser;
+
 namespace Erasystemlevel.Generator
 {
     public class MemoryManager
     {
         private RegistersManager registers;
-        
+
+        private Dictionary<string, int> moduleBase; // Static base for each module
+        private int staticPointer = 0; // Pointer to the top of the static data
+
         public MemoryManager(AssemblyBuffer assembly)
         {
             registers = new RegistersManager(assembly);
         }
+
+        public void addModuleVariable(string module, AstNode node)
+        {
+            // todo
+        }
+
+        public void addData(AstNode node)
+        {
+            // todo
+        }
+
+        public void generateDataAllocation()
+        {
+            // todo
+        }
+
+        public void generateStaticAllocation()
+        {
+            // todo
+        }
+
     }
 
     class RegistersManager
