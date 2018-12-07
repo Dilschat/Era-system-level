@@ -92,7 +92,7 @@ namespace Erasystemlevel.Generator
             // On completion would jump to the end
             assembly.put(AsmBuilder.setRegister(RegistersManager.RL_REG, ":end"));
 
-            _generateRoutine(module, module.routines["code"]);
+            _generateRoutine(module, module.routines["Code"]);
         }
 
         private void generateModulesRoutines()
@@ -104,8 +104,8 @@ namespace Erasystemlevel.Generator
                 {
                     var routine = routinePair.Value;
 
-                    // we skip `code` routine
-                    if (module.name != SemanticAnalyzer.basicModuleName || routine.name != "code")
+                    // we skip `Code` routine
+                    if (module.name != SemanticAnalyzer.basicModuleName || routine.name != "Code")
                     {
                         _generateRoutine(module, routine);
                     }

@@ -11,8 +11,14 @@ namespace Erasystemlevel.Semantic
         public CallTableEntry callTableEntry;
         public SymbolTableEntry symbolTableEntry;
 
-        public AastNode(object value) : base(value)
+        public AastNode(AstNode node) : base(node.getValue())
         {
+            type = node.GetNodeType();
+
+            foreach (var astNode in node.getChilds())
+            {
+                childs.Add(astNode);
+            }
         }
     }
 }

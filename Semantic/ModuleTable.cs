@@ -24,6 +24,9 @@ namespace Erasystemlevel.Semantic
         public CallTable routines = new CallTable();
         public SymbolTable symbols = new SymbolTable();
 
+        private int maxVarId = 0;
+        private int maxRoutineId = 0;
+
         public Module(AstNode node)
         {
             this.node = node;
@@ -39,45 +42,27 @@ namespace Erasystemlevel.Semantic
         {
             if (node.GetNodeType().Equals(AstNode.NodeType.Constant))
             {
-                List<AstNode> consts = node.getChilds();
+                var consts = node.getChilds();
+
                 foreach (var i in consts)
                 {
-                    handleConstDefinition(i);
+                    handleSymbol(i);
                 }
             }
             else if (node.GetNodeType().Equals(AstNode.NodeType.Variable))
             {
-                List<AstNode> childs = node.getChilds();
-                AstNode type = childs[0];
-                for (int i = 1; i < childs.Count; i++)
+                var childs = node.getChilds();
+                for (var i = 1; i < childs.Count; i++)
                 {
-                    handleVarDefinitions(childs[i], ((Token) type.getValue()).GetValue());
+                    handleSymbol(childs[i]);
                 }
             }
         }
 
-        private void handleConstDefinition(AstNode node)
+        private void handleSymbol(AstNode node)
         {
-            AstNode id = node.getChilds()[0];
-            SymbolTableEntry entry = new SymbolTableEntry(id);
-            entry.type = "int";
-            entry.isConst = true;
-            entry.isInitialized = true;
-            symbols.Add(((Token) id.getValue()).GetValue(), entry);
-        }
-
-        private void handleVarDefinitions(AstNode node, string type)
-        {
-            List<AstNode> childs = node.getChilds();
-            AstNode id = childs[0];
-            SymbolTableEntry entry = new SymbolTableEntry(id);
-            entry.type = type;
-            if (childs.Count > 1 && childs[1].GetNodeType().Equals(AstNode.NodeType.Expression))
-            {
-                entry.isInitialized = true;
-            }
-
-            symbols.Add(((Token) id.getValue()).GetValue(), entry);
+            var entry = new SymbolTableEntry(node, maxVarId++);
+            symbols.Add(entry.name, entry);
         }
 
         public void addRoutine(AstNode node)
@@ -110,9 +95,9 @@ namespace Erasystemlevel.Semantic
                     entry.hasBody = true;
                     entry.symbols = handleRoutineBody(i, new SymbolTable());
                 }
-
-                routines.Add(entry.name, entry);
             }
+
+            routines.Add(entry.name, entry);
         }
 
         private SymbolTable handleRoutineBody(AstNode node, SymbolTable table)
@@ -149,8 +134,9 @@ namespace Erasystemlevel.Semantic
                         }
 
                         table.Add(((Token) id.getValue()).GetValue(), entry);
-                        return table;
                     }
+
+                    return table;
                 }
                 else
                 {

@@ -7,10 +7,11 @@ namespace Erasystemlevel
     internal static class Run
     {
         private const string CodeFile = "code.txt";
+        private const bool _debug = true;
 
         private static void Main()
         {
-            var compiler = new Compiler(true);
+            var compiler = new Compiler(_debug);
 
             string eraAsm;
             try
@@ -33,7 +34,10 @@ namespace Erasystemlevel
                 return;
             }
 
-            Console.WriteLine(eraAsm);
+            if (!_debug)
+            {
+                Console.WriteLine(eraAsm);
+            }
         }
 
         public static void printError(string description, SystemException error)

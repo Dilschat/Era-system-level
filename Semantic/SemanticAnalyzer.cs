@@ -24,6 +24,7 @@ namespace Erasystemlevel.Semantic
             reservedNames = new HashSet<string>();
 
             _tree = tree;
+            annotatedTree = new AastNode(tree); // fixme
 
             var basicModule = new Module(basicModuleName);
             moduleTable.Add(basicModule);
@@ -57,7 +58,6 @@ namespace Erasystemlevel.Semantic
         private void handleData(AstNode node)
         {
             // check module name in reservedNames
-
             var dataName = ((Token) node.getValue()).GetValue();
             if (reservedNames.Contains(dataName))
             {
@@ -65,7 +65,8 @@ namespace Erasystemlevel.Semantic
             }
 
             // add to data table
-            dataTable.Add(dataName, new DataTableEntry(node));
+            dataTable.Add(node);
+
             // add data name to reservedNames
             reservedNames.Add(dataName);
         }
@@ -81,10 +82,12 @@ namespace Erasystemlevel.Semantic
 
             // add module name to reservedNames
             reservedNames.Add(moduleName);
+
             // add to module table
-            Module module = new Module(node);
-            List<AstNode> childes = node.getChilds();
-            foreach (var i in childes)
+            var module = new Module(node);
+
+            // add all variables and functions to this module
+            foreach (var i in node.getChilds())
             {
                 if (i.GetNodeType().Equals(AstNode.NodeType.Variable) ||
                     i.GetNodeType().Equals(AstNode.NodeType.Constant))
@@ -97,38 +100,14 @@ namespace Erasystemlevel.Semantic
                 }
             }
 
-            handleChild(node, module);
-            moduleTable.Add(moduleName, module);
-            // add all variables and functions to this table
-        }
-
-        private void handleChild(AstNode node, Module module)
-        {
-            List<AstNode> childes = node.getChilds();
-            foreach (var i in childes)
-            {
-                if (i.GetNodeType().Equals(AstNode.NodeType.Variable) ||
-                    i.GetNodeType().Equals(AstNode.NodeType.Constant))
-                {
-                    module.addVariable(i);
-                }
-                else if (i.GetNodeType().Equals(AstNode.NodeType.Routine))
-                {
-                    module.addRoutine(i);
-                }
-
-                handleChild(i, module);
-            }
+            moduleTable.Add(module);
         }
 
         private void handleRoutine(AstNode node)
         {
-            // check function name in reservedNames
-            Module module = new Module(basicModuleName);
-            string name = "";
-            List<string> parameters = new List<string>();
-            List<AstNode> childs = node.getChilds();
-            foreach (var i in childs)
+            var name = "";
+            var parameters = new List<string>();
+            foreach (var i in node.getChilds())
             {
                 if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
                 {
@@ -138,20 +117,22 @@ namespace Erasystemlevel.Semantic
                 {
                     foreach (var parameter in i.getChilds())
                     {
-                        List<AstNode> parameterChilds = parameter.getChilds();
+                        var parameterChilds = parameter.getChilds();
                         parameters.Add(((Token) parameterChilds[1].getValue()).GetValue());
                     }
                 }
             }
 
-            // check function parameters in reservedNames
+            // check function name in reservedNames
             if (reservedNames.Contains(name))
             {
                 throw new SemanticError("Routine name is not unique: " + name);
             }
 
-            reservedNames.Add(name);
             // add function name to reservedNames
+            reservedNames.Add(name);
+
+            // check function parameters in reservedNames
             foreach (var i in parameters)
             {
                 if (reservedNames.Contains(i))
@@ -162,20 +143,19 @@ namespace Erasystemlevel.Semantic
                 reservedNames.Add(name);
             }
 
-            {
-            }
             // add to this function to basic module
+            var module = moduleTable[basicModuleName];
             module.addRoutine(node);
             moduleTable.Add(name, module);
+
             validateRoutine(module, node);
         }
 
+        // add function `code` to basic module, may be wrapper above handleRoutine
         private void handleCode(AstNode node)
         {
-            // add function `code` to basic module, may be wrapper above handleRoutine
-            Module code = new Module(basicModuleName);
-            code.addRoutine(node);
-            moduleTable.Add("code", code);
+            var basicModule = moduleTable[basicModuleName];
+            basicModule.addRoutine(node);
         }
 
         private void validateRoutine(Module module, AstNode node)
@@ -185,10 +165,10 @@ namespace Erasystemlevel.Semantic
             // check that return registers are last statements
         }
 
+        // throw an exceptions if there is no `code` function in basic module
         private void validate()
         {
-            // throw an exceptions if there is no `code` function in basic module
-            if (!moduleTable[basicModuleName].routines.ContainsKey("code"))
+            if (!moduleTable[basicModuleName].routines.ContainsKey("Code"))
             {
                 throw new SemanticError("No code provided");
             }

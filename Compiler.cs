@@ -38,7 +38,7 @@ namespace Erasystemlevel
             codeGen.generate();
 
             var asmCode = codeGen.assembly.ToString();
-            printDebug("Generated assembly:\n" + asmCode + "\n");
+            printDebug("Generated assembly:\n" + asmCode);
 
             return asmCode;
         }

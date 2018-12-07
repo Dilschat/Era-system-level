@@ -1,5 +1,5 @@
 ﻿code
     const a = 5;
     const b = 3;
-    cst d = 5;
+    //cst d = 5;
 end
