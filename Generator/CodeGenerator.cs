@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Erasystemlevel.Semantic;
 
 namespace Erasystemlevel.Generator
@@ -39,19 +40,20 @@ namespace Erasystemlevel.Generator
         {
             foreach (var de in dataTable)
             {
-                memoryManager.addData(de.Value);
+                memoryManager.appendData(de.Value);
             }
 
             foreach (var me in moduleTable)
             {
                 var module = me.Value;
+                var symbols = new List<SymbolTableEntry2>();
 
                 foreach (var se in module.symbols)
                 {
-                    var symbol = se.Value;
-
-                    memoryManager.addModuleVariable(module, symbol);
+                    symbols.Add(se.Value);
                 }
+
+                memoryManager.appendModuleVariables(module, symbols.ToArray());
             }
         }
 

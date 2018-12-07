@@ -16,7 +16,7 @@ namespace Erasystemlevel.Semantic
         public AstNode node;
         public readonly string name;
 
-        private int staticBase;
+        public int staticBase;
 
         public CallTable2 routines = new CallTable2();
         public SymbolTable2 symbols = new SymbolTable2();

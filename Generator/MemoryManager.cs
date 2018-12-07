@@ -6,26 +6,40 @@ namespace Erasystemlevel.Generator
 {
     public class MemoryManager
     {
+        private const int wordSize = 32;
+
         private RegistersManager registers;
-        
+        private AssemblyBuffer buffer;
+
         private int staticPointer = 0; // Pointer to the top of the static data
 
         public MemoryManager(AssemblyBuffer assembly)
         {
+            buffer = assembly;
             registers = new RegistersManager(assembly);
         }
-        
-        public void addData(DataTableEntry node)
+
+        public void appendData(DataTableEntry entry)
         {
-            
-            // todo
+            entry.baseAddr = staticPointer;
+
+            buffer.put(entry.node);
+
+            staticPointer += wordSize * entry.node.getChilds().Count;
         }
 
-        public void addModuleVariable(Module module, SymbolTableEntry2 node)
+        public void appendModuleVariables(Module module, SymbolTableEntry2[] symbols)
         {
-            // todo
+            module.staticBase = staticPointer;
+
+            var locId = 0;
+            foreach (var symbol in symbols)
+            {
+                symbol.localId = locId++;
+            }
+
+            staticPointer += wordSize * symbols.Length;
         }
-       
     }
 
     class RegistersManager
