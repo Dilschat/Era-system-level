@@ -864,8 +864,8 @@ namespace Erasystemlevel.Tests
             var exIf = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseLoopBody(readerIf); });
             var exElse = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseLoopBody(readerElse); });
 
-            Assert.That(exIf.Message, Is.EqualTo("todo"));
-            Assert.That(exElse.Message, Is.EqualTo("todo"));
+            Assert.That(exIf.Message, Is.EqualTo("Can't parse if body"));
+            Assert.That(exElse.Message, Is.EqualTo("Can't parse if body"));
         }
 
         private static string getTestFilePath(string fileName)
