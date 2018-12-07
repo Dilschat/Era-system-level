@@ -14,5 +14,6 @@ namespace Erasystemlevel.Semantic
         public string functionType;
         public ArrayList parameters;
         public ArrayList results;
+        public bool hasBody = false;
     }
 }

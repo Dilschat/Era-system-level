@@ -51,9 +51,12 @@ namespace Erasystemlevel.Semantic
                     }
                     else if (i.GetNodeType().Equals(AstNode.NodeType.RoutineBody))
                     {
+                        entry.hasBody = true;
                         AnalyzeSymbols(i);
 
                     }
+                    checkCallEntry(entry);
+                    callTable.Add(entry.functionName, entry);
                 }
             }
             else
@@ -140,12 +143,24 @@ namespace Erasystemlevel.Semantic
             if (!entry.Equals(symbolTable[entry.name]))
             {
                 throw new SemanticError("Type error for:"+ entry.ToString());
-
             }
         }
         
         private void checkCallEntry(CallTableEntry entry)
         {
+            if (entry.functionType.Equals("start")&& callTable.ContainsKey(entry.functionName))
+            {
+                throw new SemanticError("Routine error for:"+ entry.ToString());
+            }
+
+            if (entry.functionType.Equals("start") && entry.hasBody)
+            {
+                throw new SemanticError("Routine error for:"+ entry.ToString());
+            }
+            if (entry.functionType.Equals("entry") && !entry.hasBody)
+            {
+                throw new SemanticError("Routine error for:"+ entry.ToString());
+            }
             
 
         }
