@@ -1,11 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
-using Erasystemlevel.Tokenizer;
-using EraSystemLevel.Semantic;
-using NUnit.Framework.Constraints;
 
 namespace Erasystemlevel.Semantic
 {
