@@ -27,9 +27,10 @@ namespace Erasystemlevel.Generator
         {
             allocateStatic();
             generateStaticInitializer();
-            jumpToCode();
-            generateModulesRoutines();
             generateCodeRoutine();
+            generateModulesRoutines();
+
+            assembly.put(AsmBuilder.label(":end"));
         }
 
         public void reset()
@@ -61,22 +62,35 @@ namespace Erasystemlevel.Generator
 
         private void generateStaticInitializer()
         {
-            memoryManager.setRegister(RegistersManager.SB_REG, _getMainModule().staticBase);
-            memoryManager.setRegister(RegistersManager.SP_REG, memoryManager.getStaticPointer());
-            memoryManager.moveFpToSp();
+            memoryManager.initialize();
 
-            // todo: вычисление значений для переменных модулей
-        }
+            // Execute modules and statements sequentially
+            foreach (var ctx in _tree.getChilds())
+            {
+                if (ctx.GetNodeType() != AstNode.NodeType.Module) continue;
+                var module = moduleTable[ctx.getValue().ToString()];
+                memoryManager.setCurrentModule(module);
 
-        private void jumpToCode()
-        {
-            var label = _generateRoutineLabel(SemanticAnalyzer2.basicModuleName, "code");
-            asmJumpToLabel(label);
+                foreach (var astNode in ctx.getChilds())
+                {
+                    if (astNode.GetNodeType() != AstNode.NodeType.Variable) continue;
+
+                    foreach (var varDecl in astNode.getChilds())
+                    {
+                        if (varDecl.GetNodeType() == AstNode.NodeType.Type) continue;
+
+                        // todo: вычисление значения для переменной модулей
+                    }
+                }
+            }
         }
 
         private void generateCodeRoutine()
         {
             var module = _getMainModule();
+
+            // On completion would jump to the end
+            assembly.put(AsmBuilder.setRegister(RegistersManager.RL_REG, ":end"));
 
             _generateRoutine(module, module.routines["code"]);
         }
@@ -104,15 +118,14 @@ namespace Erasystemlevel.Generator
             // todo: генерация кода одной функции
         }
 
+        private void _generateVarExpr(AstNode node)
+        {
+            var name = node.getChilds()[0].getValue();
+        }
+
         private string _generateRoutineLabel(string module, string routine)
         {
             return module + "." + routine;
-        }
-
-        private void asmJumpToLabel(string name)
-        {
-            // todo: allocate register
-            assembly.put(AsmBuilder.jumpToRegister("R-1"));
         }
 
         private Module _getMainModule()

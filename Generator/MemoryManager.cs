@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Erasystemlevel.Parser;
 using Erasystemlevel.Semantic;
 
 namespace Erasystemlevel.Generator
@@ -41,6 +39,13 @@ namespace Erasystemlevel.Generator
             staticPointer += wordSize * symbols.Length;
         }
 
+        public void initialize()
+        {
+            setRegister(RegistersManager.SB_REG, 0);
+            setRegister(RegistersManager.SP_REG, getStaticPointer());
+            moveFpToSp();
+        }
+
         public int getStaticPointer()
         {
             return staticPointer;
@@ -48,46 +53,37 @@ namespace Erasystemlevel.Generator
 
         public void setRegister(string reg, int index)
         {
-            buffer.put(asmSetRegister(reg, index));
+            buffer.put(AsmBuilder.setRegister(reg, index));
+        }
+
+        public void setCurrentModule(Module module)
+        {
+            buffer.put(AsmBuilder.setRegister(RegistersManager.SB_REG, module.staticBase));
         }
 
         public void moveFpToSp()
         {
-            buffer.put(asmSetRegister(RegistersManager.FP_REG, RegistersManager.SP_REG));
-        }
-
-        private AstNode asmSetRegister(string reg, int val)
-        {
-            return asmOpOnRegister(reg, ":=", val.ToString());
-        }
-
-        private AstNode asmSetRegister(string rl, string rr)
-        {
-            return asmOpOnRegister(rl, ":=", rr);
-        }
-
-        private AstNode asmOpOnRegister(string rl, string op, string rr)
-        {
-            var node = new AstNode(op);
-            node.addChild(new AstNode(rl));
-            node.addChild(new AstNode(rr));
-            node.SetNodeType(AstNode.NodeType.OperationOnRegisters);
-
-            return node;
+            buffer.put(AsmBuilder.setRegister(RegistersManager.FP_REG, RegistersManager.SP_REG));
         }
     }
 
     internal class RegistersManager
     {
+        // System registers
         internal const string PC_REG = "R31"; // Program counter
         internal const string SB_REG = "R30"; // Static base
         internal const string SP_REG = "R29"; // Stack pointer
         internal const string FP_REG = "R28"; // Frame pointer
-        internal const string TR_REG = "R27"; // Register with always true value
-        internal const string FL_REG = "R26"; // Register with always false value
+
+        // Useful registers
+        internal const string JL_REG = "R27"; // Jump location register
+        internal const string RL_REG = "R26"; // Return location register
+
+        private AsmBuffer buffer;
 
         internal RegistersManager(AsmBuffer assembly)
         {
+            buffer = assembly;
         }
     }
 }

@@ -7,9 +7,33 @@ namespace Erasystemlevel.Generator
      */
     public class AsmBuilder
     {
-        public static AstNode jumpToRegister(string reg)
+        public static AstNode label(string name)
         {
-            return null;
+            var node = new AstNode(name);
+            node.SetNodeType(AstNode.NodeType.Label);
+
+            return node;
+        }
+
+        public static AstNode condJump(string r1, string r2)
+        {
+            var ifNode = new AstNode("if");
+            ifNode.SetNodeType(AstNode.NodeType.AssemblerStatement);
+
+            var retReg = new AstNode(r1);
+            retReg.SetNodeType(AstNode.NodeType.Register);
+
+            var gotoNode = new AstNode("goto");
+            gotoNode.SetNodeType(AstNode.NodeType.AssemblerStatement);
+
+            var jumpReg = new AstNode(r2);
+            jumpReg.SetNodeType(AstNode.NodeType.Register);
+
+            ifNode.addChild(retReg);
+            ifNode.addChild(gotoNode);
+            gotoNode.addChild(jumpReg);
+
+            return ifNode;
         }
 
         public static AstNode setRegister(string reg, int val)
