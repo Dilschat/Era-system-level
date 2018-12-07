@@ -2,9 +2,8 @@ using System;
 using Erasystemlevel.Generator;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Semantic;
-using Erasystemlevel.Tokenizer;
 
-namespace EraSystemLevel
+namespace Erasystemlevel
 {
     public class Compiler
     {
@@ -17,11 +16,11 @@ namespace EraSystemLevel
 
         public string compile(string filepath)
         {
-            var tokenizer = new Tokenizer(filepath);
+            var tokenizer = new Tokenizer.Tokenizer(filepath);
             var tokenReader = new TokenReader(tokenizer);
 
-            Parser._debug = false;
-            var tree = Parser.ParseUnit(tokenReader);
+            Parser.Parser._debug = false;
+            var tree = Parser.Parser.ParseUnit(tokenReader);
             printDebug("Parse tree:\n" + tree + "\n");
 
             var semantic = new SemanticAnalyzer2(tree);

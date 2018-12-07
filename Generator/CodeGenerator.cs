@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using Erasystemlevel.Parser;
 using Erasystemlevel.Semantic;
-using EraSystemLevel.Semantic;
 
 namespace Erasystemlevel.Generator
 {
@@ -42,23 +39,20 @@ namespace Erasystemlevel.Generator
         {
             foreach (var de in dataTable)
             {
-                memoryManager.addData(de.Value.node);
+                memoryManager.addData(de.Value);
             }
 
             foreach (var me in moduleTable)
             {
                 var module = me.Value;
-               
+
                 foreach (var se in module.symbols)
                 {
                     var symbol = se.Value;
-                    
+
                     memoryManager.addModuleVariable(module, symbol);
                 }
             }
-            
-            memoryManager.generateDataAllocation();
-            memoryManager.generateStaticAllocation();
         }
 
         private void generateStaticInitializer()

@@ -29,6 +29,8 @@ namespace Erasystemlevel.Semantic
         public AstNode node;
         public readonly string name;
 
+        public int baseAddr;
+
         public DataTableEntry(AstNode node)
         {
             name = node.getValue().ToString();
