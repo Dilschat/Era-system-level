@@ -14,7 +14,7 @@ namespace Erasystemlevel.Tokenizer
 
         readonly HashSet<string> delimeters = new HashSet<string>(new List<string>
         {
-            ";", ",", ".", "(", ")", "[", "]", "//", ":>"
+            ";", ",", ".", "(", ")", "[", "]", ":>"
         });
 
         readonly HashSet<string> operators = new HashSet<string>(new List<string>
@@ -60,6 +60,22 @@ namespace Erasystemlevel.Tokenizer
                 }
 
                 currentToken += next;
+
+                if (currentToken.Equals("//"))
+                {
+                    currentToken = string.Empty;
+
+                    while (!reader.EndOfStream)
+                    {
+                        next = Convert.ToChar(reader.Read());
+                        if (next.Equals('\n'))
+                        {
+                            break;
+                        }
+                    }
+
+                    continue;
+                }
 
                 if (delimeters.Contains(currentToken))
                 {

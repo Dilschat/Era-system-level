@@ -31,6 +31,18 @@ namespace Erasystemlevel.Tests
             Assert.AreEqual(reader.readNextToken().ToString(), new Token(Token.TokenType.Number, "3").ToString());
         }
 
+        [Test]
+        public void CommentsIgnored()
+        {
+            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("comments.txt"));
+            var reader = new TokenReader(tokenizer);
+
+            var firstToken = reader.readNextToken();
+            Assert.NotNull(firstToken);
+            Assert.AreEqual(new Token(Token.TokenType.Keyword, "code").ToString(), firstToken.ToString());
+            Assert.Null(reader.readNextToken());
+        }
+
         private static string getTestFilePath(string fileName)
         {
             return TestUtils.getTestFilePath(fileName);
