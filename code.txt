@@ -1,8 +1,7 @@
-﻿// routine foo(int a): R0 do
-//    R0 := a
-//    R0 += 32
-// end
-
-code
-    int a := 2;
+﻿module myModule
+short id := 2, id1 := 3;
 end
+module myModule
+short id := 2, id1 := 3;
+end
+
