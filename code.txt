@@ -5,4 +5,5 @@
 
 code
     int a := 2;
+    int b[44];
 end

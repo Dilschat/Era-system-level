@@ -225,7 +225,7 @@ namespace Erasystemlevel.Parser
             if (!nextToken.GetValue().Equals("end"))
             {
                 reader.saveReadTokens();
-                throw new SyntaxError("");
+                throw new SyntaxError("Expected end literal");
             }
 
             reader.clear();
