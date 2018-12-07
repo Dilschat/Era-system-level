@@ -61,26 +61,91 @@ namespace Erasystemlevel.Semantic
         private void handleData(AstNode node)
         {
             // check module name in reservedNames
+
+            var dataName = ((Token) node.getValue()).GetValue();
+            if (reservedNames.Contains(dataName))
+            {
+                throw new SemanticError("Data name is not unique: "+ dataName);
+            }
             // add to data table
+            dataTable.Add(dataName, new DataTableEntry(node));
             // add data name to reservedNames
+            reservedNames.Add(dataName);
         }
 
         private void handleModule(AstNode node)
         {
             // check module name in reservedNames
+            var moduleName = ((Token) node.getValue()).GetValue();
+            if (reservedNames.Contains(moduleName))
+            {
+                throw new SemanticError("Module name is not unique: "+ moduleName);
+            }
             // add module name to reservedNames
+            reservedNames.Add(moduleName);
             // add to module table
+            Module module = new Module(moduleName);
+            List<AstNode> childes = node.getChilds();
+            foreach (var i in childes)
+            {
+                if (i.GetNodeType().Equals(AstNode.NodeType.Variable)||i.GetNodeType().Equals(AstNode.NodeType.Constant))
+                {
+                    module.addVariable(i);
+                }else if (i.GetNodeType().Equals(AstNode.NodeType.Routine))
+                {
+                    module.addRoutine(i);
+                }
+            }
+            moduleTable.Add(moduleName, module);
             // add all variables and functions to this table
+            
         }
 
         private void handleRoutine(AstNode node)
         {
             // check function name in reservedNames
+            Module module = new Module(basicModuleName);
+            string name  ="";
+            List<string> parameters = new List<string>();
+            List<AstNode> childs = node.getChilds();
+            foreach (var i in childs)
+            {
+                if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
+                {
+                    name = ((Token) i.getValue()).GetValue();
+                }else if (i.GetNodeType().Equals(AstNode.NodeType.Parameters))
+                {
+                    foreach (var parameter in i.getChilds())
+                    {
+                        List<AstNode> parameterChilds = parameter.getChilds();
+                        parameters.Add(((Token)parameterChilds[1].getValue()).GetValue());
+                    }
+                }
+            }
             // check function parameters in reservedNames
-            // add function name to reservedNames
-            // add to this function to basic module
+            if (reservedNames.Contains(name))
+            {
+                throw new SemanticError("Routine name is not unique: "+ name);
+            }
 
-            validateRoutine(null, node);
+            reservedNames.Add(name);
+            // add function name to reservedNames
+            foreach (var i in parameters)
+            {
+                if (reservedNames.Contains(i))
+                {
+                    throw new SemanticError("Routine parameter name is not unique: "+ i);
+                }
+
+                reservedNames.Add(name);
+            }
+            {
+                
+            }
+            // add to this function to basic module
+            module.addRoutine(node);
+            moduleTable.Add(name, module);
+            validateRoutine(module, node);
         }
 
         private void handleCode(AstNode node)
