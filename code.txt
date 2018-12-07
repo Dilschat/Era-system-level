@@ -1,25 +1,5 @@
-﻿// routine foo(int a): R0 do
-//    R0 := a
-//    R0 += 32
-// end
-
-// module tm
-//    int a := 10;
-// end
-
-data ABC 12, 34 end
-module myModule
-    short id := 2, id1 := 3;
-end
-module myModule
-    short id := 2, id1 := 3;
-end
-
-code
-    int a := 2;
-    //int b[a + 44], c[0];
-    
-    //*a := 100;
-    //R0 += 0;
-    //c[0] := a + b[0];
+﻿code
+    const a = 5;
+    const b = 3;
+    //cst d = 5;
 end

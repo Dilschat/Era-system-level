@@ -6,17 +6,17 @@ namespace Erasystemlevel.Generator
 {
     public class CodeGenerator
     {
-        public AssemblyBuffer assembly;
+        public AsmBuffer assembly;
 
-        private AstNode root;
+        private AastNode _tree;
         private MemoryManager memoryManager;
 
         private ModuleTable moduleTable;
         private DataTable dataTable;
 
-        public CodeGenerator(AstNode tree, ModuleTable modules, DataTable data)
+        public CodeGenerator(AastNode tree, ModuleTable modules, DataTable data)
         {
-            root = tree;
+            _tree = tree;
             moduleTable = modules;
             dataTable = data;
 
@@ -27,34 +27,110 @@ namespace Erasystemlevel.Generator
         {
             allocateStatic();
             generateStaticInitializer();
-            generateModulesRoutines();
             generateCodeRoutine();
+            generateModulesRoutines();
+
+            assembly.put(AsmBuilder.label(":end"));
         }
 
         public void reset()
         {
-            assembly = new AssemblyBuffer();
+            assembly = new AsmBuffer();
             memoryManager = new MemoryManager(assembly);
         }
 
         private void allocateStatic()
         {
-            // todo
+            foreach (var de in dataTable)
+            {
+                memoryManager.appendData(de.Value);
+            }
+
+            foreach (var me in moduleTable)
+            {
+                var module = me.Value;
+                var symbols = new List<SymbolTableEntry>();
+
+                foreach (var se in module.symbols)
+                {
+                    symbols.Add(se.Value);
+                }
+
+                memoryManager.appendModuleVariables(module, symbols.ToArray());
+            }
         }
 
         private void generateStaticInitializer()
         {
-            // todo
-        }
+            memoryManager.initialize();
 
-        private void generateModulesRoutines()
-        {
-            // todo
+            // Execute modules and statements sequentially
+            foreach (var ctx in _tree.getChilds())
+            {
+                if (ctx.GetNodeType() != AstNode.NodeType.Module) continue;
+                var module = moduleTable[ctx.getValue().ToString()];
+                memoryManager.setCurrentModule(module);
+
+                foreach (var astNode in ctx.getChilds())
+                {
+                    if (astNode.GetNodeType() != AstNode.NodeType.Variable) continue;
+
+                    foreach (var varDecl in astNode.getChilds())
+                    {
+                        if (varDecl.GetNodeType() == AstNode.NodeType.Type) continue;
+
+                        // todo: вычисление значения для переменной модулей
+                    }
+                }
+            }
         }
 
         private void generateCodeRoutine()
         {
-            // todo
+            var module = _getMainModule();
+
+            // On completion would jump to the end
+            assembly.put(AsmBuilder.setRegister(RegistersManager.RL_REG, ":end"));
+
+            _generateRoutine(module, module.routines["Code"]);
+        }
+
+        private void generateModulesRoutines()
+        {
+            foreach (var modulePair in moduleTable)
+            {
+                var module = modulePair.Value;
+                foreach (var routinePair in module.routines)
+                {
+                    var routine = routinePair.Value;
+
+                    // we skip `Code` routine
+                    if (module.name != SemanticAnalyzer.basicModuleName || routine.name != "Code")
+                    {
+                        _generateRoutine(module, routine);
+                    }
+                }
+            }
+        }
+
+        private void _generateRoutine(Module module, CallTableEntry routine)
+        {
+            // todo: генерация кода одной функции
+        }
+
+        private void _generateVarExpr(AstNode node)
+        {
+            var name = node.getChilds()[0].getValue();
+        }
+
+        private string _generateRoutineLabel(string module, string routine)
+        {
+            return module + "." + routine;
+        }
+
+        private Module _getMainModule()
+        {
+            return moduleTable[SemanticAnalyzer.basicModuleName];
         }
     }
 }

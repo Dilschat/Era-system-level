@@ -1,52 +1,89 @@
-using System.Collections.Generic;
-using Erasystemlevel.Parser;
+using Erasystemlevel.Semantic;
 
 namespace Erasystemlevel.Generator
 {
     public class MemoryManager
     {
-        private RegistersManager registers;
+        private const int wordSize = 32;
 
-        private Dictionary<string, int> moduleBase; // Static base for each module
+        private RegistersManager registers;
+        private AsmBuffer buffer;
+
         private int staticPointer = 0; // Pointer to the top of the static data
 
-        public MemoryManager(AssemblyBuffer assembly)
+        public MemoryManager(AsmBuffer assembly)
         {
+            buffer = assembly;
             registers = new RegistersManager(assembly);
         }
 
-        public void addModuleVariable(string module, AstNode node)
+        public void appendData(DataTableEntry entry)
         {
-            // todo
+            entry.baseAddr = staticPointer;
+
+            buffer.put(entry.node);
+
+            staticPointer += wordSize * entry.node.getChilds().Count;
         }
 
-        public void addData(AstNode node)
+        public void appendModuleVariables(Module module, SymbolTableEntry[] symbols)
         {
-            // todo
+            module.staticBase = staticPointer;
+
+            var locId = 0;
+            foreach (var symbol in symbols)
+            {
+                symbol.localId = locId++;
+            }
+
+            staticPointer += wordSize * symbols.Length;
         }
 
-        public void generateDataAllocation()
+        public void initialize()
         {
-            // todo
+            setRegister(RegistersManager.SB_REG, 0);
+            setRegister(RegistersManager.SP_REG, getStaticPointer());
+            moveFpToSp();
         }
 
-        public void generateStaticAllocation()
+        public int getStaticPointer()
         {
-            // todo
+            return staticPointer;
         }
 
+        public void setRegister(string reg, int index)
+        {
+            buffer.put(AsmBuilder.setRegister(reg, index));
+        }
+
+        public void setCurrentModule(Module module)
+        {
+            buffer.put(AsmBuilder.setRegister(RegistersManager.SB_REG, module.staticBase));
+        }
+
+        public void moveFpToSp()
+        {
+            buffer.put(AsmBuilder.setRegister(RegistersManager.FP_REG, RegistersManager.SP_REG));
+        }
     }
 
-    class RegistersManager
+    internal class RegistersManager
     {
-        private const string PC_REG = "R31"; // Program counter
-        private const string SB_REG = "R30"; // Static base
-        private const string SP_REG = "R29"; // Stack pointer
-        private const string FP_REG = "R28"; // Frame pointer
-        
-        internal RegistersManager(AssemblyBuffer assembly)
+        // System registers
+        internal const string PC_REG = "R31"; // Program counter
+        internal const string SB_REG = "R30"; // Static base
+        internal const string SP_REG = "R29"; // Stack pointer
+        internal const string FP_REG = "R28"; // Frame pointer
+
+        // Useful registers
+        internal const string JL_REG = "R27"; // Jump location register
+        internal const string RL_REG = "R26"; // Return location register
+
+        private AsmBuffer buffer;
+
+        internal RegistersManager(AsmBuffer assembly)
         {
-            
+            buffer = assembly;
         }
     }
 }

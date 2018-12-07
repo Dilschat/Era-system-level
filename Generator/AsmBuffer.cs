@@ -9,7 +9,10 @@ using Erasystemlevel.Tokenizer;
 
 namespace Erasystemlevel.Generator
 {
-    public class AssemblyBuffer
+    /**
+     * Converts nodes into asm code
+     */
+    public class AsmBuffer
     {
         private readonly LinkedList<AstNode> statements = new LinkedList<AstNode>();
 
@@ -77,6 +80,7 @@ namespace Erasystemlevel.Generator
             {
                 val.Add(((Token) childs[i].getValue()).GetValue());
             }
+
             var literals = string.Join(",", val.Select(x => x.ToString()).ToArray());
 
             return "DATA" + literals;

@@ -6,9 +6,9 @@ namespace Erasystemlevel.Parser
 {
     public class AstNode
     {
-        private object value;
-        private NodeType type;
-        private readonly List<AstNode> childs = new List<AstNode>();
+        protected object value;
+        protected NodeType type;
+        protected readonly List<AstNode> childs = new List<AstNode>();
 
         public enum NodeType
         {

@@ -1,236 +1,176 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
-using NUnit.Framework.Constraints;
 
 namespace Erasystemlevel.Semantic
 {
     public class SemanticAnalyzer
     {
-        public readonly SymbolTable symbolTable;
-        public readonly CallTable callTable;
-        private readonly AstNode tree;
-        public readonly string  unitName;
-        private static Dictionary<string, SemanticAnalyzer> units = new Dictionary<string, SemanticAnalyzer>();
-        
+        public const string basicModuleName = ":b";
+
+        public readonly ModuleTable moduleTable;
+        public readonly DataTable dataTable;
+
+        private readonly HashSet<string> reservedNames;
+
+        private readonly AstNode _tree;
+        public readonly AastNode annotatedTree;
+
         public SemanticAnalyzer(AstNode tree)
         {
-            callTable = new CallTable();
-            symbolTable = new SymbolTable();
-            this.tree = tree;
-            if (!tree.GetNodeType().Equals(AstNode.NodeType.Code))
-            {
-                unitName = ((Token) tree.getChilds()[0].getValue()).GetValue();
-            }
+            moduleTable = new ModuleTable();
+            dataTable = new DataTable();
+            reservedNames = new HashSet<string>();
 
+            _tree = tree;
+            annotatedTree = new AastNode(tree); // fixme
+
+            var basicModule = new Module(basicModuleName);
+            moduleTable.Add(basicModule);
         }
 
-        public void generateTables()
+        public void analyze()
         {
-            AnalyzeTree(tree);
-            if (!units.ContainsKey(unitName))
+            foreach (var ctx in _tree.getChilds())
             {
-                units.Add(unitName, this);
-            }
-            else
-            {
-                throw new SemanticError("Unit name is not unique: "+unitName);
-            }
-        }
-        private void AnalyzeTree(AstNode tree)
-        {
-            var childes = tree.getChilds();
-            if(tree.GetNodeType().Equals(AstNode.NodeType.Call))
-            {
-                
-            }
-            else if (tree.GetNodeType().Equals(AstNode.NodeType.Routine))
-            {
-                var entry = new CallTableEntry();
-                foreach(var i in childes)
+                if (ctx.GetNodeType() == AstNode.NodeType.Module)
                 {
-                    if (i.GetNodeType().Equals(AstNode.NodeType.Attribute))
-                    {
-                        entry.functionType= AnalyzeAttribute(i);
-                    }else if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
-                    {
-                        entry.functionName= AnalyzeName(i);
+                    handleModule(ctx);
+                }
+                else if (ctx.GetNodeType() == AstNode.NodeType.Data)
+                {
+                    handleData(ctx);
+                }
+                else if (ctx.GetNodeType() == AstNode.NodeType.Routine)
+                {
+                    handleRoutine(ctx);
+                }
+                else if (ctx.GetNodeType() == AstNode.NodeType.Code)
+                {
+                    handleCode(ctx);
+                }
+            }
 
+            validate();
+        }
+
+        private void handleData(AstNode node)
+        {
+            // check module name in reservedNames
+            var dataName = ((Token) node.getValue()).GetValue();
+            if (reservedNames.Contains(dataName))
+            {
+                throw new SemanticError("Data name is not unique: " + dataName);
+            }
+
+            // add to data table
+            dataTable.Add(node);
+
+            // add data name to reservedNames
+            reservedNames.Add(dataName);
+        }
+
+        private void handleModule(AstNode node)
+        {
+            // check module name in reservedNames
+            var moduleName = ((Token) node.getValue()).GetValue();
+            if (reservedNames.Contains(moduleName))
+            {
+                throw new SemanticError("Module name is not unique: " + moduleName);
+            }
+
+            // add module name to reservedNames
+            reservedNames.Add(moduleName);
+
+            // add to module table
+            var module = new Module(node);
+
+            // add all variables and functions to this module
+            foreach (var i in node.getChilds())
+            {
+                if (i.GetNodeType().Equals(AstNode.NodeType.Variable) ||
+                    i.GetNodeType().Equals(AstNode.NodeType.Constant))
+                {
+                    module.addVariable(i);
+                }
+                else if (i.GetNodeType().Equals(AstNode.NodeType.Routine))
+                {
+                    module.addRoutine(i);
+                }
+            }
+
+            moduleTable.Add(module);
+        }
+
+        private void handleRoutine(AstNode node)
+        {
+            var name = "";
+            var parameters = new List<string>();
+            foreach (var i in node.getChilds())
+            {
+                if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
+                {
+                    name = ((Token) i.getValue()).GetValue();
+                }
+                else if (i.GetNodeType().Equals(AstNode.NodeType.Parameters))
+                {
+                    foreach (var parameter in i.getChilds())
+                    {
+                        var parameterChilds = parameter.getChilds();
+                        parameters.Add(((Token) parameterChilds[1].getValue()).GetValue());
                     }
-                    else if (i.GetNodeType().Equals(AstNode.NodeType.Parameters))
-                    {
-                        entry.parameters= AnalyzeParameters(i);
-
-                    }
-                    else if (i.GetNodeType().Equals(AstNode.NodeType.Results))
-                    {
-                        entry.results= AnalyzeResults(i);
-
-                    }
-                    else if (i.GetNodeType().Equals(AstNode.NodeType.RoutineBody))
-                    {
-                        entry.hasBody = true;
-                        AnalyzeSymbols(i);
-
-                    }
-                    checkCallEntry(entry);
-                    callTable.Add(entry.functionName, entry);
                 }
             }
-            else
+
+            // check function name in reservedNames
+            if (reservedNames.Contains(name))
             {
-                AnalyzeSymbols(tree);
-                foreach(var i in childes)
+                throw new SemanticError("Routine name is not unique: " + name);
+            }
+
+            // add function name to reservedNames
+            reservedNames.Add(name);
+
+            // check function parameters in reservedNames
+            foreach (var i in parameters)
+            {
+                if (reservedNames.Contains(i))
                 {
-                    AnalyzeTree(i);
+                    throw new SemanticError("Routine parameter name is not unique: " + i);
                 }
+
+                reservedNames.Add(name);
             }
+
+            // add to this function to basic module
+            var module = moduleTable[basicModuleName];
+            module.addRoutine(node);
+            moduleTable.Add(name, module);
+
+            validateRoutine(module, node);
         }
 
-        private void AnalyzeSymbols(AstNode tree)
+        // add function `code` to basic module, may be wrapper above handleRoutine
+        private void handleCode(AstNode node)
         {
-            if (tree.GetNodeType().Equals(AstNode.NodeType.ConstDefinition))
-            {
-                AstNode curNode = tree.getChilds()[0];
-                SymbolTableEntry entry = new SymbolTableEntry
-                {
-                    type = "int", name = ((Token) curNode.getValue()).GetValue()
-                };
-                if (curNode.GetNodeType().Equals(AstNode.NodeType.Literal))
-                {
-                    checkNumberType(curNode, entry);
-                }
-                checkSymbolEntry(entry);
-                symbolTable.Add(entry.name, entry);
-
-
-            }else if(tree.GetNodeType().Equals(AstNode.NodeType.Variable))
-            {
-                var childes = tree.getChilds();
-                var type = ((Token) childes[0].getValue()).GetValue();
-                for (var i = 1; i < childes.Count; i++)
-                {
-                    var entry = new SymbolTableEntry
-                    {
-                        type = type, name = ((Token) childes[i].getChilds()[0].getValue()).GetValue()
-
-                    };
-                    checkNumberType(childes[i].getChilds()[1],entry);
-                    checkSymbolEntry(entry);
-                    symbolTable.Add(entry.name, entry);
-                    
-                }
-                
-
-            
-            }
-            else if (tree.GetNodeType().Equals(AstNode.NodeType.Assignment))
-            {
-                List<AstNode> childes = tree.getChilds();
-                AstNode literal = childes[1];
-                string name = ((Token) childes[0].getValue()).GetValue();
-                if (literal.GetNodeType().Equals(AstNode.NodeType.Literal))
-                {
-                    checkNumberType(literal,symbolTable[name]);
-                }
-            }
-            else if (tree.GetNodeType().Equals(AstNode.NodeType.VariableReference))
-            {
-                checkSymbolDeclaration(tree);
-            }
+            var basicModule = moduleTable[basicModuleName];
+            basicModule.addRoutine(node);
         }
 
-
-
-        private static string AnalyzeName(AstNode astNode)
+        private void validateRoutine(Module module, AstNode node)
         {
-            return astNode.getValue().ToString();
+            // check symbols and make links
+            // check that return registers are used
+            // check that return registers are last statements
         }
 
-        private ArrayList AnalyzeParameters(AstNode astNode)
+        // throw an exceptions if there is no `code` function in basic module
+        private void validate()
         {
-            
-            var childes = astNode.getChilds();
-            var parameters = new ArrayList();
-            foreach (var i in childes)
+            if (!moduleTable[basicModuleName].routines.ContainsKey("Code"))
             {
-                parameters.Add(((Token)i.getChilds()[0].getChilds()[0].getValue()).GetValue());
-            }
-             
-            return parameters;
-        }
-
-        private static ArrayList AnalyzeResults(AstNode astNode)
-        {
-            var childes = astNode.getChilds();
-            var results = new ArrayList();
-            foreach (var i in childes)
-            {
-                results.Add(((Token)i.getValue()).GetValue());
-            }
-            return results;
-        }
-
-        private static string AnalyzeAttribute(AstNode astNode)
-        {
-            return astNode.getValue().ToString();
-        }
-
-        private void checkSymbolEntry(SymbolTableEntry entry)
-        {
-
-            if (!entry.Equals(symbolTable[entry.name]))
-            {
-                throw new SemanticError("Type error for:"+ entry.ToString());
-            }
-        }
-        
-        private void checkCallEntry(CallTableEntry entry)
-        {
-            if (entry.functionType.Equals("start")&& callTable.ContainsKey(entry.functionName))
-            {
-                throw new SemanticError("Routine error for:"+ entry.ToString());
-            }
-
-            if (entry.functionType.Equals("start") && entry.hasBody)
-            {
-                throw new SemanticError("Routine error for:"+ entry.ToString());
-            }
-            if (entry.functionType.Equals("entry") && !entry.hasBody)
-            {
-                throw new SemanticError("Routine error for:"+ entry.ToString());
-            }
-            
-
-        }
-        private void checkSymbolDeclaration(AstNode astNode)
-        {
-            if (symbolTable.ContainsKey(((Token) tree.getValue()).GetValue()))
-            {
-                throw new SemanticError("Variable is not declared:"+ ((Token) tree.getValue()).GetValue());
-            }
-        }
-
-        private void checkNumberType( AstNode curNode, SymbolTableEntry entry)
-        {
-            string number = ((Token) curNode.getValue()).GetValue();
-            int a;
-            if (entry.type.Equals("int")&&!int.TryParse(number,out a))
-            {
-                throw new SemanticError(entry.name+" is not int");
-            }
-            short b;
-            if (entry.type.Equals("short")&&!short.TryParse(number,out b))
-            {
-                throw new SemanticError(entry.name+" is not short");
-            }
-            byte c;
-            if (entry.type.Equals("byte")&&!byte.TryParse(number,out c));
-            {
-                throw new SemanticError(entry.name+" is not byte");
+                throw new SemanticError("No code provided");
             }
         }
     }
