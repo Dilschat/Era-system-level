@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Tokenizer;
 
@@ -69,7 +70,9 @@ namespace Erasystemlevel.Parser
                     if (_debug) Console.WriteLine(e.Message);
                 }
 
-                throw new SyntaxError("Can't parse unit");
+                (int,int )line = reader.getCurrentPosition();
+                
+                throw new SyntaxError("Syntax error! line: "+ line.Item1.ToString() + " symbol: "+ line.Item2.ToString());
             }
 
             return unit;

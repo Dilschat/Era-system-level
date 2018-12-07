@@ -1,0 +1,7 @@
+module mod
+    int a := 2;
+end
+
+code
+    while 3>4 loop a := 1; end
+end

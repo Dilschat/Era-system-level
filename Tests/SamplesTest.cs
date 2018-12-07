@@ -119,6 +119,15 @@ namespace Erasystemlevel.Tests
             var node = Parser.Parser.ParseUnit(reader);
             Console.WriteLine(node.ToString());
         }
+        
+        [Test]
+        public void sample1Case()
+        {
+            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("codeSample1.txt"));
+            var reader = new TokenReader(tokenizer);
+            var node = Parser.Parser.ParseUnit(reader);
+            Console.WriteLine(node.ToString());
+        }
         private static string getTestFilePath(string fileName)
         {
             return "Tests/codeSamples/" + fileName;
