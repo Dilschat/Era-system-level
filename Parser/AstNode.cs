@@ -12,6 +12,7 @@ namespace Erasystemlevel.Parser
 
         public enum NodeType
         {
+            None,
             Unit,
             Code,
             Data,
