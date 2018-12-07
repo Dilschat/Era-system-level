@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Tokenizer;
@@ -455,7 +456,7 @@ namespace Erasystemlevel.Tests
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("varDefinition.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseVarDefinition(reader);
-            Assert.AreEqual(node.getValue(), new Token(Token.TokenType.Operator, ":="));
+            Assert.AreEqual(node.getValue(), new Token(Token.TokenType.Operator, "[]"));
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList {new AstNode(new Token(Token.TokenType.Identifier, "dilchat"))};
             var expression = new AstNode(new Token(Token.TokenType.Operator, "+"));
@@ -731,23 +732,76 @@ namespace Erasystemlevel.Tests
         }
 
         [Test]
-        public void parseIfTest()
+        public void parseSimpleIfTest()
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("if.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.parseIf(reader);
             Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "if"));
-
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList();
             var expression = new AstNode(new Token(Token.TokenType.Operator, ">"));
             expression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
             expression.addChild(new AstNode(new Token(Token.TokenType.Number, "2")));
-            var ifBody = new AstNode("RoutineBody");
             expectedChilds.Add(expression);
+            var ifBody = new AstNode(AstNode.NodeType.IfBody);
+            ifBody.SetNodeType(AstNode.NodeType.IfBody);
+            
+            AstNode statement = new AstNode(AstNode.NodeType.Statement);
+            statement.SetNodeType(AstNode.NodeType.Statement);
+            AstNode assigment = new AstNode(new Token(Token.TokenType.Operator,":="));
+            AstNode id = new AstNode(new Token(Token.TokenType.Identifier,"a"));
+            id.SetNodeType(AstNode.NodeType.Identifier);
+            AstNode lit = new AstNode(new Token(Token.TokenType.Number,"2"));
+            id.SetNodeType(AstNode.NodeType.Literal);
+            assigment.addChild(id);
+            assigment.addChild(lit);
+            assigment.SetNodeType(AstNode.NodeType.Assignment);
+            statement.addChild(assigment);
+            ifBody.addChild(statement);
+            AstNode ifBody2 = new AstNode(AstNode.NodeType.IfBody);
+            ifBody2.SetNodeType(AstNode.NodeType.IfBody);
             expectedChilds.Add(ifBody);
-            expectedChilds.Add(ifBody);
+            expectedChilds.Add(ifBody2);
             Assert.AreEqual(curChilds, expectedChilds);
+        }
+        
+        [Test]
+        public void parseComplexIfTest()
+        {
+            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("if.txt"));
+            var reader = new TokenReader(tokenizer);
+            var node = Parser.Parser.parseIf(reader);
+            
+          
+//            Console.WriteLine(node.ToString());
+//            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "if"));
+//            var curChilds = node.getChilds();
+//            var expectedChilds = new ArrayList();
+//            var expression = new AstNode(new Token(Token.TokenType.Operator, ">"));
+//            expression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
+//            expression.addChild(new AstNode(new Token(Token.TokenType.Number, "2")));
+//            expectedChilds.Add(expression);
+//            var ifBody = new AstNode(AstNode.NodeType.IfBody);
+//            ifBody.SetNodeType(AstNode.NodeType.IfBody);
+//            
+//            AstNode statement = new AstNode(AstNode.NodeType.Statement);
+//            statement.SetNodeType(AstNode.NodeType.Statement);
+//            AstNode assigment = new AstNode(new Token(Token.TokenType.Operator,":="));
+//            AstNode id = new AstNode(new Token(Token.TokenType.Identifier,"a"));
+//            id.SetNodeType(AstNode.NodeType.Identifier);
+//            AstNode lit = new AstNode(new Token(Token.TokenType.Number,"2"));
+//            id.SetNodeType(AstNode.NodeType.Literal);
+//            assigment.addChild(id);
+//            assigment.addChild(lit);
+//            assigment.SetNodeType(AstNode.NodeType.Assignment);
+//            statement.addChild(assigment);
+//            ifBody.addChild(statement);
+//            AstNode ifBody2 = new AstNode(AstNode.NodeType.IfBody);
+//            ifBody2.SetNodeType(AstNode.NodeType.IfBody);
+//            expectedChilds.Add(ifBody);
+//            expectedChilds.Add(ifBody2);
+//            Assert.AreEqual(curChilds, expectedChilds);
         }
 
         [Test]
@@ -788,17 +842,16 @@ namespace Erasystemlevel.Tests
 
             Assert.AreEqual(curChilds[0].GetNodeType(), AstNode.NodeType.Statement);
         }
-        
+
         [Test]
         public void negativeLoopVarDefinitionTest()
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("varInLoop.txt"));
             var reader = new TokenReader(tokenizer);
 
-            Assert.Throws<SyntaxError>(delegate
-            {
-                Parser.Parser.parseLoopBody(reader);
-            });
+            var exLoop = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseWhile(reader); });
+
+            Assert.That(exLoop.Message, Is.EqualTo("Can't parse loop body"));
         }
 
         [Test]
@@ -806,18 +859,15 @@ namespace Erasystemlevel.Tests
         {
             var tokenizerIf = new Tokenizer.Tokenizer(getTestFilePath("varInIf.txt"));
             var readerIf = new TokenReader(tokenizerIf);
-            
+
             var tokenizerElse = new Tokenizer.Tokenizer(getTestFilePath("varInElse.txt"));
             var readerElse = new TokenReader(tokenizerElse);
 
-            Assert.Throws<SyntaxError>(delegate
-            {
-                Parser.Parser.parseLoopBody(readerIf);
-            });
-            Assert.Throws<SyntaxError>(delegate
-            {
-                Parser.Parser.parseLoopBody(readerElse);
-            });
+            var exIf = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseIf(readerIf); });
+            var exElse = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseIf(readerElse); });
+
+            Assert.That(exIf.Message, Is.EqualTo("Can't parse if body"));
+            Assert.That(exElse.Message, Is.EqualTo("Can't parse if body"));
         }
 
         private static string getTestFilePath(string fileName)

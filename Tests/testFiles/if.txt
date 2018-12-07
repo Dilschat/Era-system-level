@@ -1,8 +1,5 @@
 if a>2 do 
-    a := a + 4;
+    a := 2;
 end else do
-    a := a - 4;
-    while a > 0 loop
-        a := a - 1
-    end
+
 end

@@ -11,5 +11,21 @@ namespace Erasystemlevel.Semantic
     {
         public string type;
         public string name;
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null||obj.GetType() != typeof(SymbolTableEntry))
+            {
+                return false;
+            }
+
+            var val = (SymbolTableEntry) obj;
+            return type.Equals(val.type) && name.Equals(val.name);
+        }
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
 }
