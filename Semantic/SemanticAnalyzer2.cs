@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using Erasystemlevel.Exception;
 using Erasystemlevel.Parser;
+using Erasystemlevel.Tokenizer;
 
 namespace Erasystemlevel.Semantic
 {
@@ -90,11 +92,27 @@ namespace Erasystemlevel.Semantic
                     module.addRoutine(i);
                 }
             }
+            handleChild(node, module);
             moduleTable.Add(moduleName, module);
             // add all variables and functions to this table
             
         }
 
+        private void handleChild(AstNode node, Module module)
+        {
+            List<AstNode> childes = node.getChilds();
+            foreach (var i in childes)
+            {
+                if (i.GetNodeType().Equals(AstNode.NodeType.Variable)||i.GetNodeType().Equals(AstNode.NodeType.Constant))
+                {
+                    module.addVariable(i);
+                }else if (i.GetNodeType().Equals(AstNode.NodeType.Routine))
+                {
+                    module.addRoutine(i);
+                }
+                handleChild(i,module);
+            }
+        }
         private void handleRoutine(AstNode node)
         {
             // check function name in reservedNames
@@ -153,6 +171,7 @@ namespace Erasystemlevel.Semantic
 
         private void validateRoutine(Module module, AstNode node)
         {
+            
             // check symbols and make links
             // check that return registers are used
             // check that return registers are last statements
@@ -161,7 +180,7 @@ namespace Erasystemlevel.Semantic
         private void validate()
         {
             // throw an exceptions if there is no `code` function in basic module
-            if (!moduleTable.ContainsKey("code"))
+            if (!moduleTable[basicModuleName].routines.ContainsKey("code"))
             {
                 throw new SemanticError("No code provided");
             }
