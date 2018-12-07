@@ -63,7 +63,8 @@ namespace Erasystemlevel.Parser
             VarDefinition,
             From,
             To,
-            Step
+            Step,
+            Format
         }
 
         public void SetNodeType(NodeType type)

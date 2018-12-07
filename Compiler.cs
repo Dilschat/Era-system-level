@@ -12,7 +12,7 @@ namespace EraSystemLevel
 
         public Compiler(bool debug)
         {
-            this._debug = debug;
+            _debug = debug;
         }
 
         public string compile(string filepath)
@@ -24,21 +24,24 @@ namespace EraSystemLevel
             var tree = Parser.ParseUnit(tokenReader);
             printDebug("Parse tree:\n" + tree + "\n");
 
-            var semantic = new SemanticAnalyzer(tree);
-            var codeGen = new CodeGenerator(tree, semantic.symbolTable, semantic.callTable);
+            var semantic = new SemanticAnalyzer2(tree);
+            semantic.analyze();
+
+            var aTree = semantic.annotatedTree;
+            printDebug("Semantic tree:\n" + aTree + "\n");
+            
+            //var semantic = new SemanticAnalyzer(tree);
+            //semantic.generateTables();
+            //semantic.analyze();
+            //printDebug("Semantic tree:\n" + tree + "\n");
+            
+            var codeGen = new CodeGenerator(aTree, semantic.moduleTable, semantic.dataTable);
+            codeGen.generate();
 
             var asmCode = codeGen.assembly.ToString();
             printDebug("Generated assembly:\n" + asmCode + "\n");
 
             return asmCode;
-        }
-
-        private void printDebug(string line, object obj)
-        {
-            if (_debug)
-            {
-                Console.WriteLine(line, obj);
-            }
         }
 
         private void printDebug(string line)

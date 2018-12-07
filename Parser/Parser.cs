@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Erasystemlevel.Exception;
 using Erasystemlevel.Tokenizer;
@@ -12,57 +13,74 @@ namespace Erasystemlevel.Parser
 
         public static AstNode ParseUnit(TokenReader reader)
         {
-            try
+            AstNode unit = new AstNode(AstNode.NodeType.Unit);
+            unit.SetNodeType(AstNode.NodeType.Unit);
+            while (true)
             {
-                var node = parseCode(reader);
-                reader.clear();
-                return node;
-            }
-            catch (SyntaxError e)
-            {
-                if (_debug) Console.WriteLine(e.Message);
+                if (reader.isEmpty())
+                {
+                    break;
+                }
+                try
+                {
+                    var node = parseCode(reader);
+                    reader.clear();
+                    unit.addChild(node);      
+                    continue;
+                }
+                catch (SyntaxError e)
+                {
+                    if (_debug) Console.WriteLine(e.Message);
+                }
+
+                try
+                {
+                    var node = parseData(reader);
+                    reader.clear();
+                    unit.addChild(node);
+                    continue;
+                }
+                catch (SyntaxError e)
+                {
+                    if (_debug) Console.WriteLine(e.Message);
+                }
+
+                try
+                {
+                    var node = parseModule(reader);
+                    reader.clear();
+                    unit.addChild(node);
+                    continue;
+                }
+                catch (SyntaxError e)
+                {
+                    if (_debug) Console.WriteLine(e.Message);
+                }
+
+                try
+                {
+                    var node = parseRoutine(reader);
+                    reader.clear();
+                    unit.addChild(node);
+                    continue;
+                }
+                catch (SyntaxError e)
+                {
+                    if (_debug) Console.WriteLine(e.Message);
+                }
+
+                throw new SyntaxError("Can't parse unit");
             }
 
-            try
-            {
-                var node = parseData(reader);
-                reader.clear();
-                return node;
-            }
-            catch (SyntaxError e)
-            {
-                if (_debug) Console.WriteLine(e.Message);
-            }
+            return unit;
 
-            try
-            {
-                var node = parseModule(reader);
-                reader.clear();
-                return node;
-            }
-            catch (SyntaxError e)
-            {
-                if (_debug) Console.WriteLine(e.Message);
-            }
-
-            try
-            {
-                var node = parseRoutine(reader);
-                reader.clear();
-                return node;
-            }
-            catch (SyntaxError e)
-            {
-                if (_debug) Console.WriteLine(e.Message);
-            }
-
-            throw new SyntaxError("Can't parse unit");
         }
-
+        
         public static AstNode parseCode(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
             var code = new AstNode(AstNode.NodeType.Code);
+            checkToken(nextToken);
             if (!nextToken.GetValue().Equals("code"))
             {
                 reader.saveReadTokens();
@@ -119,6 +137,7 @@ namespace Erasystemlevel.Parser
         public static AstNode parseData(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
+            checkToken(nextToken);
             if (!nextToken.GetValue().Equals("data"))
             {
                 reader.saveReadTokens();
@@ -172,6 +191,7 @@ namespace Erasystemlevel.Parser
             }
 
             var nextToken = reader.readNextToken();
+            checkToken(nextToken);
             if (!nextToken.GetValue().Equals("routine"))
             {
                 reader.saveReadTokens();
@@ -225,7 +245,7 @@ namespace Erasystemlevel.Parser
             if (!nextToken.GetValue().Equals("end"))
             {
                 reader.saveReadTokens();
-                throw new SyntaxError("");
+                throw new SyntaxError("Expected end literal");
             }
 
             reader.clear();
@@ -236,6 +256,7 @@ namespace Erasystemlevel.Parser
         public static AstNode parseModule(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
+            checkToken(nextToken);
             if (!nextToken.GetValue().Equals("module"))
             {
                 reader.saveReadTokens();
@@ -354,6 +375,7 @@ namespace Erasystemlevel.Parser
                 node.SetNodeType(AstNode.NodeType.Identifier);
                 return node;
             }
+
             reader.saveReadTokens();
             throw new SyntaxError("Can't parse identifier");
         }
@@ -456,19 +478,25 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetValue().Equals("int"))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Type);
+                return node;
             }
 
             if (nextToken.GetValue().Equals("short"))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Type);
+                return node;
             }
 
             if (nextToken.GetValue().Equals("byte"))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Type);
+                return node;
             }
 
             reader.saveReadTokens();
@@ -618,6 +646,9 @@ namespace Erasystemlevel.Parser
                     node.addChild(parseExpression(reader));
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
+
+
                     return node;
                 }
                 catch (SyntaxError)
@@ -625,6 +656,7 @@ namespace Erasystemlevel.Parser
                     reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
                     return node;
                 }
             }
@@ -637,6 +669,7 @@ namespace Erasystemlevel.Parser
                     node.addChild(parseExpression(reader));
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
                     return node;
                 }
                 catch (SyntaxError)
@@ -644,6 +677,7 @@ namespace Erasystemlevel.Parser
                     reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
                     return node;
                 }
             }
@@ -688,7 +722,17 @@ namespace Erasystemlevel.Parser
 
             reader.clear();
             node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+            checkDelim(reader);
             return node;
+        }
+
+        public static void checkDelim(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals(";"))
+            {
+                throw new SyntaxError("cant parse assembler statement");
+            }
         }
 
         private static AstNode parseOperationOnRegisters(IEnumerable<string> operators, TokenReader reader)
@@ -982,7 +1026,10 @@ namespace Erasystemlevel.Parser
 
         public static AstNode parseVariableReference(TokenReader reader)
         {
-            return parseIdentifier(reader);
+            AstNode node = parseIdentifier(reader);
+            node.SetNodeType(AstNode.NodeType.VariableReference);
+            return node;
+           
         }
 
         public static AstNode parseDereference(TokenReader reader)
@@ -996,6 +1043,7 @@ namespace Erasystemlevel.Parser
             }
 
             dereference.setValue(nextToken);
+            dereference.SetNodeType(AstNode.NodeType.Deference);
             try
             {
                 reader.clear();
@@ -1150,7 +1198,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             const Token.TokenType operatorType = Token.TokenType.Operator;
             if (!nextToken.GetTokenType().Equals(operatorType)) throw new SyntaxError("Can't parse operator");
-            reader.clear();
+            //reader.clear();
             return new AstNode(nextToken);
         }
 
@@ -1161,7 +1209,9 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetTokenType().Equals(Token.TokenType.Register))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                var node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Register);
+                return node;
             }
 
             reader.saveReadTokens();
@@ -1334,11 +1384,10 @@ namespace Erasystemlevel.Parser
             }
         }
 
-        public static AstNode
-            parseCall(TokenReader reader)
+        public static AstNode parseCall(TokenReader reader)
         {
             var call = new AstNode("Call");
-            var primary = parsePrimary(reader);
+            var primary = parseIdentifier(reader);
             var nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("."))
             {
@@ -1654,5 +1703,7 @@ namespace Erasystemlevel.Parser
             assignment.SetNodeType(AstNode.NodeType.Assignment);
             return assignment;
         }
+        
+       
     }
 }

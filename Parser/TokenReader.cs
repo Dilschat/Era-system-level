@@ -39,5 +39,27 @@ namespace Erasystemlevel.Parser
         {
             lookaheadBuffer.Clear();
         }
+
+        public bool isEmpty()
+
+        {
+            Token token;
+            try
+            {
+                token = readNextToken();
+            }
+            catch (System.ObjectDisposedException)
+            {
+                return true;
+            }
+
+            if (token == null)
+            {
+                return true;
+            }
+
+            saveReadTokens();
+            return false;
+        }
     }
 }
