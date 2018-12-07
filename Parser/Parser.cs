@@ -349,7 +349,12 @@ namespace Erasystemlevel.Parser
         public static AstNode parseIdentifier(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
-            if (nextToken.GetTokenType() == Token.TokenType.Identifier) return new AstNode(nextToken);
+            if (nextToken.GetTokenType() == Token.TokenType.Identifier)
+            {
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Identifier);
+                return node;
+            }
             reader.saveReadTokens();
             throw new SyntaxError("Can't parse identifier");
         }
@@ -360,7 +365,9 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetTokenType() == Token.TokenType.Number)
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Literal);
+                return node;
             }
 
             reader.saveReadTokens();
@@ -1296,6 +1303,7 @@ namespace Erasystemlevel.Parser
 
         private static AstNode parseIfBody(TokenReader reader)
         {
+            var ifBody = new AstNode(AstNode.NodeType.IfBody);
             var nextToken = reader.readNextToken();
             if (!nextToken.GetValue().Equals("do"))
             {
@@ -1304,25 +1312,27 @@ namespace Erasystemlevel.Parser
             }
 
             reader.clear();
-            nextToken = reader.readNextToken();
-            if (nextToken.GetValue().Equals("end"))
+            while (true)
             {
-                return new AstNode("RoutineBody");
+                try
+                {
+                    ifBody.addChild(parseStatement(reader));
+                }
+                catch (SyntaxError)
+                {
+                    reader.saveReadTokens();
+                    nextToken = reader.readNextToken();
+                    if (!nextToken.GetValue().Equals("end"))
+                    {
+                        reader.saveReadTokens();
+                        throw new SyntaxError("Can't parse if body");
+                    }
+
+                    reader.clear();
+                    ifBody.SetNodeType(AstNode.NodeType.IfBody);
+                    return ifBody;
+                }
             }
-
-            reader.saveReadTokens();
-
-            var ifBody = parseRoutineBody(reader);
-            nextToken = reader.readNextToken();
-            if (!nextToken.GetValue().Equals("end"))
-            {
-                reader.saveReadTokens();
-                throw new SyntaxError("Can't parse if body");
-            }
-
-            reader.clear();
-            ifBody.SetNodeType(AstNode.NodeType.IfBody);
-            return ifBody;
         }
 
         public static AstNode
