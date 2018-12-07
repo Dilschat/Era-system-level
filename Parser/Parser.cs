@@ -456,19 +456,25 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetValue().Equals("int"))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Type);
+                return node;
             }
 
             if (nextToken.GetValue().Equals("short"))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Type);
+                return node;
             }
 
             if (nextToken.GetValue().Equals("byte"))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                AstNode node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Type);
+                return node;
             }
 
             reader.saveReadTokens();
