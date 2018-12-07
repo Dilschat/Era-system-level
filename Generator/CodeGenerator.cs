@@ -49,7 +49,7 @@ namespace Erasystemlevel.Generator
             foreach (var me in moduleTable)
             {
                 var module = me.Value;
-                var symbols = new List<SymbolTableEntry2>();
+                var symbols = new List<SymbolTableEntry>();
 
                 foreach (var se in module.symbols)
                 {
@@ -105,7 +105,7 @@ namespace Erasystemlevel.Generator
                     var routine = routinePair.Value;
 
                     // we skip `code` routine
-                    if (module.name != SemanticAnalyzer2.basicModuleName || routine.name != "code")
+                    if (module.name != SemanticAnalyzer.basicModuleName || routine.name != "code")
                     {
                         _generateRoutine(module, routine);
                     }
@@ -113,7 +113,7 @@ namespace Erasystemlevel.Generator
             }
         }
 
-        private void _generateRoutine(Module module, CallTableEntry2 routine)
+        private void _generateRoutine(Module module, CallTableEntry routine)
         {
             // todo: генерация кода одной функции
         }
@@ -130,7 +130,7 @@ namespace Erasystemlevel.Generator
 
         private Module _getMainModule()
         {
-            return moduleTable[SemanticAnalyzer2.basicModuleName];
+            return moduleTable[SemanticAnalyzer.basicModuleName];
         }
     }
 }

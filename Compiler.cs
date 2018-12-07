@@ -23,7 +23,7 @@ namespace Erasystemlevel
             var tree = Parser.Parser.ParseUnit(tokenReader);
             printDebug("Parse tree:\n" + tree + "\n");
 
-            var semantic = new SemanticAnalyzer2(tree);
+            var semantic = new SemanticAnalyzer(tree);
             semantic.analyze();
 
             var aTree = semantic.annotatedTree;

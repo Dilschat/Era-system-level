@@ -21,8 +21,8 @@ namespace Erasystemlevel.Semantic
 
         public int staticBase;
 
-        public CallTable2 routines = new CallTable2();
-        public SymbolTable2 symbols = new SymbolTable2();
+        public CallTable routines = new CallTable();
+        public SymbolTable symbols = new SymbolTable();
 
         public Module(AstNode node)
         {
@@ -44,13 +44,14 @@ namespace Erasystemlevel.Semantic
                 {
                     handleConstDefinition(i);
                 }
-            }else if(node.GetNodeType().Equals(AstNode.NodeType.Variable))
+            }
+            else if (node.GetNodeType().Equals(AstNode.NodeType.Variable))
             {
                 List<AstNode> childs = node.getChilds();
-                AstNode type = childs[0] ;
+                AstNode type = childs[0];
                 for (int i = 1; i < childs.Count; i++)
                 {
-                    handleVarDefinitions(childs[i], ((Token)type.getValue()).GetValue());
+                    handleVarDefinitions(childs[i], ((Token) type.getValue()).GetValue());
                 }
             }
         }
@@ -58,129 +59,123 @@ namespace Erasystemlevel.Semantic
         private void handleConstDefinition(AstNode node)
         {
             AstNode id = node.getChilds()[0];
-            SymbolTableEntry2 entry2 = new SymbolTableEntry2(id);
-            entry2.type = "int";
-            entry2.isConst = true;
-            entry2.isInitialized = true;
-            symbols.Add(((Token)id.getValue()).GetValue(),entry2);
+            SymbolTableEntry entry = new SymbolTableEntry(id);
+            entry.type = "int";
+            entry.isConst = true;
+            entry.isInitialized = true;
+            symbols.Add(((Token) id.getValue()).GetValue(), entry);
         }
 
         private void handleVarDefinitions(AstNode node, string type)
         {
             List<AstNode> childs = node.getChilds();
             AstNode id = childs[0];
-            SymbolTableEntry2 entry2 = new SymbolTableEntry2(id);
-            entry2.type = type;
+            SymbolTableEntry entry = new SymbolTableEntry(id);
+            entry.type = type;
             if (childs.Count > 1 && childs[1].GetNodeType().Equals(AstNode.NodeType.Expression))
             {
-                entry2.isInitialized = true;
+                entry.isInitialized = true;
             }
-            symbols.Add(((Token)id.getValue()).GetValue(),entry2);
+
+            symbols.Add(((Token) id.getValue()).GetValue(), entry);
         }
 
         public void addRoutine(AstNode node)
         {
             List<AstNode> childs = node.getChilds();
-            CallTableEntry2 entry2 = new CallTableEntry2(node);
+            CallTableEntry entry = new CallTableEntry(node);
             foreach (var i in childs)
             {
                 if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
                 {
-                    entry2.name = ((Token) i.getValue()).GetValue();
-                }else if (i.GetNodeType().Equals(AstNode.NodeType.Parameters))
+                    entry.name = ((Token) i.getValue()).GetValue();
+                }
+                else if (i.GetNodeType().Equals(AstNode.NodeType.Parameters))
                 {
                     foreach (var parameter in i.getChilds())
                     {
-                        entry2.parameters.Add(handleParameters(parameter,entry2));
+                        entry.parameters.Add(handleParameters(parameter, entry));
                     }
-                }else if (i.GetNodeType().Equals(AstNode.NodeType.Results))
+                }
+                else if (i.GetNodeType().Equals(AstNode.NodeType.Results))
                 {
                     foreach (var result in i.getChilds())
                     {
-                        entry2.results.Add(handleResult(result));
+                        entry.results.Add(handleResult(result));
                     }
-                    
-                }else if (i.GetNodeType().Equals(AstNode.NodeType.RoutineBody))
+                }
+                else if (i.GetNodeType().Equals(AstNode.NodeType.RoutineBody))
 
                 {
-                    entry2.hasBody = true;
-                    entry2.symbols = handleRoutineBody(i,new SymbolTable2());
-
+                    entry.hasBody = true;
+                    entry.symbols = handleRoutineBody(i, new SymbolTable());
                 }
-                routines.Add(entry2.name,entry2);
-                
+
+                routines.Add(entry.name, entry);
             }
         }
 
-        private SymbolTable2 handleRoutineBody(AstNode node, SymbolTable2 table)
+        private SymbolTable handleRoutineBody(AstNode node, SymbolTable table)
         {
             List<AstNode> childes = node.getChilds();
             foreach (var j in childes)
             {
-                    if (j.GetNodeType().Equals(AstNode.NodeType.Constant))
+                if (j.GetNodeType().Equals(AstNode.NodeType.Constant))
+                {
+                    List<AstNode> consts = j.getChilds();
+                    foreach (var constant in consts)
                     {
-                        List<AstNode> consts = j.getChilds();
-                        foreach (var constant in consts)
-                        {
-                            AstNode id = constant.getChilds()[0];
-                            SymbolTableEntry2 entry2 = new SymbolTableEntry2(id);
-                            entry2.type = "int";
-                            entry2.isConst = true;
-                            entry2.isInitialized = true;
-                            table.Add(((Token)id.getValue()).GetValue(),entry2);
-                            return table;
-                        }
-                                    
-                    }
-                    else if (j.GetNodeType().Equals(AstNode.NodeType.Variable))
-                    {
-                        List<AstNode> childs = j.getChilds();
-                        string type = ((Token) childs[0].getValue()).GetValue();
-                        for (int i = 1; i<childs.Count; i++)
-                        {
-                            AstNode id = childs[i].getChilds()[0];
-                            SymbolTableEntry2 entry2 = new SymbolTableEntry2(id);
-                            entry2.type =type;
-                            if (childs.Count > 1 && childs[1].GetNodeType().Equals(AstNode.NodeType.Expression))
-                            {
-                                entry2.isInitialized = true;
-                            }
-                            table.Add(((Token)id.getValue()).GetValue(),entry2);
-                            return table;
-                        }
-                        
-                        
-                    }
-                    else
-                    {
-                        SymbolTable2 newTable = handleRoutineBody(j, table);
-                        foreach (var t in newTable.Values)
-                        {
-                            table.Add(t.name, t);
-                        }
-
+                        AstNode id = constant.getChilds()[0];
+                        SymbolTableEntry entry = new SymbolTableEntry(id);
+                        entry.type = "int";
+                        entry.isConst = true;
+                        entry.isInitialized = true;
+                        table.Add(((Token) id.getValue()).GetValue(), entry);
                         return table;
-
                     }
-                
-                
-            }
-            return new SymbolTable2();
+                }
+                else if (j.GetNodeType().Equals(AstNode.NodeType.Variable))
+                {
+                    List<AstNode> childs = j.getChilds();
+                    string type = ((Token) childs[0].getValue()).GetValue();
+                    for (int i = 1; i < childs.Count; i++)
+                    {
+                        AstNode id = childs[i].getChilds()[0];
+                        SymbolTableEntry entry = new SymbolTableEntry(id);
+                        entry.type = type;
+                        if (childs.Count > 1 && childs[1].GetNodeType().Equals(AstNode.NodeType.Expression))
+                        {
+                            entry.isInitialized = true;
+                        }
 
+                        table.Add(((Token) id.getValue()).GetValue(), entry);
+                        return table;
+                    }
+                }
+                else
+                {
+                    SymbolTable newTable = handleRoutineBody(j, table);
+                    foreach (var t in newTable.Values)
+                    {
+                        table.Add(t.name, t);
+                    }
+
+                    return table;
+                }
+            }
+
+            return new SymbolTable();
         }
 
-        private string handleParameters(AstNode parameter, CallTableEntry2 entry2)
+        private string handleParameters(AstNode parameter, CallTableEntry entry)
         {
             string type = ((Token) parameter.getValue()).GetValue();
             string name = ((Token) parameter.getChilds()[0].getValue()).GetValue();
             checkSymbol(name);
-            SymbolTableEntry2 symbolTableEntry2 = new SymbolTableEntry2(parameter.getChilds()[0]);
-            symbolTableEntry2.type = type;
-            symbols.Add(name,symbolTableEntry2);
+            SymbolTableEntry symbolTableEntry = new SymbolTableEntry(parameter.getChilds()[0]);
+            symbolTableEntry.type = type;
+            symbols.Add(name, symbolTableEntry);
             return type;
-
-
-
         }
 
         private string handleResult(AstNode result)

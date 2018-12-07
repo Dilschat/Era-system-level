@@ -26,7 +26,7 @@ namespace Erasystemlevel.Generator
             staticPointer += wordSize * entry.node.getChilds().Count;
         }
 
-        public void appendModuleVariables(Module module, SymbolTableEntry2[] symbols)
+        public void appendModuleVariables(Module module, SymbolTableEntry[] symbols)
         {
             module.staticBase = staticPointer;
 
