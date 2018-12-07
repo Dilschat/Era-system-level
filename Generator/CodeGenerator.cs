@@ -1,13 +1,14 @@
 using System.Collections.Generic;
+using Erasystemlevel.Parser;
 using Erasystemlevel.Semantic;
 
 namespace Erasystemlevel.Generator
 {
     public class CodeGenerator
     {
-        public AssemblyBuffer assembly;
+        public AsmBuffer assembly;
 
-        private AastNode root;
+        private AastNode _tree;
         private MemoryManager memoryManager;
 
         private ModuleTable moduleTable;
@@ -15,7 +16,7 @@ namespace Erasystemlevel.Generator
 
         public CodeGenerator(AastNode tree, ModuleTable modules, DataTable data)
         {
-            root = tree;
+            _tree = tree;
             moduleTable = modules;
             dataTable = data;
 
@@ -26,13 +27,14 @@ namespace Erasystemlevel.Generator
         {
             allocateStatic();
             generateStaticInitializer();
+            jumpToCode();
             generateModulesRoutines();
             generateCodeRoutine();
         }
 
         public void reset()
         {
-            assembly = new AssemblyBuffer();
+            assembly = new AsmBuffer();
             memoryManager = new MemoryManager(assembly);
         }
 
@@ -59,17 +61,63 @@ namespace Erasystemlevel.Generator
 
         private void generateStaticInitializer()
         {
-            // todo
+            memoryManager.setRegister(RegistersManager.SB_REG, _getMainModule().staticBase);
+            memoryManager.setRegister(RegistersManager.SP_REG, memoryManager.getStaticPointer());
+            memoryManager.moveFpToSp();
+
+            // todo: вычисление значений для переменных модулей
         }
 
-        private void generateModulesRoutines()
+        private void jumpToCode()
         {
-            // todo
+            var label = _generateRoutineLabel(SemanticAnalyzer2.basicModuleName, "code");
+            asmJumpToLabel(label);
         }
 
         private void generateCodeRoutine()
         {
-            // todo
+            var module = _getMainModule();
+
+            _generateRoutine(module, module.routines["code"]);
+        }
+
+        private void generateModulesRoutines()
+        {
+            foreach (var modulePair in moduleTable)
+            {
+                var module = modulePair.Value;
+                foreach (var routinePair in module.routines)
+                {
+                    var routine = routinePair.Value;
+
+                    // we skip `code` routine
+                    if (module.name != SemanticAnalyzer2.basicModuleName || routine.name != "code")
+                    {
+                        _generateRoutine(module, routine);
+                    }
+                }
+            }
+        }
+
+        private void _generateRoutine(Module module, CallTableEntry2 routine)
+        {
+            // todo: генерация кода одной функции
+        }
+
+        private string _generateRoutineLabel(string module, string routine)
+        {
+            return module + "." + routine;
+        }
+
+        private void asmJumpToLabel(string name)
+        {
+            // todo: allocate register
+            assembly.put(AsmBuilder.jumpToRegister("R-1"));
+        }
+
+        private Module _getMainModule()
+        {
+            return moduleTable[SemanticAnalyzer2.basicModuleName];
         }
     }
 }
