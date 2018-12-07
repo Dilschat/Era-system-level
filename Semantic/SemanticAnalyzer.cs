@@ -143,5 +143,11 @@ namespace Erasystemlevel.Semantic
 
             }
         }
+        
+        private void checkCallEntry(CallTableEntry entry)
+        {
+
+
+        }
     }
 }
