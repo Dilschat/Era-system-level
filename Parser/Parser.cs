@@ -8,6 +8,8 @@ namespace Erasystemlevel.Parser
 {
     public static class Parser
     {
+        public static bool _debug = false;
+
         public static AstNode ParseUnit(TokenReader reader)
         {
             try
@@ -18,10 +20,9 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-                Console.WriteLine(e);
+                if (_debug) Console.WriteLine(e.Message);
             }
 
-            Console.WriteLine('1');
             try
             {
                 var node = parseData(reader);
@@ -30,10 +31,8 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-                Console.WriteLine(e);
+                if (_debug) Console.WriteLine(e.Message);
             }
-
-            Console.WriteLine('2');
 
             try
             {
@@ -43,7 +42,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-                Console.WriteLine(e);
+                if (_debug) Console.WriteLine(e.Message);
             }
 
             try
@@ -54,7 +53,7 @@ namespace Erasystemlevel.Parser
             }
             catch (SyntaxError e)
             {
-                Console.WriteLine(e);
+                if (_debug) Console.WriteLine(e.Message);
             }
 
             throw new SyntaxError("Can't parse unit");
@@ -80,7 +79,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError e)
                 {
-                    Console.WriteLine(e);
+                    if (_debug) Console.WriteLine(e.Message);
                 }
 
                 try
@@ -90,7 +89,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError e)
                 {
-                    Console.WriteLine(e);
+                    if (_debug) Console.WriteLine(e.Message);
                 }
 
                 try
@@ -100,7 +99,7 @@ namespace Erasystemlevel.Parser
                 }
                 catch (SyntaxError e)
                 {
-                    Console.WriteLine(e);
+                    if (_debug) Console.WriteLine(e.Message);
                 }
 
                 nextToken = reader.readNextToken();

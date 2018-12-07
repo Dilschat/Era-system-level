@@ -840,17 +840,16 @@ namespace Erasystemlevel.Tests
 
             Assert.AreEqual(curChilds[0].GetNodeType(), AstNode.NodeType.Statement);
         }
-        
+
         [Test]
         public void negativeLoopVarDefinitionTest()
         {
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("varInLoop.txt"));
             var reader = new TokenReader(tokenizer);
 
-            Assert.Throws<SyntaxError>(delegate
-            {
-                Parser.Parser.parseLoopBody(reader);
-            });
+            var exLoop = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseLoopBody(reader); });
+
+            Assert.That(exLoop.Message, Is.EqualTo("Can't parse loop body"));
         }
 
         [Test]
@@ -858,18 +857,15 @@ namespace Erasystemlevel.Tests
         {
             var tokenizerIf = new Tokenizer.Tokenizer(getTestFilePath("varInIf.txt"));
             var readerIf = new TokenReader(tokenizerIf);
-            
+
             var tokenizerElse = new Tokenizer.Tokenizer(getTestFilePath("varInElse.txt"));
             var readerElse = new TokenReader(tokenizerElse);
 
-            Assert.Throws<SyntaxError>(delegate
-            {
-                Parser.Parser.parseLoopBody(readerIf);
-            });
-            Assert.Throws<SyntaxError>(delegate
-            {
-                Parser.Parser.parseLoopBody(readerElse);
-            });
+            var exIf = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseLoopBody(readerIf); });
+            var exElse = Assert.Throws<SyntaxError>(delegate { Parser.Parser.parseLoopBody(readerElse); });
+
+            Assert.That(exIf.Message, Is.EqualTo("todo"));
+            Assert.That(exElse.Message, Is.EqualTo("todo"));
         }
 
         private static string getTestFilePath(string fileName)
