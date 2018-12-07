@@ -11,14 +11,14 @@ namespace Erasystemlevel.Generator
         private AstNode root;
         private MemoryManager memoryManager;
 
-        private SymbolTable symbolTable;
-        private CallTable callTable;
+        private ModuleTable moduleTable;
+        private DataTable dataTable;
 
-        public CodeGenerator(AstNode tree, SymbolTable symbols, CallTable calls)
+        public CodeGenerator(AstNode tree, ModuleTable modules, DataTable data)
         {
             root = tree;
-            symbolTable = symbols;
-            callTable = calls;
+            moduleTable = modules;
+            dataTable = data;
 
             reset();
         }
@@ -56,6 +56,5 @@ namespace Erasystemlevel.Generator
         {
             // todo
         }
-        
     }
 }
