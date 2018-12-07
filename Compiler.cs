@@ -29,12 +29,12 @@ namespace EraSystemLevel
 
             var aTree = semantic.annotatedTree;
             printDebug("Semantic tree:\n" + aTree + "\n");
-            
+
             //var semantic = new SemanticAnalyzer(tree);
             //semantic.generateTables();
             //semantic.analyze();
             //printDebug("Semantic tree:\n" + tree + "\n");
-            
+
             var codeGen = new CodeGenerator(aTree, semantic.moduleTable, semantic.dataTable);
             codeGen.generate();
 

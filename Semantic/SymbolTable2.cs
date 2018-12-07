@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Erasystemlevel.Parser;
 
 namespace Erasystemlevel.Semantic
 {
@@ -9,8 +10,9 @@ namespace Erasystemlevel.Semantic
     public class SymbolTableEntry2
     {
         public int localId;
+        public AstNode node;
 
-        public string name;
+        public readonly string name;
         public string type;
 
         public bool isConst = false;
@@ -18,9 +20,11 @@ namespace Erasystemlevel.Semantic
 
         public bool isInitialized = false;
 
-        public SymbolTableEntry2(string name)
+        public SymbolTableEntry2(AstNode node)
         {
-            this.name = name;
+            // todo: extend to more data
+            this.node = node;
+            name = node.getChilds()[0].getValue().ToString();
         }
 
         public override string ToString()

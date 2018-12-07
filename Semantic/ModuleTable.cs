@@ -13,19 +13,23 @@ namespace Erasystemlevel.Semantic
 
     public class Module
     {
+        public AstNode node;
         public readonly string name;
 
         private int staticBase;
-        
-        private CallTable2 routines;
-        private SymbolTable2 symbols;
+
+        public CallTable2 routines = new CallTable2();
+        public SymbolTable2 symbols = new SymbolTable2();
+
+        public Module(AstNode node)
+        {
+            this.node = node;
+            name = node.getValue().ToString();
+        }
 
         public Module(string name)
         {
             this.name = name;
-            
-            routines = new CallTable2();
-            symbols = new SymbolTable2();
         }
 
         public void addVariable(AstNode node)

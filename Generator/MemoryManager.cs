@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Erasystemlevel.Parser;
+using Erasystemlevel.Semantic;
 
 namespace Erasystemlevel.Generator
 {
@@ -15,7 +16,7 @@ namespace Erasystemlevel.Generator
             registers = new RegistersManager(assembly);
         }
 
-        public void addModuleVariable(string module, AstNode node)
+        public void addModuleVariable(Module module, SymbolTableEntry2 node)
         {
             // todo
         }
@@ -34,7 +35,6 @@ namespace Erasystemlevel.Generator
         {
             // todo
         }
-
     }
 
     class RegistersManager
@@ -43,10 +43,9 @@ namespace Erasystemlevel.Generator
         private const string SB_REG = "R30"; // Static base
         private const string SP_REG = "R29"; // Stack pointer
         private const string FP_REG = "R28"; // Frame pointer
-        
+
         internal RegistersManager(AssemblyBuffer assembly)
         {
-            
         }
     }
 }

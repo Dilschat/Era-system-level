@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Erasystemlevel.Parser;
 using Erasystemlevel.Semantic;
+using EraSystemLevel.Semantic;
 
 namespace Erasystemlevel.Generator
 {
@@ -8,13 +9,13 @@ namespace Erasystemlevel.Generator
     {
         public AssemblyBuffer assembly;
 
-        private AstNode root;
+        private AastNode root;
         private MemoryManager memoryManager;
 
         private ModuleTable moduleTable;
         private DataTable dataTable;
 
-        public CodeGenerator(AstNode tree, ModuleTable modules, DataTable data)
+        public CodeGenerator(AastNode tree, ModuleTable modules, DataTable data)
         {
             root = tree;
             moduleTable = modules;
@@ -39,7 +40,25 @@ namespace Erasystemlevel.Generator
 
         private void allocateStatic()
         {
-            // todo
+            foreach (var de in dataTable)
+            {
+                memoryManager.addData(de.Value.node);
+            }
+
+            foreach (var me in moduleTable)
+            {
+                var module = me.Value;
+               
+                foreach (var se in module.symbols)
+                {
+                    var symbol = se.Value;
+                    
+                    memoryManager.addModuleVariable(module, symbol);
+                }
+            }
+            
+            memoryManager.generateDataAllocation();
+            memoryManager.generateStaticAllocation();
         }
 
         private void generateStaticInitializer()

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Erasystemlevel.Parser;
 
 namespace Erasystemlevel.Semantic
 {
@@ -9,6 +10,8 @@ namespace Erasystemlevel.Semantic
 
     public class CallTableEntry2
     {
+        public AstNode node;
+        
         public bool hasBody = true;
         public string name;
 
@@ -17,9 +20,10 @@ namespace Erasystemlevel.Semantic
 
         public SymbolTable2 symbols;
 
-        public CallTableEntry2(string name)
+        public CallTableEntry2(AstNode node)
         {
-            this.name = name;
+            this.node = node;
+            name = node.getValue().ToString();
 
             parameters = new ArrayList();
             results = new ArrayList();
