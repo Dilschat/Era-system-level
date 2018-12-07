@@ -31,6 +31,14 @@ namespace Erasystemlevel.Semantic
         public void generateTables()
         {
             AnalyzeTree(tree);
+            if (!units.ContainsKey(unitName))
+            {
+                units.Add(unitName, this);
+            }
+            else
+            {
+                throw new SemanticError("Unit name is not unique: "+unitName);
+            }
         }
         private void AnalyzeTree(AstNode tree)
         {

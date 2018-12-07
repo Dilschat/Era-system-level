@@ -1364,11 +1364,10 @@ namespace Erasystemlevel.Parser
             }
         }
 
-        public static AstNode
-            parseCall(TokenReader reader)
+        public static AstNode parseCall(TokenReader reader)
         {
             var call = new AstNode("Call");
-            var primary = parsePrimary(reader);
+            var primary = parseIdentifier(reader);
             var nextToken = reader.readNextToken();
             if (nextToken.GetValue().Equals("."))
             {

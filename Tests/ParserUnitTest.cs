@@ -592,7 +592,7 @@ namespace Erasystemlevel.Tests
             var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("code.txt"));
             var reader = new TokenReader(tokenizer);
             var node = Parser.Parser.ParseUnit(reader);
-            Assert.AreEqual(node.getValue(), AstNode.NodeType.Code);
+            Assert.AreEqual(node.getValue(), AstNode.NodeType.Unit);
             var curChilds = node.getChilds();
             var expectedChilds = new ArrayList
             {
