@@ -20,16 +20,17 @@ namespace EraSystemLevel
             var tokenizer = new Tokenizer(filepath);
             var tokenReader = new TokenReader(tokenizer);
 
+            Parser._debug = false;
             var tree = Parser.ParseUnit(tokenReader);
-            printDebug("Parse tree:", tree.ToString());
+            printDebug("Parse tree:\n" + tree + "\n");
 
             var semantic = new SemanticAnalyzer(tree);
             var codeGen = new CodeGenerator(tree, semantic.symbolTable, semantic.callTable);
 
-            var assembly = codeGen.assembly;
-            printDebug("Generated assembly:\n", assembly);
+            var asmCode = codeGen.assembly.ToString();
+            printDebug("Generated assembly:\n" + asmCode + "\n");
 
-            return assembly.ToString();
+            return asmCode;
         }
 
         private void printDebug(string line, object obj)

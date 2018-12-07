@@ -1,0 +1,7 @@
+if a>2 do 
+    
+end else do
+    while a>2 loop
+        a:=1;
+    end
+end

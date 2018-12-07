@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Erasystemlevel.Tokenizer;
+
 namespace Erasystemlevel.Parser
 {
     public class TokenReader
@@ -7,12 +8,13 @@ namespace Erasystemlevel.Parser
         private Tokenizer.Tokenizer tokenizer;
         private Stack<Token> lookaheadBuffer = new Stack<Token>();
         private Stack<Token> savingBuffer = new Stack<Token>();
+
         public TokenReader(Tokenizer.Tokenizer tokenizer)
         {
             this.tokenizer = tokenizer;
         }
 
-       public void saveReadTokens()
+        public void saveReadTokens()
         {
             while (lookaheadBuffer.Count > 0)
             {
@@ -27,6 +29,7 @@ namespace Erasystemlevel.Parser
                 lookaheadBuffer.Push(savingBuffer.Peek());
                 return savingBuffer.Pop();
             }
+
             var nextToken = tokenizer.Tokenize();
             lookaheadBuffer.Push(nextToken);
             return nextToken;

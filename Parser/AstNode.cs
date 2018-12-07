@@ -12,6 +12,7 @@ namespace Erasystemlevel.Parser
 
         public enum NodeType
         {
+            None,
             Unit,
             Code,
             Data,
@@ -63,7 +64,6 @@ namespace Erasystemlevel.Parser
             From,
             To,
             Step
-            
         }
 
         public void SetNodeType(NodeType type)
@@ -135,19 +135,31 @@ namespace Erasystemlevel.Parser
             return hashCode;
         }
 
-        override
-            public string ToString()
+        public override string ToString()
         {
-            var childsJsons = "";
+
+            var currentName = type.ToString();
+            if (value.ToString().Length > 0 && !currentName.Equals(value.ToString()))
+            {
+                currentName += "(" + value + ")";
+            }
+            
+            var childrenJson = "";
             foreach (var i in childs)
             {
-                var childsList = i.ToString().Split('\n');
-                var formattedChilds = childsList.Aggregate("", (current, j) => current + "  " + j + "\n");
+                var childrenList = i.ToString().Split('\n');
+                var formattedChildren = childrenList.Aggregate("", (current, j) => current + "  " + j + "\n");
 
-                childsJsons = childsJsons + formattedChilds;
+                childrenJson = childrenJson + formattedChildren;
             }
 
-            return value + ":{\n" + childsJsons + "\n}";
+            var currentJson = currentName;
+            if (childrenJson.Length > 0)
+            {
+                currentJson += ": {\n" + childrenJson + "}";
+            }
+
+            return currentJson;
         }
     }
 }
