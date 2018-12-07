@@ -1,7 +1,5 @@
-﻿module myModule
-short id := 2, id1 := 3;
+﻿code
+    const a = 5;
+    const b = 3;
+    cst d = 5;
 end
-module myModule
-short id := 2, id1 := 3;
-end
-

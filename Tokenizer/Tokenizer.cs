@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,6 +13,8 @@ namespace Erasystemlevel.Tokenizer
         readonly Regex numericRegex = new Regex("^(\\+|-)?\\d+$");
         readonly Regex identifierRegex = new Regex("\\b([A-Za-z][A-Za-z0-9_]*)\\b");
         private readonly Regex register = new Regex("\\bR([0-9]|[12][0-9]|3[01])\\b");
+        private int lineNumber = 1;
+        private int symbolNumber = 1;
 
         readonly HashSet<string> delimeters = new HashSet<string>(new List<string>
         {
@@ -55,12 +58,24 @@ namespace Erasystemlevel.Tokenizer
             while (!reader.EndOfStream)
             {
                 var next = Convert.ToChar(reader.Read());
+                if (next.ToString().Equals("\n"))
+                {
+                    symbolNumber = 0;
+                    lineNumber += 1;
+                    
+                }
+                if (!next.ToString().Equals("")&&!next.ToString().Equals("\n"))
+                {
+                    symbolNumber += 1;
+                }
+                
                 if (whitespace.Contains(next.ToString()))
                 {
                     continue;
                 }
 
                 currentToken += next;
+  
 
                 if (currentToken.Equals("//"))
                 {
@@ -149,6 +164,21 @@ namespace Erasystemlevel.Tokenizer
 
             reader.Close();
             return null;
+        }
+
+
+        public int GetLineNumber()
+        {
+            return lineNumber;
+        }
+        public int GetSymbolNumber()
+        {
+            return symbolNumber;
+        }
+
+        public (int, int) GetCurPosition()
+        {
+            return (lineNumber, symbolNumber);
         }
     }
     
