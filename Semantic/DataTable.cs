@@ -26,11 +26,12 @@ namespace Erasystemlevel.Semantic
 
     public class DataTableEntry
     {
-        public string name;
+        public AstNode node;
+        public readonly string name;
 
         public DataTableEntry(AstNode node)
         {
-            name = (string) ((AstNode) node.getValue()).getValue();
+            name = node.getValue().ToString();
         }
     }
 }
