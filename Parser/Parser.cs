@@ -354,6 +354,7 @@ namespace Erasystemlevel.Parser
                 node.SetNodeType(AstNode.NodeType.Identifier);
                 return node;
             }
+
             reader.saveReadTokens();
             throw new SyntaxError("Can't parse identifier");
         }
@@ -624,6 +625,9 @@ namespace Erasystemlevel.Parser
                     node.addChild(parseExpression(reader));
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
+
+
                     return node;
                 }
                 catch (SyntaxError)
@@ -631,6 +635,7 @@ namespace Erasystemlevel.Parser
                     reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
                     return node;
                 }
             }
@@ -643,6 +648,7 @@ namespace Erasystemlevel.Parser
                     node.addChild(parseExpression(reader));
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
                     return node;
                 }
                 catch (SyntaxError)
@@ -650,6 +656,7 @@ namespace Erasystemlevel.Parser
                     reader.saveReadTokens();
                     reader.clear();
                     node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+                    checkDelim(reader);
                     return node;
                 }
             }
@@ -694,7 +701,17 @@ namespace Erasystemlevel.Parser
 
             reader.clear();
             node.SetNodeType(AstNode.NodeType.AssemblerStatement);
+            checkDelim(reader);
             return node;
+        }
+
+        public static void checkDelim(TokenReader reader)
+        {
+            var nextToken = reader.readNextToken();
+            if (!nextToken.GetValue().Equals(";"))
+            {
+                throw new SyntaxError("cant parse assembler statement");
+            }
         }
 
         private static AstNode parseOperationOnRegisters(IEnumerable<string> operators, TokenReader reader)
@@ -1002,6 +1019,7 @@ namespace Erasystemlevel.Parser
             }
 
             dereference.setValue(nextToken);
+            dereference.SetNodeType(AstNode.NodeType.Deference);
             try
             {
                 reader.clear();
@@ -1156,7 +1174,7 @@ namespace Erasystemlevel.Parser
             var nextToken = reader.readNextToken();
             const Token.TokenType operatorType = Token.TokenType.Operator;
             if (!nextToken.GetTokenType().Equals(operatorType)) throw new SyntaxError("Can't parse operator");
-            reader.clear();
+            //reader.clear();
             return new AstNode(nextToken);
         }
 
@@ -1167,7 +1185,9 @@ namespace Erasystemlevel.Parser
             if (nextToken.GetTokenType().Equals(Token.TokenType.Register))
             {
                 reader.clear();
-                return new AstNode(nextToken);
+                var node = new AstNode(nextToken);
+                node.SetNodeType(AstNode.NodeType.Register);
+                return node;
             }
 
             reader.saveReadTokens();

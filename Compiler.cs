@@ -25,7 +25,7 @@ namespace EraSystemLevel
             printDebug("Parse tree:\n" + tree + "\n");
 
             var semantic = new SemanticAnalyzer(tree);
-            printDebug("Semantic tree:\n" + tree + "\n");
+            //printDebug("Semantic tree:\n" + tree + "\n");
             
             var codeGen = new CodeGenerator(tree, semantic.symbolTable, semantic.callTable);
 
