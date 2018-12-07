@@ -19,21 +19,27 @@ namespace Erasystemlevel
             }
             catch (SyntaxError e)
             {
-                Console.WriteLine("Syntax error:", e);
+                printError("Syntax error: ", e);
                 return;
             }
             catch (SemanticError e)
             {
-                Console.WriteLine("Semantic error:", e);
+                printError("Semantic error: ", e);
                 return;
             }
             catch (GenerationError e)
             {
-                Console.WriteLine("Generation error:", e);
+                printError("Generation error: ", e);
                 return;
             }
 
             Console.WriteLine(eraAsm);
+        }
+
+        public static void printError(string description, SystemException error)
+        {
+            Console.Write(description);
+            Console.WriteLine(error);
         }
     }
 }

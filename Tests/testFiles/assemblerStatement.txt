@@ -1,5 +1,5 @@
-skip 1;
-stop;
-R0 := *R1;
-R0 := R1;
+skip 1;;
+stop;;
+R0 := *R1;;
+R0 := R1;;
 

@@ -746,6 +746,44 @@ namespace Erasystemlevel.Tests
             expectedChilds.Add(expression);
             var ifBody = new AstNode(AstNode.NodeType.IfBody);
             ifBody.SetNodeType(AstNode.NodeType.IfBody);
+
+            var statement = new AstNode(AstNode.NodeType.Statement);
+            statement.SetNodeType(AstNode.NodeType.Statement);
+            var assigment = new AstNode(new Token(Token.TokenType.Operator, ":="));
+            var id = new AstNode(new Token(Token.TokenType.Identifier, "a"));
+            id.SetNodeType(AstNode.NodeType.Identifier);
+            var lit = new AstNode(new Token(Token.TokenType.Number, "2"));
+            id.SetNodeType(AstNode.NodeType.Literal);
+            assigment.addChild(id);
+            assigment.addChild(lit);
+            assigment.SetNodeType(AstNode.NodeType.Assignment);
+            statement.addChild(assigment);
+            ifBody.addChild(statement);
+            var ifBody2 = new AstNode(AstNode.NodeType.IfBody);
+            ifBody2.SetNodeType(AstNode.NodeType.IfBody);
+            expectedChilds.Add(ifBody);
+            expectedChilds.Add(ifBody2);
+            Assert.AreEqual(curChilds, expectedChilds);
+        }
+
+        [Test]
+        public void parseComplexIfTest()
+        {
+            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("if.txt"));
+            var reader = new TokenReader(tokenizer);
+
+            Assert.DoesNotThrow(delegate { Parser.Parser.parseIf(reader); });
+
+            /*Console.WriteLine(node.ToString());
+            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "if"));
+            var curChilds = node.getChilds();
+            var expectedChilds = new ArrayList();
+            var expression = new AstNode(new Token(Token.TokenType.Operator, ">"));
+            expression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
+            expression.addChild(new AstNode(new Token(Token.TokenType.Number, "2")));
+            expectedChilds.Add(expression);
+            var ifBody = new AstNode(AstNode.NodeType.IfBody);
+            ifBody.SetNodeType(AstNode.NodeType.IfBody);
             
             AstNode statement = new AstNode(AstNode.NodeType.Statement);
             statement.SetNodeType(AstNode.NodeType.Statement);
@@ -763,45 +801,7 @@ namespace Erasystemlevel.Tests
             ifBody2.SetNodeType(AstNode.NodeType.IfBody);
             expectedChilds.Add(ifBody);
             expectedChilds.Add(ifBody2);
-            Assert.AreEqual(curChilds, expectedChilds);
-        }
-        
-        [Test]
-        public void parseComplexIfTest()
-        {
-            var tokenizer = new Tokenizer.Tokenizer(getTestFilePath("if.txt"));
-            var reader = new TokenReader(tokenizer);
-            var node = Parser.Parser.parseIf(reader);
-            
-          
-//            Console.WriteLine(node.ToString());
-//            Assert.AreEqual((Token) node.getValue(), new Token(Token.TokenType.Keyword, "if"));
-//            var curChilds = node.getChilds();
-//            var expectedChilds = new ArrayList();
-//            var expression = new AstNode(new Token(Token.TokenType.Operator, ">"));
-//            expression.addChild(new AstNode(new Token(Token.TokenType.Identifier, "a")));
-//            expression.addChild(new AstNode(new Token(Token.TokenType.Number, "2")));
-//            expectedChilds.Add(expression);
-//            var ifBody = new AstNode(AstNode.NodeType.IfBody);
-//            ifBody.SetNodeType(AstNode.NodeType.IfBody);
-//            
-//            AstNode statement = new AstNode(AstNode.NodeType.Statement);
-//            statement.SetNodeType(AstNode.NodeType.Statement);
-//            AstNode assigment = new AstNode(new Token(Token.TokenType.Operator,":="));
-//            AstNode id = new AstNode(new Token(Token.TokenType.Identifier,"a"));
-//            id.SetNodeType(AstNode.NodeType.Identifier);
-//            AstNode lit = new AstNode(new Token(Token.TokenType.Number,"2"));
-//            id.SetNodeType(AstNode.NodeType.Literal);
-//            assigment.addChild(id);
-//            assigment.addChild(lit);
-//            assigment.SetNodeType(AstNode.NodeType.Assignment);
-//            statement.addChild(assigment);
-//            ifBody.addChild(statement);
-//            AstNode ifBody2 = new AstNode(AstNode.NodeType.IfBody);
-//            ifBody2.SetNodeType(AstNode.NodeType.IfBody);
-//            expectedChilds.Add(ifBody);
-//            expectedChilds.Add(ifBody2);
-//            Assert.AreEqual(curChilds, expectedChilds);
+            Assert.AreEqual(curChilds, expectedChilds);*/
         }
 
         [Test]
