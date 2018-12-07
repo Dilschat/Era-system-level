@@ -58,7 +58,7 @@ namespace Erasystemlevel.Semantic
         private void handleData(AstNode node)
         {
             // check module name in reservedNames
-            var dataName = ((Token) node.getValue()).GetValue();
+            var dataName = node.getValue().ToString();
             if (reservedNames.Contains(dataName))
             {
                 throw new SemanticError("Data name is not unique: " + dataName);
@@ -74,7 +74,7 @@ namespace Erasystemlevel.Semantic
         private void handleModule(AstNode node)
         {
             // check module name in reservedNames
-            var moduleName = ((Token) node.getValue()).GetValue();
+            var moduleName = Module.getName(node);
             if (reservedNames.Contains(moduleName))
             {
                 throw new SemanticError("Module name is not unique: " + moduleName);

@@ -26,10 +26,19 @@ namespace Erasystemlevel.Generator
         public void generate()
         {
             allocateStatic();
+            
+            //assembly.putLine();
+            assembly.putComment("Init static data");
             generateStaticInitializer();
+            
+            assembly.putComment("Code block");
             generateCodeRoutine();
+            
+            assembly.putLine();
             generateModulesRoutines();
 
+            assembly.putLine();
+            assembly.putComment("End of program");
             assembly.put(AsmBuilder.label(":end"));
         }
 
@@ -41,6 +50,7 @@ namespace Erasystemlevel.Generator
 
         private void allocateStatic()
         {
+            assembly.putComment("Data section");
             foreach (var de in dataTable)
             {
                 memoryManager.appendData(de.Value);
@@ -68,9 +78,10 @@ namespace Erasystemlevel.Generator
             foreach (var ctx in _tree.getChilds())
             {
                 if (ctx.GetNodeType() != AstNode.NodeType.Module) continue;
-                var module = moduleTable[ctx.getValue().ToString()];
+                var module = moduleTable[Module.getName(ctx)];
                 memoryManager.setCurrentModule(module);
 
+                assembly.putComment("Eval static data for `" + module.name + "`");
                 foreach (var astNode in ctx.getChilds())
                 {
                     if (astNode.GetNodeType() != AstNode.NodeType.Variable) continue;
@@ -100,6 +111,8 @@ namespace Erasystemlevel.Generator
             foreach (var modulePair in moduleTable)
             {
                 var module = modulePair.Value;
+                
+                assembly.putComment("Routines for `" + module.name + "`");
                 foreach (var routinePair in module.routines)
                 {
                     var routine = routinePair.Value;
@@ -116,6 +129,7 @@ namespace Erasystemlevel.Generator
         private void _generateRoutine(Module module, CallTableEntry routine)
         {
             // todo: генерация кода одной функции
+            assembly.put(AsmBuilder.condJump(RegistersManager.JL_REG, RegistersManager.RL_REG));
         }
 
         private void _generateVarExpr(AstNode node)
