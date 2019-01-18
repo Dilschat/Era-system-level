@@ -22,11 +22,12 @@ namespace Erasystemlevel.Parser
                 {
                     break;
                 }
+
                 try
                 {
                     var node = parseCode(reader);
                     reader.clear();
-                    unit.addChild(node);      
+                    unit.addChild(node);
                     continue;
                 }
                 catch (SyntaxError e)
@@ -70,15 +71,17 @@ namespace Erasystemlevel.Parser
                     if (_debug) Console.WriteLine(e.Message);
                 }
 
-                (int,int )line = reader.getCurrentPosition();
-                
-                throw new SyntaxError("Syntax error! line: "+ line.Item1.ToString() + " symbol: "+ line.Item2.ToString());
+                var lastToken = reader.getLastToken();
+                var buffSize = lastToken?.GetValue().Length ?? 0;
+
+                var (line, symbol) = reader.getCurrentPosition();
+
+                throw new SyntaxError(SyntaxError.DefaultMessage, line, symbol, buffSize);
             }
 
             return unit;
-
         }
-        
+
         public static AstNode parseCode(TokenReader reader)
         {
             var nextToken = reader.readNextToken();
@@ -1032,7 +1035,6 @@ namespace Erasystemlevel.Parser
             AstNode node = parseIdentifier(reader);
             node.SetNodeType(AstNode.NodeType.VariableReference);
             return node;
-           
         }
 
         public static AstNode parseDereference(TokenReader reader)
@@ -1706,7 +1708,5 @@ namespace Erasystemlevel.Parser
             assignment.SetNodeType(AstNode.NodeType.Assignment);
             return assignment;
         }
-        
-       
     }
 }

@@ -9,6 +9,10 @@ namespace Erasystemlevel
     {
         private readonly bool _debug;
 
+        public Tokenizer.Tokenizer tokenizer;
+        public TokenReader tokenReader;
+        public AstNode astTree;
+
         public Compiler(bool debug)
         {
             _debug = debug;
@@ -16,14 +20,14 @@ namespace Erasystemlevel
 
         public string compile(string filepath)
         {
-            var tokenizer = new Tokenizer.Tokenizer(filepath);
-            var tokenReader = new TokenReader(tokenizer);
+            tokenizer = new Tokenizer.Tokenizer(filepath);
+            tokenReader = new TokenReader(tokenizer);
 
             Parser.Parser._debug = false;
-            var tree = Parser.Parser.ParseUnit(tokenReader);
-            printDebug("Parse tree:\n" + tree + "\n");
+            astTree = Parser.Parser.ParseUnit(tokenReader);
+            printDebug("Parse tree:\n" + astTree + "\n");
 
-            var semantic = new SemanticAnalyzer(tree);
+            var semantic = new SemanticAnalyzer(astTree);
             semantic.analyze();
 
             var aTree = semantic.annotatedTree;

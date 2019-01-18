@@ -41,14 +41,14 @@ namespace Erasystemlevel.Tokenizer
             "", "\n", "\r", " "
         });
 
-        private readonly StreamReader reader;
+        public readonly FileStream fileStream;
+        public readonly StreamReader reader;
 
 
         public Tokenizer(string filePath)
         {
-            var fs = new FileStream(filePath, FileMode.Open,
-                FileAccess.Read);
-            reader = new StreamReader(fs, Encoding.UTF8);
+            fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            reader = new StreamReader(fileStream, Encoding.UTF8);
         }
 
         public Token Tokenize()
@@ -62,20 +62,20 @@ namespace Erasystemlevel.Tokenizer
                 {
                     symbolNumber = 0;
                     lineNumber += 1;
-                    
                 }
-                if (!next.ToString().Equals("")&&!next.ToString().Equals("\n"))
+
+                if (!next.ToString().Equals("") && !next.ToString().Equals("\n"))
                 {
                     symbolNumber += 1;
                 }
-                
+
                 if (whitespace.Contains(next.ToString()))
                 {
                     continue;
                 }
 
                 currentToken += next;
-  
+
 
                 if (currentToken.Equals("//"))
                 {
@@ -171,6 +171,7 @@ namespace Erasystemlevel.Tokenizer
         {
             return lineNumber;
         }
+
         public int GetSymbolNumber()
         {
             return symbolNumber;
@@ -181,7 +182,4 @@ namespace Erasystemlevel.Tokenizer
             return (lineNumber, symbolNumber);
         }
     }
-    
-
-    
 }

@@ -1,4 +1,4 @@
-﻿entry rout   ine func ()
+﻿entry routd e func ()
 do
     for i from 1 to 2 step 1
         loop

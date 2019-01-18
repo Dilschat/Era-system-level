@@ -8,8 +8,10 @@ namespace Erasystemlevel.Parser
         private Tokenizer.Tokenizer tokenizer;
         private Stack<Token> lookaheadBuffer = new Stack<Token>();
         private Stack<Token> savingBuffer = new Stack<Token>();
-        private Stack<(int,int)> lookaheadNumberBuffer = new Stack<(int,int)>();
-        private Stack<(int,int)> savingNumberBuffer = new Stack<(int,int)>();
+        private Stack<(int, int)> lookaheadNumberBuffer = new Stack<(int, int)>();
+        private Stack<(int, int)> savingNumberBuffer = new Stack<(int, int)>();
+
+        private Token lastToken;
 
         public TokenReader(Tokenizer.Tokenizer tokenizer)
         {
@@ -31,14 +33,15 @@ namespace Erasystemlevel.Parser
             {
                 lookaheadBuffer.Push(savingBuffer.Peek());
                 lookaheadNumberBuffer.Push(savingNumberBuffer.Pop());
-            
+
                 return savingBuffer.Pop();
             }
 
-            var nextToken = tokenizer.Tokenize();
-            lookaheadBuffer.Push(nextToken);
+            lastToken = tokenizer.Tokenize();
+            lookaheadBuffer.Push(lastToken);
             lookaheadNumberBuffer.Push(tokenizer.GetCurPosition());
-            return nextToken;
+
+            return lastToken;
         }
 
         public void clear()
@@ -48,7 +51,6 @@ namespace Erasystemlevel.Parser
         }
 
         public bool isEmpty()
-
         {
             Token token;
             try
@@ -69,12 +71,27 @@ namespace Erasystemlevel.Parser
             return false;
         }
 
+        private int getCurrentBufferLength()
+        {
+            var tmp = 0;
+            foreach (var (start, end) in lookaheadNumberBuffer)
+            {
+                tmp += end - start;
+            }
+
+            return tmp;
+        }
+
+        public Token getLastToken()
+        {
+            return lastToken;
+        }
+
         public (int, int) getCurrentPosition()
         {
             saveReadTokens();
+
             return savingNumberBuffer.Pop();
         }
-
     }
-    
 }

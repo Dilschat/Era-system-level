@@ -1,26 +1,29 @@
 ﻿using System;
 using Erasystemlevel.Exception;
 using Erasystemlevel;
+using Erasystemlevel.Utils;
 
 namespace Erasystemlevel
 {
     internal static class Run
     {
-        private const string CodeFile = "code.txt";
-        private const bool _debug = true;
+        private const string CODE_FILE = "code.txt";
+        private const bool DEBUG = true;
 
         private static void Main()
         {
-            var compiler = new Compiler(_debug);
+            var compiler = new Compiler(DEBUG);
 
             string eraAsm;
             try
             {
-                eraAsm = compiler.compile(CodeFile);
+                eraAsm = compiler.compile(CODE_FILE);
             }
             catch (SyntaxError e)
             {
-                printError("Syntax error: ", e);
+                e.setProgramText(SourceCodeUtils.getProgramText(CODE_FILE));
+
+                printError(e);
                 return;
             }
             catch (SemanticError e)
@@ -34,16 +37,21 @@ namespace Erasystemlevel
                 return;
             }
 
-            if (!_debug)
+            if (!DEBUG)
             {
                 Console.WriteLine(eraAsm);
             }
         }
 
-        public static void printError(string description, SystemException error)
+        private static void printError(string description, SystemException error)
         {
             Console.Write(description);
             Console.WriteLine(error);
+        }
+
+        private static void printError(SyntaxError error)
+        {
+            Console.WriteLine(error.verbose());
         }
     }
 }
