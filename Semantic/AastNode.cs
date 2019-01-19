@@ -8,7 +8,7 @@ namespace Erasystemlevel.Semantic
     public class AastNode : AstNode
     {
         public DataTableEntry dataTableEntry;
-        public CallTableEntry callTableEntry;
+        public RoutineTableEntry routineTableEntry;
         public SymbolTableEntry symbolTableEntry;
 
         public AastNode(AstNode node) : base(node.getValue())

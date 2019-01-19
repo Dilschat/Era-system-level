@@ -56,8 +56,8 @@ namespace Erasystemlevel.Generator
 
         public static string statementToString(AstNode item)
         {
-            var childs = item.getChilds();
-            if (childs.Count != 2 && item.GetNodeType() == AstNode.NodeType.OperationOnRegisters)
+            var children = item.getChilds();
+            if (children.Count != 2 && item.GetNodeType() == AstNode.NodeType.OperationOnRegisters)
             {
                 throw new GenerationError("Invalid node supplied for operation on registers");
             }
@@ -69,7 +69,7 @@ namespace Erasystemlevel.Generator
 
             if (item.GetNodeType() == AstNode.NodeType.AsmComment)
             {
-                return "// " + item.getValue().ToString();
+                return "// " + item.getValue();
             }
 
             if (item.GetNodeType() == AstNode.NodeType.Label)
@@ -98,8 +98,8 @@ namespace Erasystemlevel.Generator
         private static string generateData(AstNode item)
         {
             var val = new List<string>();
-            var childs = new List<AstNode>(item.getChilds());
-            foreach (var t in childs)
+            var children = new List<AstNode>(item.getChilds());
+            foreach (var t in children)
             {
                 val.Add(((Token) t.getValue()).GetValue());
             }
@@ -119,15 +119,15 @@ namespace Erasystemlevel.Generator
         private static string generateStatement(AstNode item)
         {
             var val = item.getValue().ToString();
-            var childs = item.getChilds();
+            var children = item.getChilds();
 
             var asmCode = "";
             if (val.Equals("skip") || val.Equals("stop"))
             {
                 asmCode = val;
-                if (childs.Count == 1)
+                if (children.Count == 1)
                 {
-                    asmCode += " " + childs[0].getValue();
+                    asmCode += " " + children[0].getValue();
                 }
             }
             else if (val.Equals("if"))
@@ -146,10 +146,10 @@ namespace Erasystemlevel.Generator
         private static string generateRegisterOperation(AstNode item)
         {
             var val = item.getValue().ToString();
-            var childs = item.getChilds();
+            var children = item.getChilds();
 
-            var left = childs[0];
-            var right = childs[1];
+            var left = children[0];
+            var right = children[1];
 
             var leftRegister = left.getValue().ToString();
             var rightRegister = right.getValue().ToString();

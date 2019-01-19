@@ -1,8 +1,16 @@
-﻿entry routd e func ()
+﻿entry routine func ()
 do
     for i from 1 to 2 step 1
         loop
         end
+end
+
+module Foo
+    //data ASD 23, 43 end
+    routine func():> R1,R2
+    do
+        const id = 2, id1 = 3;
+    end
 end
 
 code

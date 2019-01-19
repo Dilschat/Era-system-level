@@ -118,7 +118,7 @@ namespace Erasystemlevel.Generator
                     var routine = routinePair.Value;
 
                     // we skip `Code` routine
-                    if (module.name != SemanticAnalyzer.basicModuleName || routine.name != "Code")
+                    if (module.name != SemanticAnalyzer.BasicModuleName || routine.name != "Code")
                     {
                         _generateRoutine(module, routine);
                     }
@@ -126,7 +126,7 @@ namespace Erasystemlevel.Generator
             }
         }
 
-        private void _generateRoutine(Module module, CallTableEntry routine)
+        private void _generateRoutine(Module module, RoutineTableEntry routine)
         {
             // todo: генерация кода одной функции
             assembly.put(AsmBuilder.condJump(RegistersManager.JL_REG, RegistersManager.RL_REG));
@@ -144,7 +144,7 @@ namespace Erasystemlevel.Generator
 
         private Module _getMainModule()
         {
-            return moduleTable[SemanticAnalyzer.basicModuleName];
+            return moduleTable[SemanticAnalyzer.BasicModuleName];
         }
     }
 }

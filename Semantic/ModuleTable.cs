@@ -20,7 +20,7 @@ namespace Erasystemlevel.Semantic
 
         public int staticBase;
 
-        public CallTable routines = new CallTable();
+        public RoutineTable routines = new RoutineTable();
         public SymbolTable symbols = new SymbolTable();
 
         private int maxVarId = 0;
@@ -73,7 +73,7 @@ namespace Erasystemlevel.Semantic
         public void addRoutine(AstNode node)
         {
             List<AstNode> childs = node.getChilds();
-            CallTableEntry entry = new CallTableEntry(node);
+            RoutineTableEntry entry = new RoutineTableEntry(node);
             foreach (var i in childs)
             {
                 if (i.GetNodeType().Equals(AstNode.NodeType.Identifier))
@@ -126,12 +126,13 @@ namespace Erasystemlevel.Semantic
                 }
                 else if (j.GetNodeType().Equals(AstNode.NodeType.Variable))
                 {
-                    List<AstNode> childs = j.getChilds();
-                    string type = ((Token) childs[0].getValue()).GetValue();
-                    for (int i = 1; i < childs.Count; i++)
+                    var childs = j.getChilds();
+                    var type = ((Token) childs[0].getValue()).GetValue();
+                    
+                    for (var i = 1; i < childs.Count; i++)
                     {
-                        AstNode id = childs[i].getChilds()[0];
-                        SymbolTableEntry entry = new SymbolTableEntry(id);
+                        var id = childs[i].getChilds()[0];
+                        var entry = new SymbolTableEntry(id);
                         entry.type = type;
                         if (childs.Count > 1 && childs[1].GetNodeType().Equals(AstNode.NodeType.Expression))
                         {
@@ -158,7 +159,7 @@ namespace Erasystemlevel.Semantic
             return new SymbolTable();
         }
 
-        private string handleParameters(AstNode parameter, CallTableEntry entry)
+        private string handleParameters(AstNode parameter, RoutineTableEntry entry)
         {
             string type = ((Token) parameter.getValue()).GetValue();
             string name = ((Token) parameter.getChilds()[0].getValue()).GetValue();
@@ -171,7 +172,7 @@ namespace Erasystemlevel.Semantic
 
         private string handleResult(AstNode result)
         {
-            return ((Token) result.getChilds()[0].getValue()).GetValue();
+            return result.getValue().ToString();
         }
 
         private void checkSymbol(string name)

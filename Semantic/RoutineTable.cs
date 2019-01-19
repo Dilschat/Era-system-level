@@ -4,11 +4,11 @@ using Erasystemlevel.Parser;
 
 namespace Erasystemlevel.Semantic
 {
-    public class CallTable : Dictionary<string, CallTableEntry>
+    public class RoutineTable : Dictionary<string, RoutineTableEntry>
     {
     }
 
-    public class CallTableEntry
+    public class RoutineTableEntry
     {
         public AstNode node;
 
@@ -20,7 +20,7 @@ namespace Erasystemlevel.Semantic
 
         public SymbolTable symbols;
 
-        public CallTableEntry(AstNode node)
+        public RoutineTableEntry(AstNode node)
         {
             this.node = node;
             name = node.getValue().ToString();

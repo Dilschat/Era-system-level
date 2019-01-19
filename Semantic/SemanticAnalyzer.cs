@@ -7,7 +7,7 @@ namespace Erasystemlevel.Semantic
 {
     public class SemanticAnalyzer
     {
-        public const string basicModuleName = ":b";
+        public const string BasicModuleName = ":b";
 
         public readonly ModuleTable moduleTable;
         public readonly DataTable dataTable;
@@ -26,7 +26,7 @@ namespace Erasystemlevel.Semantic
             _tree = tree;
             annotatedTree = new AastNode(tree); // fixme
 
-            var basicModule = new Module(basicModuleName);
+            var basicModule = new Module(BasicModuleName);
             moduleTable.Add(basicModule);
         }
 
@@ -144,7 +144,7 @@ namespace Erasystemlevel.Semantic
             }
 
             // add to this function to basic module
-            var module = moduleTable[basicModuleName];
+            var module = moduleTable[BasicModuleName];
             module.addRoutine(node);
             moduleTable.Add(name, module);
 
@@ -154,7 +154,7 @@ namespace Erasystemlevel.Semantic
         // add function `code` to basic module, may be wrapper above handleRoutine
         private void handleCode(AstNode node)
         {
-            var basicModule = moduleTable[basicModuleName];
+            var basicModule = moduleTable[BasicModuleName];
             basicModule.addRoutine(node);
         }
 
@@ -168,7 +168,7 @@ namespace Erasystemlevel.Semantic
         // throw an exceptions if there is no `code` function in basic module
         private void validate()
         {
-            if (!moduleTable[basicModuleName].routines.ContainsKey("Code"))
+            if (!moduleTable[BasicModuleName].routines.ContainsKey("Code"))
             {
                 throw new SemanticError("No code provided");
             }
